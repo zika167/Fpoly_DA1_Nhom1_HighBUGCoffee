@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.netbeans.external:AbsoluteLayout:RELEASE250">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/netbeans/external/AbsoluteLayout/RELEASE250/AbsoluteLayout-RELEASE250.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/netbeans/external/AbsoluteLayout/RELEASE250/AbsoluteLayout-RELEASE250-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/netbeans/external/AbsoluteLayout/RELEASE250/AbsoluteLayout-RELEASE250-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
