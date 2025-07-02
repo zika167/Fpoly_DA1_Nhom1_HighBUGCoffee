@@ -94,6 +94,7 @@ public class XJdbc {
     ) {
         while (rs.next()) {
             System.out.println("Id: " + rs.getString("Id") + ", Name: " + rs.getString("Name"));
+            
         }
     } catch (Exception e) {
         e.printStackTrace();

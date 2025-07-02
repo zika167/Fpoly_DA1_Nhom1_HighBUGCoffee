@@ -49,7 +49,6 @@ public class XQuery {
      */
     public static <B> List<B> getBeanList(Class<B> beanClass, String sql, Object... values) {
     List<B> list = new ArrayList<>();
-    System.out.println("Executing getBeanList with SQL: " + sql);
     try {
         ResultSet resultSet = XJdbc.executeQuery(sql, values);
         System.out.println("ResultSet opened, starting loop...");
@@ -98,7 +97,6 @@ public class XQuery {
         ResultSetMetaData metaData = resultSet.getMetaData();
         int columnCount = metaData.getColumnCount();
 
-        System.out.println("Mapping bean: " + beanClass.getSimpleName());
         for (int i = 1; i <= columnCount; i++) {
             System.out.println("Column " + i + ": " + metaData.getColumnName(i) + " (Type: " + metaData.getColumnTypeName(i) + ")");
         }

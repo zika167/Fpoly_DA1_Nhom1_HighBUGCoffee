@@ -80,7 +80,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
     
     private void setCheckedAll(boolean checked) {
         for (int i = 0; i < tblUsers.getRowCount(); i++) {
-            tblUsers.setValueAt(checked, i, 2);
+            tblUsers.setValueAt(checked, i, 6);
         }
     }
     
