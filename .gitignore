@@ -1,0 +1,36 @@
+# 👉 macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Spotlight
+.Spotlight-V100
+.Trashes
+
+# Icon?
+Icon?
+
+# macOS folder attributes
+__MACOSX/
+
+# 👉 NetBeans private config
+nbproject/private/
+
+# 👉 Maven build output
+/target/
+
+# 👉 NetBeans build output (nếu có)
+/build/
+/dist/
+
+# 👉 Logs, backups, temp
+*.log
+*.tmp
+*.bak
+*.swp
+
+# 👉 Optional local config file
+config.properties

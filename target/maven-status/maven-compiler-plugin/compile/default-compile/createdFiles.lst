@@ -57,6 +57,7 @@ poly/cafe/ui/manager/UserManagerJDialog$10.class
 poly/cafe/ui/manager/CategoryManagerJDialog$9.class
 poly/cafe/ui/manager/CardManagerJDialog$14.class
 poly/cafe/dao/BillDetailDAO.class
+poly/cafe/entity/TestLombok.class
 poly/cafe/ui/manager/BillManagerJDialog$6.class
 poly/cafe/ui/manager/DrinkManagerJDialog$16.class
 poly/cafe/ui/manager/CardManagerJDialog$2.class
@@ -106,6 +107,7 @@ poly/cafe/ui/PolyCafeJFrame$10.class
 poly/cafe/ui/manager/DrinkManagerJDialog$9.class
 poly/cafe/entity/Revenue.class
 poly/cafe/ui/BillJDialog$2.class
+poly/cafe/entity/Bill$BillBuilder.class
 poly/cafe/ui/HistoryJDialog$6.class
 poly/cafe/entity/User$Builder.class
 poly/cafe/ui/manager/UserManagerJDialog$3.class
@@ -198,7 +200,6 @@ poly/cafe/ui/manager/CardManagerJDialog$6.class
 poly/cafe/ui/manager/UserManagerJDialog$13.class
 poly/cafe/ui/PolyCafeJFrame$9.class
 poly/cafe/entity/BillDetail.class
-poly/cafe/entity/Bill$Builder.class
 poly/cafe/dao/CardDAO.class
 poly/cafe/ui/manager/BillManagerJDialog$13.class
 poly/cafe/ui/manager/CategoryManagerJDialog$15$1.class
