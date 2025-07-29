@@ -308,6 +308,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        jPanel1.setBackground(new java.awt.Color(245, 236, 213));
+
         tblUsers.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
@@ -334,6 +336,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         });
         jScrollPane1.setViewportView(tblUsers);
 
+        btnCheckAll.setBackground(new java.awt.Color(63, 195, 107));
+        btnCheckAll.setForeground(new java.awt.Color(255, 255, 255));
         btnCheckAll.setText("Chọn tất cả");
         btnCheckAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -341,6 +345,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        btnUncheckAll.setBackground(new java.awt.Color(247, 181, 58));
+        btnUncheckAll.setForeground(new java.awt.Color(255, 255, 255));
         btnUncheckAll.setText("Bỏ chọn tất cả");
         btnUncheckAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -348,6 +354,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        btnDeleteCheckedItems.setBackground(new java.awt.Color(218, 68, 68));
+        btnDeleteCheckedItems.setForeground(new java.awt.Color(255, 255, 255));
         btnDeleteCheckedItems.setText("Xóa các mục chọn");
         btnDeleteCheckedItems.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -359,14 +367,15 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(0, 190, Short.MAX_VALUE)
-                .addComponent(btnCheckAll, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnDeleteCheckedItems, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnUncheckAll, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnDeleteCheckedItems, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(btnCheckAll, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -377,10 +386,12 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
                     .addComponent(btnCheckAll)
                     .addComponent(btnUncheckAll)
                     .addComponent(btnDeleteCheckedItems))
-                .addGap(0, 136, Short.MAX_VALUE))
+                .addGap(0, 63, Short.MAX_VALUE))
         );
 
         tabs.addTab("DANH SÁCH", jPanel1);
+
+        jPanel2.setBackground(new java.awt.Color(245, 236, 213));
 
         jLabel1.setText("Họ và tên");
 
@@ -392,6 +403,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         buttonGroup2.add(rdoInactive);
         rdoInactive.setText("Tạm dừng");
 
+        btnCreate.setBackground(new java.awt.Color(122, 92, 62));
+        btnCreate.setForeground(new java.awt.Color(255, 255, 255));
         btnCreate.setText("Tạo mới");
         btnCreate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -399,6 +412,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        btnUpdate.setBackground(new java.awt.Color(122, 92, 62));
+        btnUpdate.setForeground(new java.awt.Color(255, 255, 255));
         btnUpdate.setText("Cập nhật");
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -406,6 +421,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        btnDelete.setBackground(new java.awt.Color(122, 92, 62));
+        btnDelete.setForeground(new java.awt.Color(255, 255, 255));
         btnDelete.setText("Xóa");
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -413,6 +430,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        btnClear.setBackground(new java.awt.Color(122, 92, 62));
+        btnClear.setForeground(new java.awt.Color(255, 255, 255));
         btnClear.setText("Nhập mới");
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -420,6 +439,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        btnMoveFirst.setBackground(new java.awt.Color(122, 92, 62));
+        btnMoveFirst.setForeground(new java.awt.Color(255, 255, 255));
         btnMoveFirst.setText("|<");
         btnMoveFirst.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -427,6 +448,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        btnMovePrevious.setBackground(new java.awt.Color(122, 92, 62));
+        btnMovePrevious.setForeground(new java.awt.Color(255, 255, 255));
         btnMovePrevious.setText("<<");
         btnMovePrevious.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -434,6 +457,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        btnMoveNext.setBackground(new java.awt.Color(122, 92, 62));
+        btnMoveNext.setForeground(new java.awt.Color(255, 255, 255));
         btnMoveNext.setText(">>");
         btnMoveNext.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -441,6 +466,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             }
         });
 
+        btnMoveLast.setBackground(new java.awt.Color(122, 92, 62));
+        btnMoveLast.setForeground(new java.awt.Color(255, 255, 255));
         btnMoveLast.setText(">|");
         btnMoveLast.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -454,7 +481,6 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
 
         jLabel5.setText("Mật khẩu");
 
-        lblImg.setIcon(new javax.swing.ImageIcon("/Users/wangquockhanh/Desktop/ALL/2. WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/hinh2.jpg")); // NOI18N
         lblImg.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblImgMouseClicked(evt);
@@ -581,8 +607,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabs)
-                .addContainerGap())
+                .addComponent(tabs, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();

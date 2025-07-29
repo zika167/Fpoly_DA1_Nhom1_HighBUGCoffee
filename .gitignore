@@ -3,6 +3,11 @@
 .AppleDouble
 .LSOverride
 
+# 👉 Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
 # Thumbnails
 ._*
 
@@ -34,3 +39,10 @@ nbproject/private/
 
 # 👉 Optional local config file
 config.properties
+
+# 👉 IDE riêng biệt (nếu có dùng)
+*.iml         # Nếu import sang IntelliJ
+.idea/        # Thư mục IntelliJ/JetBrains
+
+# 👉 Git merge conflict files
+*.orig
