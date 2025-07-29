@@ -52,24 +52,18 @@ public class SalesJDialog extends javax.swing.JDialog implements SalesController
             }
         });
 
-        pnlCards.setSize(new java.awt.Dimension(500, 500));
+        pnlCards.setBackground(new java.awt.Color(245, 236, 213));
         pnlCards.setLayout(new java.awt.GridLayout(5, 6));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlCards, javax.swing.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(pnlCards, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 621, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(pnlCards, javax.swing.GroupLayout.DEFAULT_SIZE, 324, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(pnlCards, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
         );
 
         pack();
@@ -156,7 +150,7 @@ public class SalesJDialog extends javax.swing.JDialog implements SalesController
         btnCard.setText(String.format("Card #%d", card.getId()));
         btnCard.setPreferredSize(new Dimension(0, 80));
         btnCard.setEnabled(card.getStatus() == 0);
-        btnCard.setBackground(btnCard.isEnabled() ? Color.GREEN : Color.GRAY);
+        btnCard.setBackground(btnCard.isEnabled() ? Color.getHSBColor(0.1083f, 0.75f, 0.89f): Color.WHITE);
         btnCard.setActionCommand(String.valueOf(card.getId()));
         btnCard.addActionListener((ActionEvent e) -> {
             int cardId = Integer.parseInt(e.getActionCommand());
