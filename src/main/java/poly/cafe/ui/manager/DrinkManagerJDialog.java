@@ -501,12 +501,10 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
                     .addComponent(btnCheckAll)
                     .addComponent(btnUncheckAll)
                     .addComponent(btnDeleteCheckedItems))
-                .addContainerGap(51, Short.MAX_VALUE))
+                .addContainerGap(63, Short.MAX_VALUE))
         );
 
         tabs.addTab("DANH SÁCH", jPanel2);
-
-        lblImage.setIcon(new javax.swing.ImageIcon("/Users/wangquockhanh/Desktop/ALL/2. WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/hinh1.jpg")); // NOI18N
 
         jLabel2.setText("Mã đồ uống");
 
@@ -688,7 +686,7 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
                     .addComponent(btnMoveLast)
                     .addComponent(btnUpdate)
                     .addComponent(btnClear))
-                .addContainerGap(63, Short.MAX_VALUE))
+                .addContainerGap(75, Short.MAX_VALUE))
         );
 
         tabs.addTab("BIỂU MẪU", jPanel3);

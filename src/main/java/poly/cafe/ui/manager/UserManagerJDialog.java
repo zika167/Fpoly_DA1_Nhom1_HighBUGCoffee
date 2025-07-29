@@ -454,7 +454,6 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
 
         jLabel5.setText("Mật khẩu");
 
-        lblImg.setIcon(new javax.swing.ImageIcon("/Users/wangquockhanh/Desktop/ALL/2. WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/hinh2.jpg")); // NOI18N
         lblImg.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblImgMouseClicked(evt);
