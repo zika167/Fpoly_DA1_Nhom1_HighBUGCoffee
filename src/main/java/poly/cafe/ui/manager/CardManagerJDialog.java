@@ -266,6 +266,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        jPanel1.setBackground(new java.awt.Color(245, 236, 213));
+
         tblCards.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
@@ -299,6 +301,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
         });
         jScrollPane1.setViewportView(tblCards);
 
+        btnCheckAll.setBackground(new java.awt.Color(63, 195, 107));
+        btnCheckAll.setForeground(new java.awt.Color(255, 255, 255));
         btnCheckAll.setText("Chọn tất cả");
         btnCheckAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -306,6 +310,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        btnUncheckAll.setBackground(new java.awt.Color(247, 181, 58));
+        btnUncheckAll.setForeground(new java.awt.Color(255, 255, 255));
         btnUncheckAll.setText("Bỏ chọn tất cả");
         btnUncheckAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -313,6 +319,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        btnDeleteCheckedItems.setBackground(new java.awt.Color(218, 68, 68));
+        btnDeleteCheckedItems.setForeground(new java.awt.Color(255, 255, 255));
         btnDeleteCheckedItems.setText("Xóa các mục chọn");
         btnDeleteCheckedItems.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -324,14 +332,15 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 695, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(0, 233, Short.MAX_VALUE)
-                .addComponent(btnCheckAll, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(btnDeleteCheckedItems, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnUncheckAll, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnDeleteCheckedItems, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(btnCheckAll, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -347,8 +356,12 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
 
         tabs.addTab("DANH SÁCH", jPanel1);
 
+        jPanel2.setBackground(new java.awt.Color(245, 236, 213));
+
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel1.setText("Mã thẻ");
 
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel2.setText("Trạng thái");
 
         buttonGroup1.add(rdoOperate);
@@ -360,6 +373,10 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
         buttonGroup1.add(rdoLose);
         rdoLose.setText("Lose");
 
+        jSeparator1.setForeground(new java.awt.Color(102, 102, 102));
+
+        btnCreate.setBackground(new java.awt.Color(122, 92, 62));
+        btnCreate.setForeground(new java.awt.Color(255, 255, 255));
         btnCreate.setText("Tạo mới");
         btnCreate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -367,6 +384,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        btnUpdate.setBackground(new java.awt.Color(122, 92, 62));
+        btnUpdate.setForeground(new java.awt.Color(255, 255, 255));
         btnUpdate.setText("Cập nhật");
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -374,6 +393,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        btnDelete.setBackground(new java.awt.Color(122, 92, 62));
+        btnDelete.setForeground(new java.awt.Color(255, 255, 255));
         btnDelete.setText("Xóa");
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -381,6 +402,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        btnClear.setBackground(new java.awt.Color(122, 92, 62));
+        btnClear.setForeground(new java.awt.Color(255, 255, 255));
         btnClear.setText("Nhập mới");
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -388,6 +411,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        btnMoveFirst.setBackground(new java.awt.Color(122, 92, 62));
+        btnMoveFirst.setForeground(new java.awt.Color(255, 255, 255));
         btnMoveFirst.setText("|<");
         btnMoveFirst.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -395,6 +420,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        btnMovePrevious.setBackground(new java.awt.Color(122, 92, 62));
+        btnMovePrevious.setForeground(new java.awt.Color(255, 255, 255));
         btnMovePrevious.setText("<<");
         btnMovePrevious.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -402,6 +429,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        btnMoveNext.setBackground(new java.awt.Color(122, 92, 62));
+        btnMoveNext.setForeground(new java.awt.Color(255, 255, 255));
         btnMoveNext.setText(">>");
         btnMoveNext.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -409,6 +438,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             }
         });
 
+        btnMoveLast.setBackground(new java.awt.Color(122, 92, 62));
+        btnMoveLast.setForeground(new java.awt.Color(255, 255, 255));
         btnMoveLast.setText(">|");
         btnMoveLast.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
