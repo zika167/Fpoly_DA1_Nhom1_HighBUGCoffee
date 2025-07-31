@@ -1,0 +1,17 @@
+# Cấu hình Database - File mẫu
+# Copy file này thành database.properties và thay đổi thông tin theo cấu hình của bạn
+
+# Driver MySQL
+database.driver=com.mysql.cj.jdbc.Driver
+
+# URL kết nối database
+# Thay đổi localhost thành địa chỉ server của bạn nếu cần
+# Thay đổi 3306 thành port MySQL của bạn nếu khác
+# Thay đổi duan1_highbugcoffee thành tên database của bạn
+database.url=jdbc:mysql://localhost:3306/duan1_highbugcoffee
+
+# Tên đăng nhập database
+database.username=root
+
+# Mật khẩu database
+database.password=your_password_here 

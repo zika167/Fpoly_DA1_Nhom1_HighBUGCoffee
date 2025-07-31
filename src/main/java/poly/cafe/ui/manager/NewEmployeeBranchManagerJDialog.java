@@ -115,11 +115,6 @@ public class NewEmployeeBranchManagerJDialog extends javax.swing.JDialog {
         btnClear.setBackground(new java.awt.Color(122, 92, 62));
         btnClear.setForeground(new java.awt.Color(255, 255, 255));
         btnClear.setText("Thêm");
-        btnClear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClearActionPerformed(evt);
-            }
-        });
 
         btnDelete.setBackground(new java.awt.Color(122, 92, 62));
         btnDelete.setForeground(new java.awt.Color(255, 255, 255));
@@ -308,34 +303,35 @@ public class NewEmployeeBranchManagerJDialog extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+// </editor-fold>                        
+// </editor-fold>                        
 
-    private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
+    private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {                                          
         // TODO add your handling code here:
-        this.create();
-    }//GEN-LAST:event_btnCreateActionPerformed
+    }
+    // TODO add your handling code here:
+//        this.clear();
+                                            
+
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {                                         
+        // TODO add your handling code here:
+//        this.clear();
+    }                                        
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         // TODO add your handling code here:
-        this.delete();
+//        this.delete();
     }//GEN-LAST:event_btnDeleteActionPerformed
-
-    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
-        // TODO add your handling code here:
-        this.clear();
-    }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
         // TODO add your handling code here:
-        this.update();
+//        this.update();
     }//GEN-LAST:event_btnUpdateActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {                                         
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void rdoActiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdoActiveActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_rdoActiveActionPerformed
+//        this.create();
+    }                                         
 
     /**
      * @param args the command line arguments
