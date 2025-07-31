@@ -368,6 +368,7 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
 
         jRadioButton2 = new javax.swing.JRadioButton();
         buttonGroup1 = new javax.swing.ButtonGroup();
+        jPanel1 = new javax.swing.JPanel();
         tabs = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
@@ -411,6 +412,8 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
                 formWindowOpened(evt);
             }
         });
+
+        jPanel1.setBackground(new java.awt.Color(245, 236, 213));
 
         tabs.setBackground(new java.awt.Color(245, 236, 213));
 
@@ -513,7 +516,7 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
                     .addComponent(btnCheckAll)
                     .addComponent(btnUncheckAll)
                     .addComponent(btnDeleteCheckedItems))
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addContainerGap(74, Short.MAX_VALUE))
         );
 
         tabs.addTab("DANH SÁCH", jPanel2);
@@ -722,7 +725,7 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
                                 .addComponent(rdoAvailable)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(rdoOutOfStock)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -739,19 +742,26 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
 
         tabs.addTab("BIỂU MẪU", jPanel3);
 
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(tabs)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(tabs)
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tabs))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tabs))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -890,6 +900,7 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JRadioButton jRadioButton2;
