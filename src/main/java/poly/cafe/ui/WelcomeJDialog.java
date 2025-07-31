@@ -16,10 +16,11 @@ public class WelcomeJDialog extends javax.swing.JDialog implements WelcomeContro
     public WelcomeJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        progressBar.setUI(new javax.swing.plaf.basic.BasicProgressBarUI());
-
+        progressBar.setUI(new javax.swing.plaf.basic.BasicProgressBarUI()); 
+        
     }
 
+    
     @Override
     public void waiting() {
         this.setLocationRelativeTo(null);
@@ -78,7 +79,8 @@ public class WelcomeJDialog extends javax.swing.JDialog implements WelcomeContro
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Loading...");
 
-        progressBar.setForeground(new java.awt.Color(255, 94, 20));
+        progressBar.setBackground(new java.awt.Color(255, 147, 98));
+        progressBar.setForeground(new java.awt.Color(221, 45, 0));
         progressBar.setOpaque(true);
 
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
