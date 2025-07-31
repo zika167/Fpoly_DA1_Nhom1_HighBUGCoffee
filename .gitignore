@@ -40,6 +40,10 @@ nbproject/private/
 # 👉 Optional local config file
 config.properties
 
+# 👉 Database configuration files
+src/main/resources/database.properties
+database.properties
+
 # 👉 IDE riêng biệt (nếu có dùng)
 *.iml         # Nếu import sang IntelliJ
 .idea/        # Thư mục IntelliJ/JetBrains
