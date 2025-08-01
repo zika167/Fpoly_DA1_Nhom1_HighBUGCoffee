@@ -158,6 +158,22 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
     public void setBill(Bill bill) {
         this.bill = bill;
     }
+private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {
+    String selected = (String) cbbThanhToan.getSelectedItem();
+    if ("Thanh toán QR".equals(selected) && bill != null) {
+        QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
+        qrDialog.setBill(bill);
+        qrDialog.open();
+        qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                BillJDialog.this.setForm(bill); 
+            }
+        });
+    } else if ("Thanh toán tiền mặt".equals(selected)) {
+        this.checkout();
+    }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -187,7 +203,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         txtStatus = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        cbbThanhToan = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Phiếu bán hàng");
@@ -280,13 +296,13 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
 
         jLabel1.setText("Mã phiếu");
 
-        jComboBox1.setBackground(new java.awt.Color(238, 142, 41));
-        jComboBox1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jComboBox1.setForeground(new java.awt.Color(255, 255, 255));
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn kiểu thanh toán", "Thanh toán tiền mặt", "Thanh toán QR", " ", " " }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+        cbbThanhToan.setBackground(new java.awt.Color(238, 142, 41));
+        cbbThanhToan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        cbbThanhToan.setForeground(new java.awt.Color(255, 255, 255));
+        cbbThanhToan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn kiểu thanh toán", "Thanh toán tiền mặt", "Thanh toán QR", " ", " " }));
+        cbbThanhToan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+                cbbThanhToanActionPerformed(evt);
             }
         });
 
@@ -303,7 +319,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnAdd)
                         .addGap(18, 18, 18)
-                        .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(cbbThanhToan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnCheckout)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -368,7 +384,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
                     .addComponent(btnAdd)
                     .addComponent(btnCheckout)
                     .addComponent(btnCancel)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbbThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(102, Short.MAX_VALUE))
         );
 
@@ -426,9 +442,9 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
 
     }//GEN-LAST:event_tblBillDetailsMouseClicked
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void cbbThanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbThanhToanActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }//GEN-LAST:event_cbbThanhToanActionPerformed
 
     /**
      * @param args the command line arguments
@@ -478,7 +494,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnCheckout;
     private javax.swing.JButton btnRemove;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JComboBox<String> cbbThanhToan;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

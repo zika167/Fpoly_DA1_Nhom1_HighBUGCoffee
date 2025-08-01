@@ -4,10 +4,15 @@
  */
 package poly.cafe.ui;
 
+import poly.cafe.entity.Bill;
+
 /**
  *
  * @author LENOVO
  */
 public interface QRpaymentController {
-    
+    void setBill(Bill bill); //thiết lập hóa đơn hiển thị trong hộp thoại
+    void open(); //hiển thị hộp thoại với thông tin chi tiết về hóa đơn
+    void confirm(); //xác nhận thanh toán   QR và cập nhật trạng thái hóa đơn
+    void close(); //đóng hộp thoại
 }
