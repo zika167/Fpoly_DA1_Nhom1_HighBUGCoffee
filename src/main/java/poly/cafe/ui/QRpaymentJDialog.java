@@ -7,7 +7,6 @@ package poly.cafe.ui;
 import java.awt.Frame;
 import java.util.Collections;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.table.DefaultTableModel;
 import lombok.Setter;
 import poly.cafe.dao.BillDAO;
@@ -24,7 +23,7 @@ import poly.cafe.util.XDialog;
  */
 public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentController {
     @Setter
-    private Bill bill; // Bill to be processed
+    private Bill bill; 
     private BillDAO billDao = new BillDAOImpl();
     private BillDetailDAO billDetailDao = new BillDetailDAOImpl();
     private List<BillDetail> billDetails = Collections.emptyList();
@@ -40,7 +39,7 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
     
     @Override
     public void setBill(Bill bill) {
-        this.bill = bill != null ? bill : new Bill(); // Tránh null
+        this.bill = bill != null ? bill : new Bill(); 
     }
     
     @Override

@@ -158,22 +158,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
     public void setBill(Bill bill) {
         this.bill = bill;
     }
-private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {
-    String selected = (String) cbbThanhToan.getSelectedItem();
-    if ("Thanh toán QR".equals(selected) && bill != null) {
-        QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
-        qrDialog.setBill(bill);
-        qrDialog.open();
-        qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
-                BillJDialog.this.setForm(bill); 
-            }
-        });
-    } else if ("Thanh toán tiền mặt".equals(selected)) {
-        this.checkout();
-    }
-}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -444,6 +429,20 @@ private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {
 
     private void cbbThanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbbThanhToanActionPerformed
         // TODO add your handling code here:
+    String selected = (String) cbbThanhToan.getSelectedItem();
+    if ("Thanh toán QR".equals(selected) && bill != null) {
+        QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
+        qrDialog.setBill(bill);
+        qrDialog.open();
+        qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                BillJDialog.this.setForm(bill); 
+            }
+        });
+    } else if ("Thanh toán tiền mặt".equals(selected)) {
+        this.checkout();
+    }
     }//GEN-LAST:event_cbbThanhToanActionPerformed
 
     /**
