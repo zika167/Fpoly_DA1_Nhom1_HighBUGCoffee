@@ -4,11 +4,29 @@
  */
 package poly.cafe.ui;
 
+import java.awt.Frame;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import lombok.Setter;
+import poly.cafe.dao.BillDAO;
+import poly.cafe.dao.BillDetailDAO;
+import poly.cafe.dao.impl.BillDAOImpl;
+import poly.cafe.dao.impl.BillDetailDAOImpl;
+import poly.cafe.entity.Bill;
+import poly.cafe.entity.BillDetail;
+import poly.cafe.util.XDate;
+import poly.cafe.util.XDialog;
 /**
  *
  * @author Admin
  */
-public class QRpaymentJDialog extends javax.swing.JDialog {
+public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentController {
+    @Setter
+    private Bill bill; 
+    private BillDAO billDao = new BillDAOImpl();
+    private BillDetailDAO billDetailDao = new BillDetailDAOImpl();
+    private List<BillDetail> billDetails = Collections.emptyList();
 
     /**
      * Creates new form QRpaymentJDialog
@@ -16,6 +34,77 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
     public QRpaymentJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setTitle("Thanh toán QR");
+    }
+    
+    @Override
+    public void setBill(Bill bill) {
+        this.bill = bill != null ? bill : new Bill(); 
+    }
+    
+    @Override
+    public void open() {
+        if (bill == null || bill.getId() == 0) {
+            XDialog.alert("Hóa đơn không hợp lệ hoặc không tồn tại!");
+            this.dispose();
+            return;
+        }
+        this.setLocationRelativeTo(null);
+        billDetails = billDetailDao.findByBillId(bill.getId());
+        if (billDetails == null) {
+            billDetails = Collections.emptyList();
+        }
+        this.setForm();
+        this.fillBillDetails();
+        this.setVisible(true);
+    }
+    
+    @Override
+    public void confirm() {
+        if (bill == null || bill.getId() == 0) {
+            XDialog.alert("Hóa đơn không hợp lệ!");
+            return;
+        }
+        if (XDialog.confirm("Xác nhận thanh toán QR cho hóa đơn này?")) {
+            try {
+                bill.setStatus(Bill.Status.Completed.ordinal());
+                bill.setCheckout(new java.util.Date());
+                billDao.update(bill);
+                XDialog.alert("Thanh toán QR thành công!");
+                this.dispose();
+            } catch (Exception e) {
+                XDialog.alert("Lỗi khi cập nhật hóa đơn: " + e.getMessage());
+            }
+        }
+    }
+    
+    @Override
+    public void close(){
+        this.dispose();
+    }
+    
+    
+    private void fillBillDetails() {
+        if (bill == null || bill.getId() == 0) return;
+        billDetails = billDetailDao.findByBillId(bill.getId());
+        if (billDetails == null) {
+            billDetails = Collections.emptyList();
+        }
+        DefaultTableModel model = (DefaultTableModel) tblTable.getModel();
+        model.setRowCount(0);
+        billDetails.forEach(d -> {
+            if (d != null) {
+                double amount = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount());
+                Object[] row = {
+                    d.getDrinkName() != null ? d.getDrinkName() : "N/A",
+                    d.getQuantity(),
+                    String.format("%.0f%%", d.getDiscount() * 100),
+                    String.format("$%.2f", d.getUnitPrice()),
+                    String.format("$%.2f", amount)
+                };
+                model.addRow(row);
+            }
+        });
     }
 
     /**
@@ -33,14 +122,14 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
         jButton2 = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
+        lblMaPhieu = new javax.swing.JLabel();
+        lblThoiGian = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jLabel18 = new javax.swing.JLabel();
+        tblTable = new javax.swing.JTable();
+        lblTongCong = new javax.swing.JLabel();
 
         jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -76,11 +165,11 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel12.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel12.setOpaque(true);
+        lblMaPhieu.setBackground(new java.awt.Color(255, 255, 255));
+        lblMaPhieu.setOpaque(true);
 
-        jLabel13.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel13.setOpaque(true);
+        lblThoiGian.setBackground(new java.awt.Color(255, 255, 255));
+        lblThoiGian.setOpaque(true);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("Mã phiếu:");
@@ -91,7 +180,7 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel9.setText("Thời gian: ");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -103,10 +192,10 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
                 "Đồ uống", "Số lượng", "Giảm giá", "Đơn giá", "Thành tiền"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblTable);
 
-        jLabel18.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel18.setOpaque(true);
+        lblTongCong.setBackground(new java.awt.Color(255, 255, 255));
+        lblTongCong.setOpaque(true);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -122,11 +211,11 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(lblMaPhieu, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addGroup(jPanel1Layout.createSequentialGroup()
                                                 .addComponent(jLabel9)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                .addComponent(lblThoiGian, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                         .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -137,7 +226,7 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
                                 .addGroup(jPanel1Layout.createSequentialGroup()
                                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                    .addComponent(lblTongCong, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(171, 171, 171)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -153,18 +242,18 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
-                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblMaPhieu, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(15, 15, 15)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel9)
-                            .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(lblThoiGian, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel18, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lblTongCong, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -238,9 +327,6 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel8;
@@ -248,6 +334,21 @@ public class QRpaymentJDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JLabel lblMaPhieu;
+    private javax.swing.JLabel lblThoiGian;
+    private javax.swing.JLabel lblTongCong;
+    private javax.swing.JTable tblTable;
     // End of variables declaration//GEN-END:variables
+
+    private void setForm(Bill Bill) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    private void fillBillDetail() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    private void setForm() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

@@ -66,11 +66,11 @@
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Group type="103" alignment="0" groupAlignment="1" attributes="0">
-                                              <Component id="jLabel12" min="-2" pref="170" max="-2" attributes="0"/>
+                                              <Component id="lblMaPhieu" min="-2" pref="170" max="-2" attributes="0"/>
                                               <Group type="102" attributes="0">
                                                   <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
                                                   <EmptySpace max="-2" attributes="0"/>
-                                                  <Component id="jLabel13" min="-2" pref="170" max="-2" attributes="0"/>
+                                                  <Component id="lblThoiGian" min="-2" pref="170" max="-2" attributes="0"/>
                                               </Group>
                                           </Group>
                                           <Component id="jLabel2" alignment="0" min="-2" pref="112" max="-2" attributes="0"/>
@@ -87,7 +87,7 @@
                                   <Group type="102" attributes="0">
                                       <Component id="jLabel8" min="-2" pref="112" max="-2" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="jLabel18" min="-2" pref="181" max="-2" attributes="0"/>
+                                      <Component id="lblTongCong" min="-2" pref="181" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -111,12 +111,12 @@
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel12" min="-2" pref="20" max="-2" attributes="0"/>
+                              <Component id="lblMaPhieu" min="-2" pref="20" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel13" min="-2" pref="20" max="-2" attributes="0"/>
+                              <Component id="lblThoiGian" min="-2" pref="20" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <Component id="jLabel4" min="-2" pref="185" max="-2" attributes="0"/>
@@ -126,7 +126,7 @@
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Component id="jLabel8" max="32767" attributes="0"/>
-                      <Component id="jLabel18" max="32767" attributes="0"/>
+                      <Component id="lblTongCong" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jButton3" min="-2" pref="34" max="-2" attributes="0"/>
@@ -195,7 +195,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton3ActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel12">
+        <Component class="javax.swing.JLabel" name="lblMaPhieu">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -203,7 +203,7 @@
             <Property name="opaque" type="boolean" value="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="jLabel13">
+        <Component class="javax.swing.JLabel" name="lblThoiGian">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -242,7 +242,7 @@
 
           <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
           <SubComponents>
-            <Component class="javax.swing.JTable" name="jTable1">
+            <Component class="javax.swing.JTable" name="tblTable">
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                   <Table columnCount="5" rowCount="5">
@@ -257,7 +257,7 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JLabel" name="jLabel18">
+        <Component class="javax.swing.JLabel" name="lblTongCong">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
