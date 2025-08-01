@@ -11,7 +11,7 @@ import poly.cafe.entity.User;
  * @author wangquockhanh
  */
 public class XAuth {
-    public static User user = User.builder()
+    /*public static User user = User.builder()
             .username("user1@gmail.com")
             .password("123")
             .enabled(true)
@@ -20,4 +20,14 @@ public class XAuth {
             .manager(true)
             .build(); // biến user này sẽ được thay thế sau khi đăng nhập
 
+}*/
+public static User user = User.builder()
+        .username("user1@gmail.com")
+        .password("123")
+        .enabled(true)
+        .fullname("Nguyễn Văn Tèo")
+        .photo("hinh2.jpg")
+        .role(User.Role.branch_manager) // <-- SỬA Ở ĐÂY
+        .shopId("S01")                  // <-- Thêm ShopId nếu là quản lý/nhân viên
+        .build();
 }
