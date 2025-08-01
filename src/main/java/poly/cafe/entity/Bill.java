@@ -30,6 +30,8 @@ public class Bill {
 
     private Date checkout;
     private int status;
+    private Long paymentId;
+    private String shopId;
 }
 
 //public class Bill {
