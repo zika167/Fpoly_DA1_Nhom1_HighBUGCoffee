@@ -30,6 +30,12 @@
             <artifactId>AbsoluteLayout</artifactId>
             <version>RELEASE250</version>
         </dependency>
+        <dependency>
+            <groupId>poly.cafe</groupId>
+            <artifactId>PolyCafe</artifactId>
+            <version>1.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
