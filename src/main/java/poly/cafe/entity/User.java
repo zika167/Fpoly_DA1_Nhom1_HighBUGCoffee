@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+/*public class User {
     private String username;
     private String password;
     private boolean enabled;
@@ -23,6 +23,35 @@ public class User {
     private String photo = "hinh2.jpg";  // giá trị mặc định
     
     private boolean manager;
+}*/
+public class User {
+
+    // Định nghĩa Enum cho các vai trò
+    public enum Role {
+        staff,
+        branch_manager,
+        chain_manager
+    }
+
+    private String username;
+    private String password;
+    private boolean enabled;
+    private String fullname;
+    
+    @Builder.Default
+    private String photo = "hinh2.jpg";
+    
+    private Role role; // Sử dụng Enum thay cho boolean
+    private String shopId;
+
+    // (Tùy chọn) Thêm các phương thức kiểm tra vai trò cho tiện lợi
+    public boolean isChainManager() {
+        return this.role == Role.chain_manager;
+    }
+
+    public boolean isBranchManager() {
+        return this.role == Role.branch_manager;
+    }
 }
 
 //public class User {
