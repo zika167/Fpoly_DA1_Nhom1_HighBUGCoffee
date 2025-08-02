@@ -3,6 +3,7 @@ package poly.cafe.util;
 import java.lang.reflect.*;
 import java.sql.*;
 import java.util.*;
+import java.io.*;
 
 /**
  * Lớp tiện ích hỗ trợ làm việc với CSDL quan hệ
@@ -13,17 +14,53 @@ import java.util.*;
 public class XJdbc {
     private static Connection connection;
 
-    private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/duan1_highbugcoffee";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "ToanLe98.";
+    private static String DRIVER;
+    private static String DB_URL;
+    private static String USERNAME;
+    private static String PASSWORD;
 
     static {
+        loadDatabaseConfig();
         try {
             Class.forName(DRIVER); // Nạp driver
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Không tìm thấy JDBC Driver", e);
         }
+    }
+
+    /**
+     * Load cấu hình database từ file properties hoặc biến môi trường
+     */
+    private static void loadDatabaseConfig() {
+        Properties props = new Properties();
+        
+        // Thử đọc từ file cấu hình trước
+        try (InputStream input = XJdbc.class.getClassLoader().getResourceAsStream("database.properties")) {
+            if (input != null) {
+                props.load(input);
+                System.out.println("Đã load cấu hình từ file database.properties");
+            }
+        } catch (IOException e) {
+            System.out.println("Không tìm thấy file database.properties, sử dụng cấu hình mặc định");
+        }
+
+        // Đọc từ file cấu hình hoặc sử dụng giá trị mặc định
+        DRIVER = props.getProperty("database.driver", "com.mysql.cj.jdbc.Driver");
+        DB_URL = props.getProperty("database.url", "jdbc:mysql://localhost:3306/duan1_highbugcoffee");
+        USERNAME = props.getProperty("database.username", "root");
+        PASSWORD = props.getProperty("database.password", "");
+
+        // Ưu tiên biến môi trường nếu có
+        String envUrl = System.getenv("DB_URL");
+        String envUsername = System.getenv("DB_USERNAME");
+        String envPassword = System.getenv("DB_PASSWORD");
+
+        if (envUrl != null) DB_URL = envUrl;
+        if (envUsername != null) USERNAME = envUsername;
+        if (envPassword != null) PASSWORD = envPassword;
+
+        System.out.println("Database URL: " + DB_URL);
+        System.out.println("Database Username: " + USERNAME);
     }
 
     public static Connection openConnection() throws SQLException {

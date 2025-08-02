@@ -3,6 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package poly.cafe.ui;
+import java.awt.Color;
+import java.awt.Font;
+import javax.swing.UIManager;
+import poly.cafe.entity.User;
 import poly.cafe.util.XAuth;
 import poly.cafe.util.XIcon;
 
@@ -16,33 +20,53 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
      * Creates new form ChangePasswordJDialog
      */
     public PolyCafeJFrame() {
-        initComponents();
-        this.init();
+    initComponents();
+    this.init();
+}
+
+@Override
+public void init() {
+    String urlImg = 
+    "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/";
+    String urlLogo2 =
+    "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/icons/logo2.png";
+
+    this.setIconImage(XIcon.getIcon(urlLogo2).getImage());
+    this.setLocationRelativeTo(null);
+
+    // Hiển thị ảnh đại diện và tên người dùng (nếu có)
+    // XIcon.setIcon(lblPhoto, urlImg + XAuth.user.getPhoto());
+    // lblFullname.setText(XAuth.user.getFullname());
+
+    System.out.println("User: " + XAuth.user.getFullname() + ", Role: " + XAuth.user.getRole());
+
+        User.Role role = XAuth.user.getRole();
+
+    if (role.equals("employee")) {
+        btnSales.setVisible(true);
+        btnChangePassword.setVisible(true);
+        btnHistory.setVisible(true);
+        btnExit.setVisible(true);
+
+        
+        btnBillManager.setVisible(false);
+        btnCardManager.setVisible(false);
+        btnCategoryManager.setVisible(false);       
+        btnDrinkManager.setVisible(false);
+        btnRevenueManager.setVisible(false);
+        btnUserManager.setVisible(false);
+    } else if (role.equals("branch_manager")) {
+        System.out.println("Quản lý chi nhánh - giới hạn một số quyền nếu cần...");
+        // pnlManager.setVisible(true); hoặc ẩn một số chức năng con nếu có
+    } else if (role.equals("owner")) {
+        System.out.println("Chủ sở hữu - hiển thị tất cả");
+        pnlManager.setVisible(true);
     }
-    
-    @Override
-    public void init() {
-        String urlImg = 
-        "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/";
-        String urlLogo2 =
-        "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/icons/logo2.png";
 
-        this.setIconImage(XIcon.getIcon(urlLogo2).getImage());
-        this.setLocationRelativeTo(null);
+    pnlManager.revalidate(); // Cập nhật layout
+    pnlManager.repaint();    // Vẽ lại
+}
 
-        XIcon.setIcon(lblPhoto, urlImg + XAuth.user.getPhoto());
-        lblFullname.setText(XAuth.user.getFullname());
-
-        System.out.println("User: " + XAuth.user.getFullname() + ", Is Manager? " + XAuth.user.isManager());
-        if (!XAuth.user.isManager()) {
-            System.out.println("Hiding manager panel for non-manager user...");
-            pnlManager.setVisible(false);; // Xóa pnlManager từ pnlCenter
-            pnlCenter.revalidate(); // Cập nhật layout của pnlCenter
-            pnlCenter.repaint(); // Vẽ lại pnlCenter
-        } else {
-            System.out.println("Manager detected, showing all panels.");
-        }
-    }
 
     
 
@@ -59,22 +83,21 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
         jFrame2 = new javax.swing.JFrame();
         jInternalFrame1 = new javax.swing.JInternalFrame();
         jLabel2 = new javax.swing.JLabel();
-        pnlCenter = new javax.swing.JPanel();
-        lblPhoto = new javax.swing.JLabel();
-        lblFullname = new javax.swing.JLabel();
+        pnlManager = new javax.swing.JPanel();
+        backgroundManager = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
         btnSales = new javax.swing.JButton();
+        btnChangePassword = new javax.swing.JButton();
         btnHistory = new javax.swing.JButton();
         btnExit = new javax.swing.JButton();
-        btnChangePassword = new javax.swing.JButton();
-        pnlManager = new javax.swing.JPanel();
-        btnCardManager = new javax.swing.JButton();
-        btnCategoryManager = new javax.swing.JButton();
-        btnUserManager = new javax.swing.JButton();
-        btnBillManager = new javax.swing.JButton();
         btnDrinkManager = new javax.swing.JButton();
+        btnCategoryManager = new javax.swing.JButton();
+        btnCardManager = new javax.swing.JButton();
+        btnBillManager = new javax.swing.JButton();
+        btnUserManager = new javax.swing.JButton();
         btnRevenueManager = new javax.swing.JButton();
-        backgroundUser = new javax.swing.JLabel();
-        backgroundManager = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
@@ -114,131 +137,207 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
         jLabel2.setText("jLabel2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Poly Cafe");
+        setTitle("Trang Chủ - HighBUG Coffee");
         setIconImage(getIconImage());
         setIconImages(getIconImages());
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        pnlCenter.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        pnlManager.setBackground(new java.awt.Color(255, 255, 255));
+        pnlManager.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        lblPhoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblPhoto.setIcon(new javax.swing.ImageIcon("/Users/wangquockhanh/Desktop/ALL/2. WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/hinh1.jpg")); // NOI18N
-        pnlCenter.add(lblPhoto, new org.netbeans.lib.awtextra.AbsoluteConstraints(74, 10, 185, 230));
+        backgroundManager.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        pnlManager.add(backgroundManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 0, 660, 540));
 
-        lblFullname.setFont(new java.awt.Font("Helvetica Neue", 1, 18)); // NOI18N
-        lblFullname.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblFullname.setText("(Tên người dùng)");
-        pnlCenter.add(lblFullname, new org.netbeans.lib.awtextra.AbsoluteConstraints(24, 258, 286, -1));
+        jPanel1.setBackground(new java.awt.Color(245, 236, 213));
 
-        btnSales.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
+        btnSales.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnSales.setText("BÁN HÀNG");
+        btnSales.setOpaque(true);
         btnSales.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSalesActionPerformed(evt);
             }
         });
-        pnlCenter.add(btnSales, new org.netbeans.lib.awtextra.AbsoluteConstraints(24, 290, 135, 50));
 
-        btnHistory.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
-        btnHistory.setText("LỊCH SỬ");
-        btnHistory.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnHistoryActionPerformed(evt);
-            }
-        });
-        pnlCenter.add(btnHistory, new org.netbeans.lib.awtextra.AbsoluteConstraints(174, 290, 135, 50));
-
-        btnExit.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
-        btnExit.setText("KẾT THÚC");
-        btnExit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExitActionPerformed(evt);
-            }
-        });
-        pnlCenter.add(btnExit, new org.netbeans.lib.awtextra.AbsoluteConstraints(174, 355, 135, 50));
-
-        btnChangePassword.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
+        btnChangePassword.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnChangePassword.setText("ĐỔI MẬT KHẨU");
+        btnChangePassword.setOpaque(true);
         btnChangePassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnChangePasswordActionPerformed(evt);
             }
         });
-        pnlCenter.add(btnChangePassword, new org.netbeans.lib.awtextra.AbsoluteConstraints(24, 355, 135, 50));
 
-        pnlManager.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        btnCardManager.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
-        btnCardManager.setText("THẺ ĐỊNH DANH");
-        btnCardManager.addActionListener(new java.awt.event.ActionListener() {
+        btnHistory.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnHistory.setText("LỊCH SỬ");
+        btnHistory.setOpaque(true);
+        btnHistory.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCardManagerActionPerformed(evt);
+                btnHistoryActionPerformed(evt);
             }
         });
-        pnlManager.add(btnCardManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 280, 150, 50));
 
-        btnCategoryManager.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
-        btnCategoryManager.setText("LOẠI ĐỒ UỐNG");
-        btnCategoryManager.addActionListener(new java.awt.event.ActionListener() {
+        btnExit.setBackground(new java.awt.Color(113, 92, 62));
+        btnExit.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnExit.setForeground(new java.awt.Color(255, 255, 255));
+        btnExit.setText("ĐĂNG XUẤT");
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCategoryManagerActionPerformed(evt);
+                btnExitActionPerformed(evt);
             }
         });
-        pnlManager.add(btnCategoryManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 280, 153, 50));
 
-        btnUserManager.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
-        btnUserManager.setText("NGƯỜI SỬ DỤNG");
-        btnUserManager.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUserManagerActionPerformed(evt);
-            }
-        });
-        pnlManager.add(btnUserManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 350, 150, 50));
-
-        btnBillManager.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
-        btnBillManager.setText("PHIẾU BÁN HÀNG");
-        btnBillManager.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBillManagerActionPerformed(evt);
-            }
-        });
-        pnlManager.add(btnBillManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 350, 150, 50));
-
-        btnDrinkManager.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
+        btnDrinkManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnDrinkManager.setText("ĐỒ UỐNG");
+        btnDrinkManager.setOpaque(true);
         btnDrinkManager.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDrinkManagerActionPerformed(evt);
             }
         });
-        pnlManager.add(btnDrinkManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 280, 150, 50));
 
-        btnRevenueManager.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
+        btnCategoryManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnCategoryManager.setText("LOẠI ĐỒ UỐNG");
+        btnCategoryManager.setOpaque(true);
+        btnCategoryManager.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCategoryManagerActionPerformed(evt);
+            }
+        });
+
+        btnCardManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnCardManager.setText("THẺ ĐỊNH DANH");
+        btnCardManager.setOpaque(true);
+        btnCardManager.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCardManagerActionPerformed(evt);
+            }
+        });
+
+        btnBillManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnBillManager.setText("PHIẾU BÁN HÀNG");
+        btnBillManager.setOpaque(true);
+        btnBillManager.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBillManagerActionPerformed(evt);
+            }
+        });
+
+        btnUserManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnUserManager.setText("QUẢN LÝ NHÂN VIÊN");
+        btnUserManager.setOpaque(true);
+        btnUserManager.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUserManagerActionPerformed(evt);
+            }
+        });
+
+        btnRevenueManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnRevenueManager.setText("DOANH THU");
+        btnRevenueManager.setOpaque(true);
         btnRevenueManager.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRevenueManagerActionPerformed(evt);
             }
         });
-        pnlManager.add(btnRevenueManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 350, 150, 50));
 
-        backgroundUser.setIcon(new javax.swing.ImageIcon("/Users/wangquockhanh/Desktop/ALL/2. WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/icons/coffee-shop.jpg")); // NOI18N
-        pnlManager.add(backgroundUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 510, 410));
+        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("HighBUG");
+        jLabel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        jLabel1.setOpaque(true);
 
-        pnlCenter.add(pnlManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(328, 6, -1, 420));
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnSales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnExit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnChangePassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnDrinkManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnCategoryManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnCardManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnBillManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnUserManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnRevenueManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnSales)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnChangePassword)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnHistory)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnDrinkManager)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCategoryManager)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCardManager)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnBillManager)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnUserManager)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRevenueManager)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 155, Short.MAX_VALUE)
+                .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14))
+        );
 
-        backgroundManager.setIcon(new javax.swing.ImageIcon("/Users/wangquockhanh/Desktop/ALL/2. WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/icons/coffee-shop.jpg")); // NOI18N
-        pnlCenter.add(backgroundManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 10, 500, 410));
+        pnlManager.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 200, 540));
+        pnlManager.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 160, -1, -1));
 
-        getContentPane().add(pnlCenter, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, 10, 860, 430));
+        getContentPane().add(pnlManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, 0, 890, 540));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalesActionPerformed
+    private void btnRevenueManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRevenueManagerActionPerformed
         // TODO add your handling code here:
-        this.showSalesJDialog(this);
-    }//GEN-LAST:event_btnSalesActionPerformed
+        this.showRevenueManagerJDialog(this);
+    }//GEN-LAST:event_btnRevenueManagerActionPerformed
+
+    private void btnUserManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUserManagerActionPerformed
+        // TODO add your handling code here:
+        this.showUserManagerJDialog(this);
+    }//GEN-LAST:event_btnUserManagerActionPerformed
+
+    private void btnBillManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBillManagerActionPerformed
+        // TODO add your handling code here:
+        this.showBillManagerJDialog(this);
+    }//GEN-LAST:event_btnBillManagerActionPerformed
+
+    private void btnCardManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardManagerActionPerformed
+        // TODO add your handling code here:
+        this.showCardManagerJDialog(this);
+    }//GEN-LAST:event_btnCardManagerActionPerformed
+
+    private void btnCategoryManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCategoryManagerActionPerformed
+        // TODO add your handling code here:
+        this.showCategoryManagerJDialog(this);
+    }//GEN-LAST:event_btnCategoryManagerActionPerformed
+
+    private void btnDrinkManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDrinkManagerActionPerformed
+        // TODO add your handling code here:
+        this.showDrinkManagerJDialog(this);
+    }//GEN-LAST:event_btnDrinkManagerActionPerformed
+
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+        // TODO add your handling code here:
+        exit();
+    }//GEN-LAST:event_btnExitActionPerformed
 
     private void btnHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
         // TODO add your handling code here:
@@ -250,40 +349,10 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
         this.showChangePasswordJDialog(jFrame1);
     }//GEN-LAST:event_btnChangePasswordActionPerformed
 
-    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+    private void btnSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalesActionPerformed
         // TODO add your handling code here:
-        exit();
-    }//GEN-LAST:event_btnExitActionPerformed
-
-    private void btnDrinkManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDrinkManagerActionPerformed
-        // TODO add your handling code here:
-        this.showDrinkManagerJDialog(this);
-    }//GEN-LAST:event_btnDrinkManagerActionPerformed
-
-    private void btnCategoryManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCategoryManagerActionPerformed
-        // TODO add your handling code here:
-        this.showCategoryManagerJDialog(this);
-    }//GEN-LAST:event_btnCategoryManagerActionPerformed
-
-    private void btnCardManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardManagerActionPerformed
-        // TODO add your handling code here:
-        this.showCardManagerJDialog(this);
-    }//GEN-LAST:event_btnCardManagerActionPerformed
-
-    private void btnBillManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBillManagerActionPerformed
-        // TODO add your handling code here:
-        this.showBillManagerJDialog(this);
-    }//GEN-LAST:event_btnBillManagerActionPerformed
-
-    private void btnUserManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUserManagerActionPerformed
-        // TODO add your handling code here:
-        this.showUserManagerJDialog(this);
-    }//GEN-LAST:event_btnUserManagerActionPerformed
-
-    private void btnRevenueManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRevenueManagerActionPerformed
-        // TODO add your handling code here:
-        this.showRevenueManagerJDialog(this);
-    }//GEN-LAST:event_btnRevenueManagerActionPerformed
+        this.showSalesJDialog(this);
+    }//GEN-LAST:event_btnSalesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -315,7 +384,7 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
         //</editor-fold>
         //</editor-fold>
         System.out.println("User logged in: " + XAuth.user);
-        System.out.println("Is Manager? " + XAuth.user.isManager());
+        System.out.println("Is Manager? " + XAuth.user.isBranchManager());
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -330,6 +399,10 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                    UIManager.put("Button.background", new Color(102, 153, 255));
+                    UIManager.put("Button.foreground", Color.WHITE);
+                    UIManager.put("Button.font", new Font("Segoe UI", Font.BOLD, 13));
+
                 new PolyCafeJFrame().setVisible(true);
             }
         });
@@ -337,7 +410,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel backgroundManager;
-    private javax.swing.JLabel backgroundUser;
     private javax.swing.JButton btnBillManager;
     private javax.swing.JButton btnCardManager;
     private javax.swing.JButton btnCategoryManager;
@@ -351,10 +423,10 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
     private javax.swing.JFrame jFrame1;
     private javax.swing.JFrame jFrame2;
     private javax.swing.JInternalFrame jInternalFrame1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel lblFullname;
-    private javax.swing.JLabel lblPhoto;
-    private javax.swing.JPanel pnlCenter;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPanel pnlManager;
     // End of variables declaration//GEN-END:variables
 }

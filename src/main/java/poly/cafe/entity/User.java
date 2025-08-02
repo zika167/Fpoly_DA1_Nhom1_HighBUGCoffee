@@ -13,42 +13,35 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class User {
+
+    // Định nghĩa Enum cho các vai trò
+    public enum Role {
+        staff,
+        branch_manager,
+        chain_manager
+    }
+
     private String username;
     private String password;
     private boolean enabled;
-    private String fullname;   
-    @Builder.Default
-    private String photo = "hinh2.jpg";  // giá trị mặc định    
-    private boolean manager;
-    private String phoneNumber;
-    private String role;
-    private int id;
-    private String email;
+    private String fullname;
     
-    public int getId() {
-    return id;
-}
-public void setId(int id) {
-    this.id = id;
-}
+    @Builder.Default
+    private String photo = "hinh2.jpg";
+    
+    private Role role; // Sử dụng Enum thay cho boolean
+    private String shopId;
 
-public String getEmail() {
-    return email;
-}
-public void setEmail(String email) {
-    this.email = email;
-}
+    // (Tùy chọn) Thêm các phương thức kiểm tra vai trò cho tiện lợi
+    public boolean isChainManager() {
+        return this.role == Role.chain_manager;
+    }
 
-public String getPhoneNumber() {
-    return phoneNumber;
-}
-public void setPhoneNumber(String phoneNumber) {
-    this.phoneNumber = phoneNumber;
-}
-
-public String getRole() {
-    return role;
+    public boolean isBranchManager() {
+        return this.role == Role.branch_manager;
+    }
 }
 public void setRole(String role) {
     this.role = role;
