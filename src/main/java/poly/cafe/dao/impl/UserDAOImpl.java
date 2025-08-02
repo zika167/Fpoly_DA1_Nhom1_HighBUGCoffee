@@ -16,8 +16,8 @@ import poly.cafe.util.XQuery;
  */
 public class UserDAOImpl implements UserDAO {
 
-    String createSql = "INSERT INTO Users (Username, Password, Enabled, Fullname, Photo, Manager) VALUES (?, ?, ?, ?, ?, ?)";
-    String updateSql = "UPDATE Users SET Password = ?, Enabled = ?, Fullname = ?, Photo = ?, Manager = ? WHERE Username = ?";
+    String createSql = "INSERT INTO Users (Username, Password, Enabled, Fullname, Photo, Role) VALUES (?, ?, ?, ?, ?, ?)";
+    String updateSql = "UPDATE Users SET Password = ?, Enabled = ?, Fullname = ?, Photo = ?, Role = ? WHERE Username = ?";
     String deleteSql = "DELETE FROM Users WHERE Username = ?";
     String findAllSql = "SELECT * FROM Users";
     String findByIdSql = "SELECT * FROM Users WHERE Username = ?";
@@ -30,7 +30,7 @@ public class UserDAOImpl implements UserDAO {
             entity.isEnabled(),
             entity.getFullname(),
             entity.getPhoto(),
-            entity.isManager()
+            entity.getRole() // <-- thêm role thay vì isManager()
         };
         XJdbc.executeUpdate(createSql, values);
         return entity;
@@ -43,7 +43,7 @@ public class UserDAOImpl implements UserDAO {
             entity.isEnabled(),
             entity.getFullname(),
             entity.getPhoto(),
-            entity.isManager(),
+            entity.getRole(), // <-- sửa lại ở đây
             entity.getUsername()
         };
         XJdbc.executeUpdate(updateSql, values);
@@ -63,6 +63,6 @@ public class UserDAOImpl implements UserDAO {
     public User findById(String username) {
         return XQuery.getSingleBean(User.class, findByIdSql, username);
     }
-
 }
+
 
