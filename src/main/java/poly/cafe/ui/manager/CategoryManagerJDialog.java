@@ -5,6 +5,7 @@
 package poly.cafe.ui.manager;
 
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import poly.cafe.dao.CategoryDAO;
 import poly.cafe.dao.impl.CategoryDAOImpl;
@@ -26,13 +27,14 @@ public class CategoryManagerJDialog extends javax.swing.JDialog implements Categ
     }
     
     CategoryDAO dao = new CategoryDAOImpl();
-    List<Category> items = List.of();
-
+    List<Category> items = List.of();   
+    
     @Override
     public void open() {
         this.setLocationRelativeTo(null);
         this.fillToTable();
         this.clear();
+        this.setVisible(true);
     }
 
     @Override
@@ -93,19 +95,24 @@ public class CategoryManagerJDialog extends javax.swing.JDialog implements Categ
         txtName.setText(entity.getName());
     }
 
+    private boolean validateForm(String id, String name) {
+    if (id.isEmpty()) {
+        XDialog.alert("Mã loại không được để trống!");
+        return false;
+    }
+    if (name.isEmpty()) {
+        XDialog.alert("Tên loại không được để trống!");
+        return false;
+    }
+    return true;
+}
+    
     @Override
     public Category getForm() {
         String id = txtId.getText().trim();
         String name = txtName.getText().trim();
 
-        if (id.isEmpty()) {
-            XDialog.alert("Mã loại không được để trống!");
-            return null;
-        }
-        if (name.isEmpty()) {
-            XDialog.alert("Tên loại không được để trống!");
-            return null;
-        }
+        if (!validateForm(id, name)) return null;
 
         Category entity = new Category();
         entity.setId(id);
@@ -115,11 +122,16 @@ public class CategoryManagerJDialog extends javax.swing.JDialog implements Categ
 
     @Override
     public void create() {
-        Category entity = this.getForm();
-        if (entity != null) {
+        Category entity = getForm();
+    if (entity != null) {
+        try {
             dao.create(entity);
-            this.fillToTable();
-            this.clear();
+            fillToTable(); // Load lại bảng
+            clear();       // Xóa form
+            JOptionPane.showMessageDialog(this, "Thêm loại thành công!");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi thêm loại: " + e.getMessage());
+            }
         }
     }
 
@@ -497,6 +509,7 @@ public class CategoryManagerJDialog extends javax.swing.JDialog implements Categ
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
         // TODO add your handling code here:
         this.create();
+        this.fillToTable();
     }//GEN-LAST:event_btnCreateActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
@@ -560,6 +573,14 @@ public class CategoryManagerJDialog extends javax.swing.JDialog implements Categ
         // TODO add your handling code here:
         this.open();
     }//GEN-LAST:event_formWindowOpened
+
+    private void txtIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdActionPerformed
+
+    private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNameActionPerformed
 
     /**
      * @param args the command line arguments

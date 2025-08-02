@@ -56,7 +56,9 @@ public class CategoryDAOImpl implements CategoryDAO {
             System.out.println("ResultSet opened, starting loop...");
             while (resultSet.next()) {
                 System.out.println("Processing row...");
-                Category category = XQuery.readBean(resultSet, Category.class);
+                Category category = new Category();
+                category.setId(resultSet.getString("Id"));   // Tên cột trong DB
+                category.setName(resultSet.getString("Name"));
                 list.add(category);
             }
             System.out.println("Loop completed, number of categories: " + list.size());

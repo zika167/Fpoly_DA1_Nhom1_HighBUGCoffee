@@ -12,6 +12,7 @@ import java.io.*;
  * @version 1.0
  */
 public class XJdbc {
+    private static Connection connection;
 
     private static String DRIVER;
     private static String DB_URL;
@@ -63,7 +64,10 @@ public class XJdbc {
     }
 
     public static Connection openConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+        }
+        return connection;
     }
 
     // UPDATE, INSERT, DELETE
