@@ -52,7 +52,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
                 item.getPassword(),
                 item.getFullname(),
                 item.getPhoto(),
-                item.isManager(),
+                 item.getRole(),
                 item.isEnabled(),
                 false
             };
@@ -114,7 +114,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         txtFullname.setText(entity.getFullname());
         lblImg.setText(entity.getPhoto());
         // Vai trò
-        if (entity.isManager()) {
+        if (entity.isBranchManager()) {
             rdoManager.setSelected(true); // Quản lý
         } else {
             rdoStaff.setSelected(true); // Nhân viên
@@ -164,7 +164,12 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         entity.setPassword(password);
         entity.setFullname(fullname);
         entity.setPhoto(photo);
-        entity.setManager(rdoManager.isSelected());
+        User.Role role = null;
+    if (rdoManager.isSelected()) {
+    role = User.Role.branch_manager;
+    } else if (rdoStaff.isSelected()) {
+    role = User.Role.staff;
+    }
         entity.setEnabled(rdoActive.isSelected());
         return entity;
     }   

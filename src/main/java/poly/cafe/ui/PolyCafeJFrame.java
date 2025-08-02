@@ -6,6 +6,7 @@ package poly.cafe.ui;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.UIManager;
+import poly.cafe.entity.User;
 import poly.cafe.util.XAuth;
 import poly.cafe.util.XIcon;
 
@@ -19,33 +20,53 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
      * Creates new form ChangePasswordJDialog
      */
     public PolyCafeJFrame() {
-        initComponents();
-        this.init();
+    initComponents();
+    this.init();
+}
+
+@Override
+public void init() {
+    String urlImg = 
+    "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/";
+    String urlLogo2 =
+    "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/icons/logo2.png";
+
+    this.setIconImage(XIcon.getIcon(urlLogo2).getImage());
+    this.setLocationRelativeTo(null);
+
+    // Hiển thị ảnh đại diện và tên người dùng (nếu có)
+    // XIcon.setIcon(lblPhoto, urlImg + XAuth.user.getPhoto());
+    // lblFullname.setText(XAuth.user.getFullname());
+
+    System.out.println("User: " + XAuth.user.getFullname() + ", Role: " + XAuth.user.getRole());
+
+        User.Role role = XAuth.user.getRole();
+
+    if (role.equals("employee")) {
+        btnSales.setVisible(true);
+        btnChangePassword.setVisible(true);
+        btnHistory.setVisible(true);
+        btnExit.setVisible(true);
+
+        
+        btnBillManager.setVisible(false);
+        btnCardManager.setVisible(false);
+        btnCategoryManager.setVisible(false);       
+        btnDrinkManager.setVisible(false);
+        btnRevenueManager.setVisible(false);
+        btnUserManager.setVisible(false);
+    } else if (role.equals("branch_manager")) {
+        System.out.println("Quản lý chi nhánh - giới hạn một số quyền nếu cần...");
+        // pnlManager.setVisible(true); hoặc ẩn một số chức năng con nếu có
+    } else if (role.equals("owner")) {
+        System.out.println("Chủ sở hữu - hiển thị tất cả");
+        pnlManager.setVisible(true);
     }
-    
-    @Override
-    public void init() {
-        String urlImg = 
-        "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/";
-        String urlLogo2 =
-        "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/icons/logo2.png";
 
-        this.setIconImage(XIcon.getIcon(urlLogo2).getImage());
-        this.setLocationRelativeTo(null);
+    pnlManager.revalidate(); // Cập nhật layout
+    pnlManager.repaint();    // Vẽ lại
+}
 
-//        XIcon.setIcon(lblPhoto, urlImg + XAuth.user.getPhoto());
-//        lblFullname.setText(XAuth.user.getFullname());
-
-        System.out.println("User: " + XAuth.user.getFullname() + ", Is Manager? " + XAuth.user.isManager());
-        if (!XAuth.user.isManager()) {
-            System.out.println("Hiding manager panel for non-manager user...");
-//            pnlManager.setVisible(false);; // Xóa pnlManager từ pnlCenter
-            pnlCenter.revalidate(); // Cập nhật layout của pnlCenter
-            pnlCenter.repaint(); // Vẽ lại pnlCenter
-        } else {
-            System.out.println("Manager detected, showing all panels.");
-        }
-    }
 
     
 
@@ -62,7 +83,7 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
         jFrame2 = new javax.swing.JFrame();
         jInternalFrame1 = new javax.swing.JInternalFrame();
         jLabel2 = new javax.swing.JLabel();
-        pnlCenter = new javax.swing.JPanel();
+        pnlManager = new javax.swing.JPanel();
         backgroundManager = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         btnSales = new javax.swing.JButton();
@@ -121,15 +142,14 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
         setIconImages(getIconImages());
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        pnlCenter.setBackground(new java.awt.Color(255, 255, 255));
-        pnlCenter.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        pnlManager.setBackground(new java.awt.Color(255, 255, 255));
+        pnlManager.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         backgroundManager.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        pnlCenter.add(backgroundManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 0, 660, 540));
+        pnlManager.add(backgroundManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 0, 660, 540));
 
         jPanel1.setBackground(new java.awt.Color(245, 236, 213));
 
-        btnSales.setBackground(new java.awt.Color(245, 245, 245));
         btnSales.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnSales.setText("BÁN HÀNG");
         btnSales.setOpaque(true);
@@ -139,7 +159,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
             }
         });
 
-        btnChangePassword.setBackground(new java.awt.Color(245, 245, 245));
         btnChangePassword.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnChangePassword.setText("ĐỔI MẬT KHẨU");
         btnChangePassword.setOpaque(true);
@@ -149,7 +168,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
             }
         });
 
-        btnHistory.setBackground(new java.awt.Color(245, 245, 245));
         btnHistory.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnHistory.setText("LỊCH SỬ");
         btnHistory.setOpaque(true);
@@ -169,7 +187,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
             }
         });
 
-        btnDrinkManager.setBackground(new java.awt.Color(245, 245, 245));
         btnDrinkManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnDrinkManager.setText("ĐỒ UỐNG");
         btnDrinkManager.setOpaque(true);
@@ -179,7 +196,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
             }
         });
 
-        btnCategoryManager.setBackground(new java.awt.Color(245, 245, 245));
         btnCategoryManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnCategoryManager.setText("LOẠI ĐỒ UỐNG");
         btnCategoryManager.setOpaque(true);
@@ -189,7 +205,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
             }
         });
 
-        btnCardManager.setBackground(new java.awt.Color(245, 245, 245));
         btnCardManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnCardManager.setText("THẺ ĐỊNH DANH");
         btnCardManager.setOpaque(true);
@@ -199,7 +214,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
             }
         });
 
-        btnBillManager.setBackground(new java.awt.Color(245, 245, 245));
         btnBillManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnBillManager.setText("PHIẾU BÁN HÀNG");
         btnBillManager.setOpaque(true);
@@ -209,7 +223,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
             }
         });
 
-        btnUserManager.setBackground(new java.awt.Color(245, 245, 245));
         btnUserManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnUserManager.setText("QUẢN LÝ NHÂN VIÊN");
         btnUserManager.setOpaque(true);
@@ -219,7 +232,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
             }
         });
 
-        btnRevenueManager.setBackground(new java.awt.Color(245, 245, 245));
         btnRevenueManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnRevenueManager.setText("DOANH THU");
         btnRevenueManager.setOpaque(true);
@@ -244,17 +256,16 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
                 .addGap(19, 19, 19)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnSales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(btnExit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnChangePassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnDrinkManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnCategoryManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnCardManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnBillManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnUserManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnRevenueManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(btnExit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnChangePassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnHistory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnDrinkManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnCategoryManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnCardManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnBillManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnUserManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnRevenueManager, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -285,10 +296,10 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
                 .addGap(14, 14, 14))
         );
 
-        pnlCenter.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 200, 540));
-        pnlCenter.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 160, -1, -1));
+        pnlManager.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 200, 540));
+        pnlManager.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 160, -1, -1));
 
-        getContentPane().add(pnlCenter, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, 0, 890, 540));
+        getContentPane().add(pnlManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, 0, 890, 540));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -373,7 +384,7 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
         //</editor-fold>
         //</editor-fold>
         System.out.println("User logged in: " + XAuth.user);
-        System.out.println("Is Manager? " + XAuth.user.isManager());
+        System.out.println("Is Manager? " + XAuth.user.isBranchManager());
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -416,6 +427,6 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JPanel pnlCenter;
+    private javax.swing.JPanel pnlManager;
     // End of variables declaration//GEN-END:variables
 }
