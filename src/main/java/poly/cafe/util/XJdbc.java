@@ -11,11 +11,12 @@ import java.util.*;
  * @version 1.0
  */
 public class XJdbc {
+    private static Connection connection;
 
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/DuAnMau_PolyCafe";
-    private static final String USERNAME = "wangquockhanh";
-    private static final String PASSWORD = "matkhau123";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/duan1_highbugcoffee";
+    private static final String USERNAME = "root";
+    private static final String PASSWORD = "ToanLe98.";
 
     static {
         try {
@@ -26,7 +27,10 @@ public class XJdbc {
     }
 
     public static Connection openConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
+        }
+        return connection;
     }
 
     // UPDATE, INSERT, DELETE

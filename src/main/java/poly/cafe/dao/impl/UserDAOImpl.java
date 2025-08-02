@@ -16,12 +16,12 @@ import poly.cafe.util.XQuery;
  */
 public class UserDAOImpl implements UserDAO {
 
-    String createSql = "INSERT INTO Users (Username, Password, Enabled, Fullname, Photo, Manager) VALUES (?, ?, ?, ?, ?, ?)";
+    String createSql = "INSERT INTO Users (Username, Password, Enabled, Fullname, Photo, Role) VALUES (?, ?, ?, ?, ?, ?)";
     String updateSql = "UPDATE Users SET Password = ?, Enabled = ?, Fullname = ?, Photo = ?, Manager = ? WHERE Username = ?";
     String deleteSql = "DELETE FROM Users WHERE Username = ?";
     String findAllSql = "SELECT * FROM Users";
     String findByIdSql = "SELECT * FROM Users WHERE Username = ?";
-
+    
     @Override
     public User create(User entity) {
         Object[] values = {
@@ -30,7 +30,7 @@ public class UserDAOImpl implements UserDAO {
             entity.isEnabled(),
             entity.getFullname(),
             entity.getPhoto(),
-            entity.isManager()
+            entity.getRole()
         };
         XJdbc.executeUpdate(createSql, values);
         return entity;
@@ -63,6 +63,5 @@ public class UserDAOImpl implements UserDAO {
     public User findById(String username) {
         return XQuery.getSingleBean(User.class, findByIdSql, username);
     }
-
 }
 

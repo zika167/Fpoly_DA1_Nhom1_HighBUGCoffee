@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -55,29 +56,36 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
         });
         
         lblImage.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) {
-                    System.out.println("Double-clicked on lblImage");
-                    JFileChooser fileChooser = new JFileChooser();
-                    fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-                    int result = fileChooser.showOpenDialog(DrinkManagerJDialog.this);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        File selectedFile = fileChooser.getSelectedFile();
-                        String fileName = selectedFile.getName();
-                        lblImage.setToolTipText(fileName); // Lưu tên file
-                        // Cập nhật đường dẫn tạm thời (cần điều chỉnh theo project)
-                        String imagePath = "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/" + fileName;
-                        try {
-                            XIcon.setIcon(lblImage, imagePath);
-                        } catch (Exception e) {
-                            System.out.println("Error loading image: " + imagePath + " - " + e.getMessage());
-                            lblImage.setIcon(null);
-                        }
-                    }
+    @Override
+    public void mouseClicked(java.awt.event.MouseEvent evt) {
+        if (evt.getClickCount() == 2) {
+            System.out.println("Double-clicked on lblImage");
+            
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+            
+            int result = fileChooser.showOpenDialog(DrinkManagerJDialog.this);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = fileChooser.getSelectedFile();
+                String fileName = selectedFile.getName();
+                String absolutePath = selectedFile.getAbsolutePath();
+
+                // Gán tên file vào tooltip
+                lblImage.setToolTipText(fileName);
+
+                try {
+                    ImageIcon icon = new ImageIcon(absolutePath);
+                    lblImage.setIcon(icon);
+                    System.out.println("Image loaded: " + absolutePath);
+                } catch (Exception e) {
+                    System.err.println("Error loading image: " + absolutePath);
+                    e.printStackTrace();
+                    lblImage.setIcon(null);
                 }
             }
-        });
+        }
+    }
+});
     }
     
     DrinkDAO dao = new DrinkDAOImpl();
