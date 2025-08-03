@@ -16,6 +16,9 @@ import poly.cafe.dao.UserDAO;
 import poly.cafe.dao.impl.UserDAOImpl;
 import poly.cafe.entity.Drink;
 import poly.cafe.entity.User;
+import static poly.cafe.entity.User.Role.chain_manager;
+import static poly.cafe.entity.User.Role.branch_manager;
+import static poly.cafe.entity.User.Role.staff;
 import poly.cafe.util.XDialog;
 
 /**
@@ -31,7 +34,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         super(parent, modal);
         initComponents();
     }
-    
+
     UserDAO dao = new UserDAOImpl();
     List<User> items = List.of();
 
@@ -54,14 +57,14 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
                 item.getPassword(),
                 item.getFullname(),
                 item.getPhoto(),
-                 item.getRole(),
+                item.getRole(),
                 item.isEnabled(),
                 false
             };
             model.addRow(rowData);
         });
     }
-    
+
     @Override
     public void edit() {
         User entity = items.get(tblUsers.getSelectedRow());
@@ -79,13 +82,13 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
     public void uncheckAll() {
         this.setCheckedAll(false);
     }
-    
+
     private void setCheckedAll(boolean checked) {
         for (int i = 0; i < tblUsers.getRowCount(); i++) {
             tblUsers.setValueAt(checked, i, 6);
         }
     }
-    
+
     @Override
     public void deleteCheckedItems() {
         if (XDialog.confirm("Bạn thực sự muốn xóa các mục chọn?")) {
@@ -167,19 +170,21 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         entity.setFullname(fullname);
         entity.setPhoto(photo);
         User.Role role = null;
-    if (rdoManager.isSelected()) {
-    role = User.Role.branch_manager;
-    } else if (rdoStaff.isSelected()) {
-    role = User.Role.staff;
-    }
+        if (rdoManager.isSelected()) {
+            role = User.Role.branch_manager;
+        } else if (rdoStaff.isSelected()) {
+            role = User.Role.staff;
+        }
         entity.setEnabled(rdoActive.isSelected());
         if (rdoManager.isSelected()) {
-        entity.setRole("Manager");
+            entity.setRole("chain_manager");
         } else if (rdoStaff.isSelected()) {
-        entity.setRole("Staff");
-}
+            entity.setRole("branch_manager");
+        } else {
+            entity.setRole("staff");
+        }
         return entity;
-    }   
+    }
 
     @Override
     public void create() {
@@ -212,18 +217,18 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         txtConfirmPassword.setText("");
         this.setEditable(false);
     }
-    
+
     @Override
     public void setEditable(boolean editable) {
         // XỬ LÝ PHẦN NÀY
         txtUsername.setEnabled(!editable);
-        
+
         txtFullname.setEnabled(true);
         txtPassword.setEnabled(true);
         txtConfirmPassword.setEnabled(true);
         rdoManager.setEnabled(true);
         rdoActive.setEnabled(true);
-        
+
         btnCreate.setEnabled(!editable);
         btnUpdate.setEnabled(editable);
         btnDelete.setEnabled(editable);
@@ -639,20 +644,20 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
         // TODO add your handling code here:
         try {
-        User user = getForm(); // Lấy dữ liệu từ form nhập
+            User user = getForm(); // Lấy dữ liệu từ form nhập
 
-        if (!txtPassword.getText().equals(txtConfirmPassword.getText())) {
-            JOptionPane.showMessageDialog(this, "Xác nhận mật khẩu không khớp!");
-            return;
+            if (!txtPassword.getText().equals(txtConfirmPassword.getText())) {
+                JOptionPane.showMessageDialog(this, "Xác nhận mật khẩu không khớp!");
+                return;
+            }
+
+            dao.create(user);       // Gọi DAO để thêm vào DB
+            this.fillToTable();     // Load lại bảng
+            JOptionPane.showMessageDialog(this, "Thêm người dùng thành công!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Thêm người dùng thất bại!");
         }
-
-        dao.create(user);       // Gọi DAO để thêm vào DB
-        this.fillToTable();     // Load lại bảng
-        JOptionPane.showMessageDialog(this, "Thêm người dùng thành công!");
-    } catch (Exception e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Thêm người dùng thất bại!");
-        }    
     }//GEN-LAST:event_btnCreateActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
@@ -723,7 +728,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
             fileChooser.setFileFilter(new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "gif"));
-            
+
             int result = fileChooser.showOpenDialog(UserManagerJDialog.this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();

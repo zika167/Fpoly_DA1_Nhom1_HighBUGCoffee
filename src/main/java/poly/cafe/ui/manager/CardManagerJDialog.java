@@ -349,12 +349,12 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCheckAll)
                     .addComponent(btnUncheckAll)
                     .addComponent(btnDeleteCheckedItems))
-                .addGap(0, 20, Short.MAX_VALUE))
+                .addGap(0, 7, Short.MAX_VALUE))
         );
 
         tabs.addTab("DANH SÁCH", jPanel1);
@@ -504,9 +504,9 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
                     .addComponent(rdoOperate)
                     .addComponent(rdoError)
                     .addComponent(rdoLose))
-                .addGap(20, 20, 20)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(10, 10, 10)
+                .addGap(23, 23, 23)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCreate)
                     .addComponent(btnDelete)
@@ -516,7 +516,7 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
                     .addComponent(btnMoveLast)
                     .addComponent(btnUpdate)
                     .addComponent(btnClear))
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         tabs.addTab("BIỂU MẪU", jPanel2);
