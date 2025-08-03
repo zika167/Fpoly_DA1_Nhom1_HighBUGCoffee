@@ -42,11 +42,12 @@ public class User {
     public boolean isBranchManager() {
         return this.role == Role.branch_manager;
     }
-}
-public void setRole(String role) {
-    this.role = role;
+    
+    public  void setRole(String role) {
+        this.role = Role.valueOf(role);
+    }
 }
 
-}
+
 
 
