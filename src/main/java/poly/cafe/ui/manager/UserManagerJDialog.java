@@ -9,10 +9,12 @@ import java.io.File;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import poly.cafe.dao.UserDAO;
 import poly.cafe.dao.impl.UserDAOImpl;
+import poly.cafe.entity.Drink;
 import poly.cafe.entity.User;
 import poly.cafe.util.XDialog;
 
@@ -52,7 +54,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
                 item.getPassword(),
                 item.getFullname(),
                 item.getPhoto(),
-                item.isManager(),
+                 item.getRole(),
                 item.isEnabled(),
                 false
             };
@@ -114,7 +116,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         txtFullname.setText(entity.getFullname());
         lblImg.setText(entity.getPhoto());
         // Vai trò
-        if (entity.isManager()) {
+        if (entity.isBranchManager()) {
             rdoManager.setSelected(true); // Quản lý
         } else {
             rdoStaff.setSelected(true); // Nhân viên
@@ -164,8 +166,18 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         entity.setPassword(password);
         entity.setFullname(fullname);
         entity.setPhoto(photo);
-        entity.setManager(rdoManager.isSelected());
+        User.Role role = null;
+    if (rdoManager.isSelected()) {
+    role = User.Role.branch_manager;
+    } else if (rdoStaff.isSelected()) {
+    role = User.Role.staff;
+    }
         entity.setEnabled(rdoActive.isSelected());
+        if (rdoManager.isSelected()) {
+        entity.setRole("Manager");
+        } else if (rdoStaff.isSelected()) {
+        entity.setRole("Staff");
+}
         return entity;
     }   
 
@@ -626,7 +638,21 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
 
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
         // TODO add your handling code here:
-        this.create();
+        try {
+        User user = getForm(); // Lấy dữ liệu từ form nhập
+
+        if (!txtPassword.getText().equals(txtConfirmPassword.getText())) {
+            JOptionPane.showMessageDialog(this, "Xác nhận mật khẩu không khớp!");
+            return;
+        }
+
+        dao.create(user);       // Gọi DAO để thêm vào DB
+        this.fillToTable();     // Load lại bảng
+        JOptionPane.showMessageDialog(this, "Thêm người dùng thành công!");
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Thêm người dùng thất bại!");
+        }    
     }//GEN-LAST:event_btnCreateActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed

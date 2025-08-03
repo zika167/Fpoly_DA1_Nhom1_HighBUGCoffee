@@ -87,7 +87,7 @@
     <Property name="useNullLayout" type="boolean" value="false"/>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JPanel" name="pnlCenter">
+    <Container class="javax.swing.JPanel" name="pnlManager">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
@@ -136,18 +136,16 @@
                       <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="btnSales" max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="btnExit" max="32767" attributes="0"/>
-                              <Component id="btnChangePassword" max="32767" attributes="0"/>
-                              <Component id="btnHistory" max="32767" attributes="0"/>
-                              <Component id="btnDrinkManager" max="32767" attributes="0"/>
-                              <Component id="btnCategoryManager" max="32767" attributes="0"/>
-                              <Component id="btnCardManager" max="32767" attributes="0"/>
-                              <Component id="btnBillManager" max="32767" attributes="0"/>
-                              <Component id="btnUserManager" max="32767" attributes="0"/>
-                              <Component id="btnRevenueManager" max="32767" attributes="0"/>
-                              <Component id="jLabel1" alignment="0" max="32767" attributes="0"/>
-                          </Group>
+                          <Component id="btnExit" max="32767" attributes="0"/>
+                          <Component id="btnChangePassword" max="32767" attributes="0"/>
+                          <Component id="btnHistory" max="32767" attributes="0"/>
+                          <Component id="btnDrinkManager" max="32767" attributes="0"/>
+                          <Component id="btnCategoryManager" max="32767" attributes="0"/>
+                          <Component id="btnCardManager" max="32767" attributes="0"/>
+                          <Component id="btnBillManager" max="32767" attributes="0"/>
+                          <Component id="btnUserManager" max="32767" attributes="0"/>
+                          <Component id="btnRevenueManager" max="32767" attributes="0"/>
+                          <Component id="jLabel1" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace pref="19" max="32767" attributes="0"/>
                   </Group>
@@ -186,9 +184,6 @@
           <SubComponents>
             <Component class="javax.swing.JButton" name="btnSales">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="f5" green="f5" red="f5" type="rgb"/>
-                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="13" style="1"/>
                 </Property>
@@ -201,9 +196,6 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnChangePassword">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="f5" green="f5" red="f5" type="rgb"/>
-                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="13" style="1"/>
                 </Property>
@@ -216,9 +208,6 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnHistory">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="f5" green="f5" red="f5" type="rgb"/>
-                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="13" style="1"/>
                 </Property>
@@ -248,9 +237,6 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnDrinkManager">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="f5" green="f5" red="f5" type="rgb"/>
-                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="13" style="1"/>
                 </Property>
@@ -263,9 +249,6 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnCategoryManager">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="f5" green="f5" red="f5" type="rgb"/>
-                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="13" style="1"/>
                 </Property>
@@ -278,9 +261,6 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnCardManager">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="f5" green="f5" red="f5" type="rgb"/>
-                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="13" style="1"/>
                 </Property>
@@ -293,9 +273,6 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnBillManager">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="f5" green="f5" red="f5" type="rgb"/>
-                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="13" style="1"/>
                 </Property>
@@ -308,9 +285,6 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnUserManager">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="f5" green="f5" red="f5" type="rgb"/>
-                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="13" style="1"/>
                 </Property>
@@ -323,9 +297,6 @@
             </Component>
             <Component class="javax.swing.JButton" name="btnRevenueManager">
               <Properties>
-                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                  <Color blue="f5" green="f5" red="f5" type="rgb"/>
-                </Property>
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Segoe UI" size="13" style="1"/>
                 </Property>
