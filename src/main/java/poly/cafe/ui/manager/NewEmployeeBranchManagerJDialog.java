@@ -202,11 +202,6 @@ public class NewEmployeeBranchManagerJDialog extends javax.swing.JDialog impleme
         btnBack.setBackground(new java.awt.Color(122, 92, 62));
         btnBack.setForeground(new java.awt.Color(255, 255, 255));
         btnBack.setText("Back");
-        btnBack.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBackActionPerformed(evt);
-            }
-        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel2.setText("HighBUG");
