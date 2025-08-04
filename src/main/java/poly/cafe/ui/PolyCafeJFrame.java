@@ -40,24 +40,30 @@ public void init() {
 
     System.out.println("User: " + XAuth.user.getFullname() + ", Role: " + XAuth.user.getRole());
 
-        User.Role role = XAuth.user.getRole();
+    User.Role role = XAuth.user.getRole();
 
-    if (role.equals("employee")) {
-        btnSales.setVisible(true);
-        btnChangePassword.setVisible(true);
-        btnHistory.setVisible(true);
-        btnExit.setVisible(true);
+    btnDrinkManager.setVisible(false);
+    btnCategoryManager.setVisible(false);
+    btnCardManager.setVisible(false);
+    btnBillManager.setVisible(false);
+    btnUserManager.setVisible(false);
+    btnRevenueManager.setVisible(false);
 
-        
-        btnBillManager.setVisible(false);
-        btnCardManager.setVisible(false);
-        btnCategoryManager.setVisible(false);       
-        btnDrinkManager.setVisible(false);
-        btnRevenueManager.setVisible(false);
-        btnUserManager.setVisible(false);
-    } else if (role.equals("branch_manager")) {
-        System.out.println("Quản lý chi nhánh - giới hạn một số quyền nếu cần...");
-        // pnlManager.setVisible(true); hoặc ẩn một số chức năng con nếu có
+    btnSales.setVisible(true);
+    btnChangePassword.setVisible(true);
+    btnHistory.setVisible(true);
+    btnExit.setVisible(true);
+
+    // Phân quyền
+    if (role == User.Role.staff) {
+        // Nhân viên - chỉ thấy 4 nút cơ bản, không cần làm gì thêm
+    } else if (role == User.Role.branch_manager) {
+        System.out.println("Quản lý chi nhánh - hiển thị 1 phần chức năng");
+        btnDrinkManager.setVisible(true);
+        btnCategoryManager.setVisible(true);
+        btnCardManager.setVisible(true);
+        btnBillManager.setVisible(true);
+        btnRevenueManager.setVisible(true);
     } else if (role.equals("owner")) {
         System.out.println("Chủ sở hữu - hiển thị tất cả");
         pnlManager.setVisible(true);
