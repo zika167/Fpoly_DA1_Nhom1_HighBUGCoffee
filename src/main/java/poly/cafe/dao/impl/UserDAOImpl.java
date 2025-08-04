@@ -23,16 +23,16 @@ public class UserDAOImpl implements UserDAO {
     String deleteSql = "DELETE FROM Users WHERE Username = ?";
     String findAllSql = "SELECT * FROM Users";
     String findByIdSql = "SELECT * FROM Users WHERE Username = ?";
-    
+
     @Override
     public User create(User entity) {
         Object[] values = {
-            entity.getUsername(),
-            entity.getPassword(),
-            entity.isEnabled(),
-            entity.getFullname(),
-            entity.getPhoto(),
-            entity.getRole() // <-- thêm role thay vì isManager()
+                entity.getUsername(),
+                entity.getPassword(),
+                entity.isEnabled(),
+                entity.getFullname(),
+                entity.getPhoto(),
+                entity.getRole() != null ? entity.getRole().name() : null // Chuyển Enum thành String
         };
         XJdbc.executeUpdate(createSql, values);
         return entity;
@@ -41,12 +41,12 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public void update(User entity) {
         Object[] values = {
-            entity.getPassword(),
-            entity.isEnabled(),
-            entity.getFullname(),
-            entity.getPhoto(),
-            entity.getRole(), // <-- sửa lại ở đây
-            entity.getUsername()
+                entity.getPassword(),
+                entity.isEnabled(),
+                entity.getFullname(),
+                entity.getPhoto(),
+                entity.getRole() != null ? entity.getRole().name() : null, // Chuyển Enum thành String
+                entity.getUsername()
         };
         XJdbc.executeUpdate(updateSql, values);
     }
@@ -66,5 +66,3 @@ public class UserDAOImpl implements UserDAO {
         return XQuery.getSingleBean(User.class, findByIdSql, username);
     }
 }
-
-

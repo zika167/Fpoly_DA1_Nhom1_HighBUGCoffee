@@ -14,6 +14,8 @@ import poly.cafe.entity.Bill;
 import poly.cafe.util.TimeRange;
 import poly.cafe.util.XAuth;
 import poly.cafe.util.XDate;
+import poly.cafe.util.XDialog;
+import poly.cafe.util.XJdbc;
 
 /**
  *
@@ -28,19 +30,31 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
         super(parent, modal);
         initComponents();
     }
-    
+
     BillDAO billDao = new BillDAOImpl();
     List<Bill> bills = List.of();
-    
+
     @Override
     public void open() {
         this.setLocationRelativeTo(null);
+
+        // Cập nhật tiêu đề dựa trên role của user
+        if (XAuth.user.isChainManager()) {
+            this.setTitle("Lịch sử bán hàng toàn hệ thống");
+        } else if (XAuth.user.isBranchManager()
+                || (XAuth.user.getShopId() != null && !XAuth.user.getShopId().trim().isEmpty())) {
+            this.setTitle("Lịch sử bán hàng của cửa hàng " + XAuth.user.getShopId());
+        } else {
+            this.setTitle("Lịch sử bán hàng của bạn");
+        }
+
         this.selectTimeRange();
     }
+
     @Override
     public void selectTimeRange() {
         TimeRange range = TimeRange.today();
-        switch(cboTimeRanges.getSelectedIndex()){
+        switch (cboTimeRanges.getSelectedIndex()) {
             case 0 -> range = TimeRange.today();
             case 1 -> range = TimeRange.thisWeek();
             case 2 -> range = TimeRange.thisMonth();
@@ -51,41 +65,117 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
         txtEnd.setText(XDate.format(range.getEnd()));
         this.fillBills();
     }
+
     @Override
     public void fillBills() {
-        String username = XAuth.user.getUsername();
-        Date begin = XDate.parse(txtBegin.getText(), "MM/dd/yyyy");
-        Date end = XDate.parse(txtEnd.getText(), "MM/dd/yyyy");
-        bills = billDao.findByUserAndTimeRange(username, begin, end);
-        DefaultTableModel model = (DefaultTableModel) tblBills.getModel();
-        model.setRowCount(0);
-        String[] statuses = {"Servicing", "Completed", "Canceled"};
-        bills.forEach(b -> {
-        Object[] row = { 
-            b.getId(), 
-            "Card #" + b.getCardId(),
-            XDate.format(b.getCheckin(), "HH:mm:ss dd-MM-yyyy"),
-            XDate.format(b.getCheckout(), "HH:mm:ss dd-MM-yyyy"),
-            statuses[b.getStatus()]
-            };
-            model.addRow(row);
-        });
+        try {
+            Date begin = XDate.parse(txtBegin.getText(), "MM/dd/yyyy");
+            Date end = XDate.parse(txtEnd.getText(), "MM/dd/yyyy");
+
+            // Kiểm tra role của user để quyết định hiển thị dữ liệu
+            if (XAuth.user.isChainManager()) {
+                // Chain manager: hiển thị tất cả bills với thông tin shop
+                fillBillsForChainManager(begin, end);
+                return; // Thoát sớm vì đã xử lý riêng
+            } else if (XAuth.user.isBranchManager()
+                    || (XAuth.user.getShopId() != null && !XAuth.user.getShopId().trim().isEmpty())) {
+                // Branch manager hoặc staff: hiển thị bills của shop đó
+                bills = billDao.findByShopAndTimeRange(XAuth.user.getShopId(), begin, end);
+            } else {
+                // User thường: chỉ hiển thị bills của mình
+                String username = XAuth.user.getUsername();
+                bills = billDao.findByUserAndTimeRange(username, begin, end);
+            }
+
+            DefaultTableModel model = (DefaultTableModel) tblBills.getModel();
+            model.setRowCount(0);
+            String[] statuses = { "Servicing", "Completed", "Canceled" };
+
+            bills.forEach(b -> {
+                Object[] row = {
+                        b.getId(),
+                        "Card #" + b.getCardId(),
+                        b.getUsername() != null ? b.getUsername() : "N/A",
+                        b.getCheckin() != null ? XDate.format(b.getCheckin(), "HH:mm:ss dd-MM-yyyy") : "N/A",
+                        b.getCheckout() != null ? XDate.format(b.getCheckout(), "HH:mm:ss dd-MM-yyyy") : "N/A",
+                        getShopNameForUser(b.getUsername()), // Lấy tên cửa hàng từ username
+                        statuses[b.getStatus()]
+                };
+                model.addRow(row);
+            });
+        } catch (Exception e) {
+            XDialog.alert("Lỗi khi tải dữ liệu: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+
+    private void fillBillsForChainManager(Date begin, Date end) {
+        try {
+            List<Object[]> billData = billDao.findBillsWithShopInfo(begin, end);
+            DefaultTableModel model = (DefaultTableModel) tblBills.getModel();
+            model.setRowCount(0);
+            String[] statuses = { "Servicing", "Completed", "Canceled" };
+
+            billData.forEach(row -> {
+                Object[] tableRow = {
+                        row[0], // Id
+                        "Card #" + row[2], // CardId
+                        row[1] != null ? row[1].toString() : "N/A", // Username
+                        row[3] != null ? XDate.format((Date) row[3], "HH:mm:ss dd-MM-yyyy") : "N/A", // Checkin
+                        row[4] != null ? XDate.format((Date) row[4], "HH:mm:ss dd-MM-yyyy") : "N/A", // Checkout
+                        row[8] != null ? row[8].toString() : "N/A", // ShopName
+                        statuses[(Integer) row[5]] // Status
+                };
+                model.addRow(tableRow);
+            });
+        } catch (Exception e) {
+            XDialog.alert("Lỗi khi tải dữ liệu: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void showBillJDialog() {
-        Bill bill = bills.get(tblBills.getSelectedRow());
-        BillJDialog dialog = new BillJDialog((Frame) this.getOwner(), true);
-        dialog.setBill(bill); // truyền bill vào cửa sổ BillJDialog
-        dialog.setVisible(true);
-        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
-                HistoryJDialog.this.fillBills();
-            }
-        });
+        int selectedRow = tblBills.getSelectedRow();
+        if (selectedRow >= 0 && selectedRow < bills.size()) {
+            Bill bill = bills.get(selectedRow);
+            BillJDialog dialog = new BillJDialog((Frame) this.getOwner(), true);
+            dialog.setBill(bill); // truyền bill vào cửa sổ BillJDialog
+            dialog.setVisible(true);
+            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    HistoryJDialog.this.fillBills();
+                }
+            });
+        }
     }
 
+    /**
+     * Lấy tên cửa hàng từ username
+     */
+    private String getShopNameForUser(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return "N/A";
+        }
 
+        try {
+            String sql = """
+                    SELECT s.ShopName
+                    FROM Users u
+                    LEFT JOIN Shops s ON u.ShopId = s.Id
+                    WHERE u.Username = ?
+                    """;
+            var rs = XJdbc.executeQuery(sql, username);
+            if (rs.next()) {
+                String shopName = rs.getString("ShopName");
+                return shopName != null ? shopName : "N/A";
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi khi lấy tên cửa hàng: " + e.getMessage());
+        }
+        return "N/A";
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -93,7 +183,8 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
@@ -131,7 +222,8 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
         });
 
         cboTimeRanges.setBackground(new java.awt.Color(250, 250, 250));
-        cboTimeRanges.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Hôm nay", "Tuần này", "Tháng này", "Quý này", "Năm nay" }));
+        cboTimeRanges.setModel(new javax.swing.DefaultComboBoxModel<>(
+                new String[] { "Hôm nay", "Tuần này", "Tháng này", "Quý này", "Năm nay" }));
         cboTimeRanges.setSelectedIndex(4);
         cboTimeRanges.setToolTipText("");
         cboTimeRanges.setOpaque(true);
@@ -142,16 +234,16 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
         });
 
         tblBills.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
-            },
-            new String [] {
-                "Mã phiếu", "Thẻ số", "Thời điểm tạo phiếu", "Thời điểm thanh toán", "Trạng thái"
-            }
-        ));
+                new Object[][] {
+                        { null, null, null, null, null, null, null },
+                        { null, null, null, null, null, null, null },
+                        { null, null, null, null, null, null, null },
+                        { null, null, null, null, null, null, null }
+                },
+                new String[] {
+                        "Mã phiếu", "Thẻ số", "Người tạo", "Thời điểm tạo phiếu", "Thời điểm thanh toán", "Cửa hàng",
+                        "Trạng thái"
+                }));
         tblBills.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblBillsMouseClicked(evt);
@@ -162,87 +254,104 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(37, 37, 37)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtBegin, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtEnd, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(35, 35, 35)
-                        .addComponent(btnFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(33, 33, 33)
-                        .addComponent(cboTimeRanges, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 84, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane1)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGap(37, 37, 37)
+                                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtBegin, javax.swing.GroupLayout.PREFERRED_SIZE, 140,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 58,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(txtEnd, javax.swing.GroupLayout.PREFERRED_SIZE, 140,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(35, 35, 35)
+                                                .addComponent(btnFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 60,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(33, 33, 33)
+                                                .addComponent(cboTimeRanges, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                        100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 84, Short.MAX_VALUE)))
+                                .addContainerGap()));
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(18, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(txtBegin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(txtEnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnFilter)
-                    .addComponent(cboTimeRanges, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(34, 34, 34))
-        );
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addContainerGap(18, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(txtBegin, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(txtEnd, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(btnFilter)
+                                        .addComponent(cboTimeRanges, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 302,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(34, 34, 34)));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowOpened
         // TODO add your handling code here:
         this.open();
-    }//GEN-LAST:event_formWindowOpened
+    }// GEN-LAST:event_formWindowOpened
 
-    private void tblBillsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBillsMouseClicked
+    private void tblBillsMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_tblBillsMouseClicked
         // TODO add your handling code here:
-        if(evt.getClickCount() == 2) {
+        if (evt.getClickCount() == 2) {
             this.showBillJDialog();
         }
-    }//GEN-LAST:event_tblBillsMouseClicked
+    }// GEN-LAST:event_tblBillsMouseClicked
 
-    private void cboTimeRangesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboTimeRangesActionPerformed
+    private void cboTimeRangesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cboTimeRangesActionPerformed
         // TODO add your handling code here:
         this.selectTimeRange();
-    }//GEN-LAST:event_cboTimeRangesActionPerformed
+    }// GEN-LAST:event_cboTimeRangesActionPerformed
 
-    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
+    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnFilterActionPerformed
         // TODO add your handling code here:
         this.fillBills();
-    }//GEN-LAST:event_btnFilterActionPerformed
+    }// GEN-LAST:event_btnFilterActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+        // <editor-fold defaultstate="collapsed" desc=" Look and feel setting code
+        // (optional) ">
+        /*
+         * If Nimbus (introduced in Java SE 6) is not available, stay with the default
+         * look and feel.
+         * For details see
+         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -252,16 +361,20 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(HistoryJDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HistoryJDialog.class.getName()).log(java.util.logging.Level.SEVERE, null,
+                    ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(HistoryJDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HistoryJDialog.class.getName()).log(java.util.logging.Level.SEVERE, null,
+                    ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(HistoryJDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HistoryJDialog.class.getName()).log(java.util.logging.Level.SEVERE, null,
+                    ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(HistoryJDialog.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(HistoryJDialog.class.getName()).log(java.util.logging.Level.SEVERE, null,
+                    ex);
         }
-        //</editor-fold>
-        //</editor-fold>
+        // </editor-fold>
+        // </editor-fold>
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -290,5 +403,4 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
     private javax.swing.JTextField txtEnd;
     // End of variables declaration//GEN-END:variables
 
-    
 }
