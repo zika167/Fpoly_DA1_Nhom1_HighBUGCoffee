@@ -32,7 +32,7 @@ public class UserDAOImpl implements UserDAO {
             entity.isEnabled(),
             entity.getFullname(),
             entity.getPhoto(),
-            entity.getRole() // <-- thêm role thay vì isManager()
+            entity.getRole().name()
         };
         XJdbc.executeUpdate(createSql, values);
         return entity;
@@ -45,7 +45,7 @@ public class UserDAOImpl implements UserDAO {
             entity.isEnabled(),
             entity.getFullname(),
             entity.getPhoto(),
-            entity.getRole(), // <-- sửa lại ở đây
+            entity.getRole().name(), // phải gọi .name() để lưu enum đúng
             entity.getUsername()
         };
         XJdbc.executeUpdate(updateSql, values);

@@ -169,21 +169,16 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         entity.setPassword(password);
         entity.setFullname(fullname);
         entity.setPhoto(photo);
-        User.Role role = null;
+        
         if (rdoManager.isSelected()) {
-            role = User.Role.branch_manager;
-        } else if (rdoStaff.isSelected()) {
-            role = User.Role.staff;
-        }
-        entity.setEnabled(rdoActive.isSelected());
-        if (rdoManager.isSelected()) {
-            entity.setRole("chain_manager");
-        } else if (rdoStaff.isSelected()) {
-            entity.setRole("branch_manager");
+            entity.setRole(User.Role.branch_manager.name()); 
         } else {
-            entity.setRole("staff");
-        }
-        return entity;
+            entity.setRole(User.Role.staff.name());
+    }
+
+    entity.setEnabled(rdoActive.isSelected());
+
+    return entity;
     }
 
     @Override
@@ -196,10 +191,20 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
 
     @Override
     public void update() {
-        User entity = this.getForm();
-        dao.update(entity);
-        this.fillToTable();
+        User user = getForm(); // hàm này lấy dữ liệu từ form, mày đã có sẵn
+
+    if (user == null) return;
+
+    try {
+        UserDAO dao = new UserDAOImpl();
+        dao.update(user); // gọi hàm update ở DAO
+        this.fillToTable(); // reload lại bảng
+        XDialog.alert("Cập nhật người dùng thành công!");
+    } catch (Exception e) {
+        e.printStackTrace();
+        XDialog.alert("Cập nhật thất bại.");
     }
+}
 
     @Override
     public void delete() {
