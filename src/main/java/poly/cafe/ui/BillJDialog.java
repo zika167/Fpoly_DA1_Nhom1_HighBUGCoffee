@@ -86,6 +86,15 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
             bill.setCheckout(new Date());
             billDao.update(bill);
             this.setForm(bill);
+            // Open ThankJJDialog after successful checkout
+            ThankJJDialog thankDialog = new ThankJJDialog((Frame) this.getOwner(), true);
+            thankDialog.setVisible(true);
+            thankDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    BillJDialog.this.dispose(); // Close BillJDialog after ThankJJDialog closes
+                }
+            });
         }
     }
     
@@ -101,31 +110,36 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         }
     }
     
-    void setForm(Bill bill) { // hiển thị bill lên form
-        txtId.setText(String.valueOf(bill.getId()));
-        txtCardId.setText("Card #" + bill.getCardId());
-        txtCheckin.setText(XDate.format(bill.getCheckin(), "HH:mm:ss dd-MM-yyyy"));
-        txtUsername.setText(bill.getUsername());
-        String[] statuses = {"Servicing", "Completed", "Canceled"};
-        txtStatus.setText(statuses[bill.getStatus()]);
-        if (bill.getCheckout() != null) {
-            txtCheckout.setText(XDate.format(bill.getCheckout(), "HH:mm:ss dd-MM-yyyy"));
-        }
-
-        boolean editable = (bill.getStatus() == 0);
-        btnAdd.setEnabled(editable);
-        btnCancel.setEnabled(editable);
-        btnCheckout.setEnabled(editable);
-        btnRemove.setEnabled(editable);
+void setForm(Bill bill) { // hiển thị bill lên form
+    if (bill == null) {
+        XDialog.alert("Hóa đơn không hợp lệ!");
+        return;
     }
+    txtId.setText(String.valueOf(bill.getId()));
+    txtCardId.setText("Card #" + (bill.getCardId() != null ? bill.getCardId() : ""));
+    txtCheckin.setText(bill.getCheckin() != null ? XDate.format(bill.getCheckin(), "HH:mm:ss dd-MM-yyyy") : "Chưa có");
+    txtUsername.setText(bill.getUsername() != null ? bill.getUsername() : "");
+    String[] statuses = {"Servicing", "Completed", "Canceled"};
+    txtStatus.setText(bill.getStatus() >= 0 && bill.getStatus() < statuses.length ? statuses[bill.getStatus()] : "Unknown");
+    txtCheckout.setText(bill.getCheckout() != null ? XDate.format(bill.getCheckout(), "HH:mm:ss dd-MM-yyyy") : "");
+    boolean editable = (bill.getStatus() == 0);
+    btnAdd.setEnabled(editable);
+    btnCancel.setEnabled(editable);
+    btnCheckout.setEnabled(editable);
+    btnRemove.setEnabled(editable);
+}
 
-    @Override
-    public void open() {
-        this.setLocationRelativeTo(null);
-        this.setForm(bill);
-        this.fillBillDetails();
-
+@Override
+public void open() {
+    if (bill == null) {
+        XDialog.alert("Vui lòng chọn hoặc tạo hóa đơn trước!");
+        this.dispose();
+        return;
     }
+    this.setLocationRelativeTo(null);
+    this.setForm(bill);
+    this.fillBillDetails();
+}
 
     @Override
     public void close() {
@@ -135,11 +149,16 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
     }
     
     void fillBillDetails() {
-        billDetails = billDetailDao.findByBillId(bill.getId());
+    if (bill == null || bill.getId() == 0) {
+        ((DefaultTableModel) tblBillDetails.getModel()).setRowCount(0);
+        return;
+    }
+    billDetails = billDetailDao.findByBillId(bill.getId());
 
-        DefaultTableModel model = (DefaultTableModel) tblBillDetails.getModel();
-        model.setRowCount(0);
-        billDetails.forEach(d -> {
+    DefaultTableModel model = (DefaultTableModel) tblBillDetails.getModel();
+    model.setRowCount(0);
+    billDetails.forEach(d -> {
+        if (d != null) {
             Double amt = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount());
             Object[] row = {
                 false,
@@ -148,11 +167,12 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
                 String.format("$%.2f", d.getUnitPrice()),
                 String.format("%.0f%%", d.getDiscount() * 100),
                 d.getQuantity(),
-                String.format("$%.2f",amt)
+                String.format("$%.2f", amt)
             };
             model.addRow(row);
-        });
-    }
+        }
+    });
+}
     
     @Override
     public void setBill(Bill bill) {
@@ -401,6 +421,20 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
 
     private void btnCheckoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCheckoutActionPerformed
         // TODO add your handling code here:
+        String selected = (String) cbbThanhToan.getSelectedItem();
+        if ("Thanh toán QR".equals(selected) && bill != null) {
+            QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
+            qrDialog.setBill(bill);
+            qrDialog.open();
+            qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    BillJDialog.this.setForm(bill); 
+                }
+            });
+        } else if ("Thanh toán tiền mặt".equals(selected)) {
+            this.checkout();
+        }
         this.checkout();
     }//GEN-LAST:event_btnCheckoutActionPerformed
 
