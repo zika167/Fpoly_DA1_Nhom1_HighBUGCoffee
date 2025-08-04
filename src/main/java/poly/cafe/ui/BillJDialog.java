@@ -421,7 +421,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
 
     private void tblBillDetailsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBillDetailsMouseClicked
         // TODO add your handling code here:
-        if (evt.getClickCount() == 2) {
+        if (evt.getClickCount() == 1) {
             this.updateQuantity();
         }
 

@@ -4,6 +4,7 @@
  */
 package poly.cafe.ui;
 
+import poly.cafe.ui.manager.HomepageBranchManagerJFrame;
 import java.util.Arrays;
 import javax.swing.JFrame;
 import poly.cafe.dao.UserDAO;
