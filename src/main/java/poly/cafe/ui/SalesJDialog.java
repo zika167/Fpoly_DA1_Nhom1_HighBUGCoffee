@@ -16,6 +16,7 @@ import poly.cafe.dao.impl.BillDAOImpl;
 import poly.cafe.dao.impl.CardDAOImpl;
 import poly.cafe.entity.Bill;
 import poly.cafe.entity.Card;
+import poly.cafe.util.XAuth;
 
 /**
  *
@@ -141,6 +142,28 @@ public class SalesJDialog extends javax.swing.JDialog implements SalesController
     private void loadCards() {// tải và hiển thị các thẻ lên cửa sổ bán hàng
         CardDAO dao = new CardDAOImpl();
         List<Card> cards = dao.findAll();
+        // Lọc theo shopId hiện tại
+        String shopId = XAuth.user != null ? XAuth.user.getShopId() : null;
+        int minId = 0, maxId = 0;
+        if (shopId != null) {
+            try {
+                int sid = Integer.parseInt(shopId);
+                minId = sid * 100 + 1;
+                maxId = sid * 100 + 15;
+            } catch (NumberFormatException e) {
+                minId = Integer.MIN_VALUE;
+                maxId = Integer.MAX_VALUE;
+            }
+        } else {
+            minId = Integer.MIN_VALUE;
+            maxId = Integer.MAX_VALUE;
+        }
+        final int fMinId = minId;
+        final int fMaxId = maxId;
+        cards = cards.stream()
+            .filter(card -> card.getId() != null && card.getId() >= fMinId && card.getId() <= fMaxId)
+            .toList();
+
         pnlCards.removeAll();
         cards.forEach(card -> pnlCards.add(this.createButton(card)));
     }
