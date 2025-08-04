@@ -10,6 +10,7 @@ import poly.cafe.dao.CardDAO;
 import poly.cafe.dao.impl.CardDAOImpl;
 import poly.cafe.entity.Card;
 import poly.cafe.util.XDialog;
+import poly.cafe.util.XAuth;
 
 /**
  *
@@ -50,6 +51,28 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
         model.setRowCount(0);
 
         items = dao.findAll();
+        // Lọc theo shopId hiện tại
+        String shopId = XAuth.user != null ? XAuth.user.getShopId() : null;
+        int minId = 0, maxId = 0;
+        if (shopId != null) {
+            try {
+                int sid = Integer.parseInt(shopId);
+                minId = sid * 100 + 1;
+                maxId = sid * 100 + 15;
+            } catch (NumberFormatException e) {
+                minId = Integer.MIN_VALUE;
+                maxId = Integer.MAX_VALUE;
+            }
+        } else {
+            minId = Integer.MIN_VALUE;
+            maxId = Integer.MAX_VALUE;
+        }
+        final int fMinId = minId;
+        final int fMaxId = maxId;
+        items = items.stream()
+            .filter(card -> card.getId() != null && card.getId() >= fMinId && card.getId() <= fMaxId)
+            .toList();
+
         items.forEach(item -> {
             Object[] rowData = {
                 item.getId(),
