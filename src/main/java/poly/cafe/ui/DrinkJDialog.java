@@ -194,7 +194,7 @@ public class DrinkJDialog extends javax.swing.JDialog implements DrinkController
 
     private void tblDrinksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDrinksMouseClicked
         // TODO add your handling code here:
-        if(evt.getClickCount() == 2){
+        if(evt.getClickCount() == 1){
             this.addDrinkToBill();
         }
 
