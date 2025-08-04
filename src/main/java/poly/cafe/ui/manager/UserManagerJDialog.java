@@ -1,3 +1,4 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
@@ -169,16 +170,21 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         entity.setPassword(password);
         entity.setFullname(fullname);
         entity.setPhoto(photo);
-        
+        User.Role role = null;
         if (rdoManager.isSelected()) {
-            entity.setRole(User.Role.branch_manager.name()); 
+            role = User.Role.branch_manager;
+        } else if (rdoStaff.isSelected()) {
+            role = User.Role.staff;
+        }
+        entity.setEnabled(rdoActive.isSelected());
+        if (rdoManager.isSelected()) {
+            entity.setRole("chain_manager");
+        } else if (rdoStaff.isSelected()) {
+            entity.setRole("branch_manager");
         } else {
-            entity.setRole(User.Role.staff.name());
-    }
-
-    entity.setEnabled(rdoActive.isSelected());
-
-    return entity;
+            entity.setRole("staff");
+        }
+        return entity;
     }
 
     @Override
@@ -191,20 +197,10 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
 
     @Override
     public void update() {
-        User user = getForm(); // hàm này lấy dữ liệu từ form, mày đã có sẵn
-
-    if (user == null) return;
-
-    try {
-        UserDAO dao = new UserDAOImpl();
-        dao.update(user); // gọi hàm update ở DAO
-        this.fillToTable(); // reload lại bảng
-        XDialog.alert("Cập nhật người dùng thành công!");
-    } catch (Exception e) {
-        e.printStackTrace();
-        XDialog.alert("Cập nhật thất bại.");
+        User entity = this.getForm();
+        dao.update(entity);
+        this.fillToTable();
     }
-}
 
     @Override
     public void delete() {
@@ -546,8 +542,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
                         .addComponent(btnMoveLast, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(lblImg, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblImg, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtUsername, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)

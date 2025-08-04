@@ -27,10 +27,10 @@ public class User {
     private String password;
     private boolean enabled;
     private String fullname;
-    
+
     @Builder.Default
     private String photo = "hinh2.jpg";
-    
+
     private Role role; // Sử dụng Enum thay cho boolean
     private String shopId;
 
@@ -42,12 +42,12 @@ public class User {
     public boolean isBranchManager() {
         return this.role == Role.branch_manager;
     }
-    
-    public  void setRole(String role) {
+
+    public void setRole(String role) {
         this.role = Role.valueOf(role);
     }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }
-
-
-
-
