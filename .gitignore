@@ -27,6 +27,11 @@ nbproject/private/
 # 👉 Maven build output
 /target/
 
+# 👉 Maven Wrapper files  <-- Thêm mục này
+.mvn/
+mvnw
+mvnw.cmd
+
 # 👉 NetBeans build output (nếu có)
 /build/
 /dist/
