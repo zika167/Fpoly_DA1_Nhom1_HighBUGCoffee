@@ -42,7 +42,7 @@ public class BillDetailDAOImpl implements BillDetailDAO {
                 SELECT 
                     bd.*
                     ,d.name AS drinkName
-                FROM BillDetails
+                FROM BillDetails bd
                 JOIN Drinks d ON d.Id = bd.DrinkId
                 WHERE BillId=?
             """;
@@ -51,7 +51,7 @@ public class BillDetailDAOImpl implements BillDetailDAO {
                 SELECT
                     bd.*
                     ,d.name AS drinkName
-                FROM BillDetails
+                FROM BillDetails bd
                 JOIN Drinks d ON d.Id = bd.DrinkId
                 WHERE DrinkId=?
             """;

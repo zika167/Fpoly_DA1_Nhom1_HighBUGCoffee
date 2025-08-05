@@ -4,6 +4,7 @@
  */
 package poly.cafe.dao.impl;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +50,20 @@ public class BillDAOImpl implements BillDAO {
                 entity.getPaymentId()
         };
         XJdbc.executeUpdate(createSql, values);
+
+        // Lấy ID vừa được tạo tự động
+        String getLastIdSql = "SELECT LAST_INSERT_ID()";
+        Object generatedIdObj = XJdbc.getValue(getLastIdSql);
+        if (generatedIdObj instanceof BigInteger) {
+            entity.setId(((BigInteger) generatedIdObj).longValue());
+        } else if (generatedIdObj instanceof Long) {
+            entity.setId((Long) generatedIdObj);
+        } else if (generatedIdObj instanceof Integer) {
+            entity.setId(((Integer) generatedIdObj).longValue());
+        } else {
+            entity.setId(Long.valueOf(generatedIdObj.toString()));
+        }
+
         return entity;
     }
 
@@ -102,7 +117,7 @@ public class BillDAOImpl implements BillDAO {
             newBill.setStatus(0); // đang phục vụ
             newBill.setUsername(XAuth.user.getUsername());
             newBill.setPaymentId(null); // Chưa thanh toán
-            bill = this.create(newBill); // insert
+            bill = this.create(newBill); // insert và lấy ID được tạo
         }
         return bill;
     }
