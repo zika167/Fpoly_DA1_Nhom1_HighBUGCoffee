@@ -55,4 +55,9 @@ public class CardDAOImpl implements CardDAO {
     public Card findById(Integer id) {
         return XQuery.getSingleBean(Card.class, findByIdSql, id);
     }
+    @Override
+    public List<Card> findByIdRange(int minId, int maxId) {
+    String sql = "SELECT * FROM Cards WHERE ID BETWEEN ? AND ?";
+    return XQuery.getBeanList(Card.class, sql, minId, maxId);
+   }
 }

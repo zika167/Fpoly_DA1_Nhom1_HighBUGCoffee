@@ -70,12 +70,15 @@ public class DrinkJDialog extends javax.swing.JDialog implements DrinkController
             Object[] row = {
                 d.getId(), 
                 d.getName(), 
-                String.format("$%.1f", d.getUnitPrice()), 
-                String.format("%.0f%%", d.getDiscount()*100)
+                 String.format("%,.0f VNĐ", d.getUnitPrice()), 
+                 String.format("%.0f%%", d.getDiscount())
             };
             model.addRow(row);
         });
     }
+    
+   
+    
     @Override
     public void addDrinkToBill() {
         String quantity = XDialog.prompt("Số lượng?");

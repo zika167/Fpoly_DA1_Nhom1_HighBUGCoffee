@@ -4,6 +4,7 @@
  */
 package poly.cafe.dao;
 
+import java.util.List;
 import poly.cafe.entity.Card;
 
 /**
@@ -11,6 +12,6 @@ import poly.cafe.entity.Card;
  * @author wangquockhanh
  */
 public interface CardDAO extends CrudDAO<Card, Integer>{
-    
+    List<Card> findByIdRange(int minId, int maxId);
 }
 

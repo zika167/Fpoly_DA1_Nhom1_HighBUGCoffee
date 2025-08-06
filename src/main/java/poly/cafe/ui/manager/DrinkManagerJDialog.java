@@ -44,7 +44,7 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
         tblDrinks.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) { // Kiểm tra double-click
+                if (evt.getClickCount() == 1) { // Kiểm tra double-click
                     int selectedRow = tblDrinks.rowAtPoint(evt.getPoint());
                     if (selectedRow >= 0) {
                         System.out.println("Double-clicked row in tblDrinks: " + selectedRow);
@@ -58,8 +58,8 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
         lblImage.addMouseListener(new java.awt.event.MouseAdapter() {
     @Override
     public void mouseClicked(java.awt.event.MouseEvent evt) {
-        if (evt.getClickCount() == 2) {
-            System.out.println("Double-clicked on lblImage");
+        if (evt.getClickCount() == 1) {
+            System.out.println("one-clicked on lblImage");
             
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -133,8 +133,8 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
             XIcon.setIcon(lblImage, file);
         }
     }
-  
-    @Override
+   
+    /*@Override
     public void fillToTable() {
         DefaultTableModel model = (DefaultTableModel) tblDrinks.getModel();
         model.setRowCount(0);
@@ -162,8 +162,38 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
             System.out.println("No category selected or categories list is empty.");
         }
         // Loại bỏ clear() ở đây để tránh làm mất dữ liệu vừa thêm
-    }       
+    }*/   
 
+    @Override
+    public void fillToTable() {
+    DefaultTableModel model = (DefaultTableModel) tblDrinks.getModel();
+    model.setRowCount(0); // Xóa các dòng cũ
+
+    // 1. Sử dụng cách kiểm tra an toàn hơn
+    int selectedRow = tblCategories.getSelectedRow();
+    if (selectedRow >= 0 && !categories.isEmpty()) {
+        Category category = categories.get(selectedRow);
+        
+        // 2. Dùng tên biến rõ ràng hơn
+        List<Drink> drinks = dao.findByCategoryId(category.getId());
+        
+        drinks.forEach(item -> {
+            Object[] rowData = {
+                item.getId(),
+                item.getName(),
+                // 3. Định dạng tiền tệ chuyên nghiệp hơn
+                String.format("%,.0f VNĐ", item.getUnitPrice()),
+                // 3. Định dạng phần trăm
+                String.format("%.0f%%", item.getDiscount()),
+                item.isAvailable() ? "Sẵn có" : "Hết hàng",
+                false
+            };
+            model.addRow(rowData);
+        });
+    }
+    // 4. Loại bỏ lệnh this.clear() để tránh lỗi logic
+}
+    
     @Override
     public void open() {
         this.setLocationRelativeTo(null);
@@ -229,9 +259,9 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
             }
         }
         // Img
-//        lblImage.setToolTipText(entity.getImage());
-//        XIcon.setIcon(lblImage, "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/" 
-//        + entity.getImage()); 
+//      lblImage.setToolTipText(entity.getImage());
+//      XIcon.setIcon(lblImage, "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/" 
+//      + entity.getImage()); 
         String imageName = entity.getImage();
         lblImage.setToolTipText(imageName);
         if (imageName != null && !imageName.isEmpty()) {
@@ -533,6 +563,11 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
 
         lblImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblImage.setText("HÌNH");
+        lblImage.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblImageMouseClicked(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel2.setText("Mã đồ uống");
@@ -556,9 +591,12 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel6.setText("Loại");
 
-        cboCategories.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Cafe", "Nước ngọt", "Nước trái cây", "Sinh tố", "Trà sữa" }));
-        cboCategories.setSelectedIndex(2);
         cboCategories.setToolTipText("");
+        cboCategories.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboCategoriesActionPerformed(evt);
+            }
+        });
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel7.setText("Trạng thái");
@@ -829,12 +867,23 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
 
     private void tblDrinksMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDrinksMouseClicked
         // TODO add your handling code here:
-        
+         if (evt.getClickCount() == 2) { // Có thể thêm điều kiện click đúp
+          this.edit(); // Thêm dòng này
     }//GEN-LAST:event_tblDrinksMouseClicked
-
+   }
     private void sldDiscountStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sldDiscountStateChanged
         // TODO add your handling code here:
+  
     }//GEN-LAST:event_sldDiscountStateChanged
+
+    private void lblImageMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblImageMouseClicked
+        // TODO add your handling code here:
+        this.chooseFile();
+    }//GEN-LAST:event_lblImageMouseClicked
+
+    private void cboCategoriesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboCategoriesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cboCategoriesActionPerformed
 
     /**
      * @param args the command line arguments
