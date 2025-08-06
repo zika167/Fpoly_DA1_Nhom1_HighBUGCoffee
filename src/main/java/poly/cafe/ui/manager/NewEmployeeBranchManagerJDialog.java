@@ -468,9 +468,9 @@ public class NewEmployeeBranchManagerJDialog extends javax.swing.JDialog impleme
          this.update();
     }// GEN-LAST:event_btnUpdateActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
-         this.create();
+         this.dispose();
     }
 
     private void rdoActiveActionPerformed(java.awt.event.ActionEvent evt) {
