@@ -17,6 +17,13 @@ import poly.cafe.entity.Bill;
 import poly.cafe.entity.BillDetail;
 import poly.cafe.util.XDate;
 import poly.cafe.util.XDialog;
+import java.awt.image.BufferedImage;
+import javax.swing.ImageIcon;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
 /**
  *
  * @author Admin
@@ -355,8 +362,52 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
     }
 
     private void fillBillDetail() {
+        if (bill == null || bill.getId() == 0) return;
+        billDetails = billDetailDao.findByBillId(bill.getId());
+        if (billDetails == null) {
+            billDetails = Collections.emptyList();
+        }
+        DefaultTableModel model = (DefaultTableModel) tblTable.getModel();
+        model.setRowCount(0);
+        billDetails.forEach(d -> {
+            if (d != null) {
+                double amount = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount());
+                Object[] row = {
+                    d.getDrinkName() != null ? d.getDrinkName() : "N/A",
+                    d.getQuantity(),
+                    String.format("%.0f%%", d.getDiscount() * 100),
+                    String.format("$%.2f", d.getUnitPrice()),
+                    String.format("$%.2f", amount)
+                };
+                model.addRow(row);
+            }
+        });
     }
-
+    
+    private BufferedImage generateQRCode(String content, int width, int height) throws WriterException {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
+        return MatrixToImageWriter.toBufferedImage(bitMatrix);
+    }
+    
     private void setForm() {
+        if (bill == null) return;
+        lblMaPhieu.setText("Mã phiếu: " + bill.getId());
+        lblThoiGian.setText("Thời gian: " + (bill.getCheckin() != null ? XDate.format(bill.getCheckin(), "HH:mm:ss dd-MM-yyyy") : "Chưa có"));
+        double total = billDetails.stream()
+                .mapToDouble(d -> d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount()))
+                .sum();
+        lblTongCong.setText(String.format("Tổng cộng: $%.2f", total));
+        
+        // Generate and display QR code
+        try {
+            String qrContent = "Bill ID: " + bill.getId() + ", Total: $" + String.format("%.2f", total);
+            BufferedImage qrImage = generateQRCode(qrContent, 180, 180);
+            lblQR.setIcon(new ImageIcon(qrImage));
+            lblQR.setText(""); // Clear placeholder text
+        } catch (Exception e) {
+            lblQR.setText("Error generating QR");
+            XDialog.alert("Không thể tạo mã QR: " + e.getMessage());
+        }
     }
 }
