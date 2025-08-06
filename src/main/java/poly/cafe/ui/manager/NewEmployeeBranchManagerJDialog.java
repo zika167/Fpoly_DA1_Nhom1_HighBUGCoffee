@@ -202,6 +202,16 @@ public class NewEmployeeBranchManagerJDialog extends javax.swing.JDialog impleme
         btnBack.setBackground(new java.awt.Color(122, 92, 62));
         btnBack.setForeground(new java.awt.Color(255, 255, 255));
         btnBack.setText("Back");
+        btnBack.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnBackMouseClicked(evt);
+            }
+        });
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel2.setText("HighBUG");
@@ -450,6 +460,10 @@ public class NewEmployeeBranchManagerJDialog extends javax.swing.JDialog impleme
     private void JtextfieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JtextfieldActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_JtextfieldActionPerformed
+
+    private void btnBackMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnBackMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBackMouseClicked
     // </editor-fold>
     // </editor-fold>
 
@@ -468,9 +482,9 @@ public class NewEmployeeBranchManagerJDialog extends javax.swing.JDialog impleme
          this.update();
     }// GEN-LAST:event_btnUpdateActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
-         this.create();
+         this.dispose();
     }
 
     private void rdoActiveActionPerformed(java.awt.event.ActionEvent evt) {
