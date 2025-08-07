@@ -19,6 +19,7 @@ import poly.cafe.entity.Card;
 import poly.cafe.ui.SalesController;
 import poly.cafe.util.XAuth;
 import poly.cafe.util.XQuery;
+import poly.cafe.dao.CardDAO;
 
 /**
  *
@@ -163,10 +164,11 @@ public class SalesJDialog extends javax.swing.JDialog implements SalesController
         }
     }
 
-    public void loadCards() {// tải và hiển thị các thẻ lên cửa sổ bán hàng
+    /*public void loadCards() {// tải và hiển thị các thẻ lên cửa sổ bán hàng
         CardDAO dao = new CardDAOImpl();
         BillDAO billDao = new BillDAOImpl();
         List<Card> cards = dao.findAll();
+        // Thay vì dao.findAll()
         // Lọc theo shopId hiện tại
         String shopId = XAuth.user != null ? XAuth.user.getShopId() : null;
         int minId = 0, maxId = 0;
@@ -197,7 +199,56 @@ public class SalesJDialog extends javax.swing.JDialog implements SalesController
             boolean isServicing = (servicingBill != null && servicingBill.getId() != null);
             pnlCards.add(this.createButton(card, isServicing));
         });
+    }*/
+    public void loadCards() {
+    // ----- BƯỚC 1: KHAI BÁO VÀ TÍNH TOÁN KHOẢNG ID CHO CHI NHÁNH -----
+    CardDAO cardDao = new CardDAOImpl();
+    String shopId = XAuth.user != null ? XAuth.user.getShopId() : null;
+    int minId, maxId; // Khai báo biến
+
+    if (shopId != null) {
+        try {
+            int sid = Integer.parseInt(shopId);
+            minId = sid * 100 + 1;
+            maxId = sid * 100 + 15; // Hoặc số lượng bàn tối đa của bạn
+        } catch (NumberFormatException e) {
+            // Trường hợp dự phòng nếu shopId không hợp lệ
+            minId = Integer.MIN_VALUE;
+            maxId = Integer.MAX_VALUE;
+        }
+    } else {
+        // Dành cho vai trò không thuộc chi nhánh nào, ví dụ: quản lý chuỗi
+        minId = Integer.MIN_VALUE;
+        maxId = Integer.MAX_VALUE;
     }
+
+    // ----- BƯỚC 2: TẢI DỮ LIỆU HIỆU QUẢ TỪ DATABASE -----
+
+    // Chỉ lấy các thẻ của chi nhánh hiện tại (1 truy vấn)
+    List<Card> cardsInShop = cardDao.findByIdRange(minId, maxId);
+
+    // Lấy TẤT CẢ các hóa đơn đang phục vụ của shop này (1 truy vấn)
+    String servicingBillsSql = "SELECT * FROM Bills WHERE CardId BETWEEN ? AND ? AND Status = 0";
+    List<Bill> servicingBills = XQuery.getBeanList(Bill.class, servicingBillsSql, minId, maxId);
+
+    // Chuyển danh sách ID thẻ đang phục vụ vào một Set để tra cứu nhanh hơn
+    java.util.Set<Integer> servicingCardIds = servicingBills.stream()
+            .map(Bill::getCardId)
+            .collect(java.util.stream.Collectors.toSet());
+
+    // ----- BƯỚC 3: VẼ LẠI GIAO DIỆN -----
+    pnlCards.removeAll(); // Xóa các nút cũ
+
+    cardsInShop.forEach(card -> {
+        // Kiểm tra trạng thái thẻ ngay trong bộ nhớ, không cần truy vấn CSDL nữa
+        boolean isServicing = servicingCardIds.contains(card.getId());
+        pnlCards.add(this.createButton(card, isServicing));
+    });
+
+    // Yêu cầu panel vẽ lại các thành phần con của nó
+    pnlCards.revalidate();
+    pnlCards.repaint();
+}
 
     private JButton createButton(Card card, boolean isServicing) { // tạo Jbutton cho thẻ
         JButton btnCard = new JButton();
