@@ -29,46 +29,39 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
  * @author Admin
  */
 public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentController {
-    @Setter
-    private Bill bill; 
-    private BillDAO billDao = new BillDAOImpl();
-    private BillDetailDAO billDetailDao = new BillDetailDAOImpl();
+
+    private Bill bill;
+    private final BillDAO billDao = new BillDAOImpl();
+    private final BillDetailDAO billDetailDao = new BillDetailDAOImpl();
     private List<BillDetail> billDetails = Collections.emptyList();
 
-    /**
-     * Creates new form QRpaymentJDialog
-     */
     public QRpaymentJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         setTitle("Thanh toán QR");
     }
-    
+
     @Override
     public void setBill(Bill bill) {
-        this.bill = bill != null ? bill : new Bill(); 
+        this.bill = bill;
     }
-    
+
     @Override
     public void open() {
-        if (bill == null || bill.getId() == 0) {
+        if (bill == null || bill.getId() == null || bill.getId() <= 0) {
             XDialog.alert("Hóa đơn không hợp lệ hoặc không tồn tại!");
             this.dispose();
             return;
         }
-        this.setLocationRelativeTo(null);
-        billDetails = billDetailDao.findByBillId(bill.getId());
-        if (billDetails == null) {
-            billDetails = Collections.emptyList();
-        }
-        this.setForm();
+        this.setLocationRelativeTo(this.getParent());
         this.fillBillDetails();
+        this.setForm();
         this.setVisible(true);
     }
-    
+
     @Override
     public void confirm() {
-        if (bill == null || bill.getId() == 0) {
+        if (bill == null || bill.getId() == null || bill.getId() <= 0) {
             XDialog.alert("Hóa đơn không hợp lệ!");
             return;
         }
@@ -84,34 +77,70 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
             }
         }
     }
-    
+
     @Override
-    public void close(){
+    public void close() {
         this.dispose();
     }
-    
-    
+
     private void fillBillDetails() {
-        if (bill == null || bill.getId() == 0) return;
+        if (bill == null || bill.getId() == null || bill.getId() <= 0) return;
+        
         billDetails = billDetailDao.findByBillId(bill.getId());
         if (billDetails == null) {
             billDetails = Collections.emptyList();
         }
+        
         DefaultTableModel model = (DefaultTableModel) tblTable.getModel();
         model.setRowCount(0);
+        
         billDetails.forEach(d -> {
             if (d != null) {
-                double amount = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount());
+                // TÍNH TOÁN BẰNG double
+                double amount = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount() / 100.0);
+
                 Object[] row = {
                     d.getDrinkName() != null ? d.getDrinkName() : "N/A",
                     d.getQuantity(),
-                    String.format("%.0f%%", d.getDiscount() * 100),
-                    String.format("$%.2f", d.getUnitPrice()),
-                    String.format("$%.2f", amount)
+                    String.format("%.0f%%", d.getDiscount()),
+                    String.format("%,.0f VNĐ", d.getUnitPrice()),
+                    String.format("%,.0f VNĐ", amount)
                 };
                 model.addRow(row);
             }
         });
+    }
+    
+    private void setForm() {
+        if (bill == null) return;
+        
+        lblMaPhieu.setText(String.valueOf(bill.getId()));
+        lblThoiGian.setText(bill.getCheckin() != null ? XDate.format(bill.getCheckin(), "HH:mm:ss dd-MM-yyyy") : "Chưa có");
+
+        // TÍNH TỔNG TIỀN BẰNG double
+        double total = billDetails.stream()
+                .mapToDouble(d -> d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount() / 100.0))
+                .sum();
+
+        // ĐỊNH DẠNG TỔNG TIỀN THEO VNĐ
+        lblTongCong.setText(String.format("%,.0f VNĐ", total));
+        
+        // Tạo và hiển thị mã QR
+        try {
+            String qrContent = "Bill ID: " + bill.getId() + ", Total: " + String.format("%.0f", total) + " VND";
+            BufferedImage qrImage = generateQRCode(qrContent, lblQR.getWidth(), lblQR.getHeight());
+            lblQR.setIcon(new ImageIcon(qrImage));
+            lblQR.setText("");
+        } catch (Exception e) {
+            lblQR.setText("Lỗi tạo QR");
+            XDialog.alert("Không thể tạo mã QR: " + e.getMessage());
+        }
+    }
+
+    private BufferedImage generateQRCode(String content, int width, int height) throws WriterException {
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
+        return MatrixToImageWriter.toBufferedImage(bitMatrix);
     }
 
     /**
@@ -356,57 +385,5 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
     private javax.swing.JLabel lblTongCong;
     private javax.swing.JTable tblTable;
     // End of variables declaration//GEN-END:variables
-
-    private void setForm(Bill Bill) {
-    }
-
-    private void fillBillDetail() {
-        if (bill == null || bill.getId() == 0) return;
-        billDetails = billDetailDao.findByBillId(bill.getId());
-        if (billDetails == null) {
-            billDetails = Collections.emptyList();
-        }
-        DefaultTableModel model = (DefaultTableModel) tblTable.getModel();
-        model.setRowCount(0);
-        billDetails.forEach(d -> {
-            if (d != null) {
-                double amount = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount());
-                Object[] row = {
-                    d.getDrinkName() != null ? d.getDrinkName() : "N/A",
-                    d.getQuantity(),
-                    String.format("%.0f%%", d.getDiscount() * 100),
-                    String.format("$%.2f", d.getUnitPrice()),
-                    String.format("$%.2f", amount)
-                };
-                model.addRow(row);
-            }
-        });
-    }
-    
-    private BufferedImage generateQRCode(String content, int width, int height) throws WriterException {
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
-        return MatrixToImageWriter.toBufferedImage(bitMatrix);
-    }
-    
-    private void setForm() {
-        if (bill == null) return;
-        lblMaPhieu.setText("Mã phiếu: " + bill.getId());
-        lblThoiGian.setText("Thời gian: " + (bill.getCheckin() != null ? XDate.format(bill.getCheckin(), "HH:mm:ss dd-MM-yyyy") : "Chưa có"));
-        double total = billDetails.stream()
-                .mapToDouble(d -> d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount()))
-                .sum();
-        lblTongCong.setText(String.format("Tổng cộng: $%.2f", total));
-        
-        // Generate and display QR code
-        try {
-            String qrContent = "Bill ID: " + bill.getId() + ", Total: $" + String.format("%.2f", total);
-            BufferedImage qrImage = generateQRCode(qrContent, 180, 180);
-            lblQR.setIcon(new ImageIcon(qrImage));
-            lblQR.setText(""); // Clear placeholder text
-        } catch (Exception e) {
-            lblQR.setText("Error generating QR");
-            XDialog.alert("Không thể tạo mã QR: " + e.getMessage());
-        }
-    }
+ 
 }
