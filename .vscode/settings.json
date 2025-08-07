@@ -3,5 +3,6 @@
         "duan",
         "highbugcoffee",
         "jdbc"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
