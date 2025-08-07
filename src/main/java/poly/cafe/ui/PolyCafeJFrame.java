@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package poly.cafe.ui;
+
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.UIManager;
@@ -20,61 +21,80 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
      * Creates new form ChangePasswordJDialog
      */
     public PolyCafeJFrame() {
-    initComponents();
-    this.init();
-}
-
-@Override
-public void init() {
-    String urlImg = 
-    "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/images/";
-    String urlLogo2 =
-    "file:/Users/wangquockhanh/Desktop/ALL/2.%20WORKSTATION/ApcheNetBeanProject/PolyCafe_DuAnMau/src/main/java/poly/cafe/icons/logo2.png";
-
-    this.setIconImage(XIcon.getIcon(urlLogo2).getImage());
-    this.setLocationRelativeTo(null);
-
-    // Hiển thị ảnh đại diện và tên người dùng (nếu có)
-    // XIcon.setIcon(lblPhoto, urlImg + XAuth.user.getPhoto());
-    // lblFullname.setText(XAuth.user.getFullname());
-
-    System.out.println("User: " + XAuth.user.getFullname() + ", Role: " + XAuth.user.getRole());
-
-    User.Role role = XAuth.user.getRole();
-
-    btnDrinkManager.setVisible(false);
-    btnCategoryManager.setVisible(false);
-    btnCardManager.setVisible(false);
-    btnBillManager.setVisible(false);
-    btnUserManager.setVisible(false);
-    btnRevenueManager.setVisible(false);
-
-    btnSales.setVisible(true);
-    btnChangePassword.setVisible(true);
-    btnHistory.setVisible(true);
-    btnExit.setVisible(true);
-
-    // Phân quyền
-    if (role == User.Role.staff) {
-        // Nhân viên - chỉ thấy 4 nút cơ bản, không cần làm gì thêm
-    } else if (role == User.Role.branch_manager) {
-        System.out.println("Quản lý chi nhánh - hiển thị 1 phần chức năng");
-        btnDrinkManager.setVisible(true);
-        btnCategoryManager.setVisible(true);
-        btnCardManager.setVisible(true);
-        btnBillManager.setVisible(true);
-        btnRevenueManager.setVisible(true);
-    } else if (role.equals("owner")) {
-        System.out.println("Chủ sở hữu - hiển thị tất cả");
-        pnlManager.setVisible(true);
+        initComponents();
+        this.init();
     }
 
-    pnlManager.revalidate(); // Cập nhật layout
-    pnlManager.repaint();    // Vẽ lại
-}
+    @Override
+    public void init() {
+        // Đường dẫn tuyệt đối cho máy local
+        String urlImg = "file:/C:/Users/Tan Phat Computer Q8/Fpoly_DA1_Nhom1_PolyCafe/src/main/java/poly/cafe/images/";
+        String urlLogo2 = "file:/C:/Users/Tan Phat Computer Q8/Fpoly_DA1_Nhom1_PolyCafe/src/main/java/poly/cafe/icons/logo2.png";
+        String urlCoffeeLogo = "file:/C:/Users/Tan Phat Computer Q8/Fpoly_DA1_Nhom1_PolyCafe/src/main/java/poly/cafe/icons/iconss/coffee.png";
 
+        // Fallback cho các máy remote khác - sử dụng đường dẫn tương đối từ resource
+        String fallbackCoffeeLogo = "/poly/cafe/icons/iconss/coffee.png";
+        String fallbackLogo2 = "/poly/cafe/icons/logo2.png";
 
-    
+        // Thử sử dụng đường dẫn tuyệt đối trước, nếu không được thì dùng fallback
+        try {
+            this.setIconImage(XIcon.getIcon(urlLogo2).getImage());
+        } catch (Exception e) {
+            // Nếu đường dẫn tuyệt đối không hoạt động, sử dụng fallback
+            this.setIconImage(XIcon.getIcon(fallbackLogo2).getImage());
+        }
+        this.setLocationRelativeTo(null);
+
+        // Hiển thị logo coffee trong jLabel1 với fallback và scale đúng kích thước
+        try {
+            // Scale icon theo kích thước phù hợp với text (khoảng 24x24 pixels)
+            jLabel1.setIcon(XIcon.getIcon(urlCoffeeLogo, 24, 24));
+        } catch (Exception e) {
+            // Nếu đường dẫn tuyệt đối không hoạt động, sử dụng fallback
+            jLabel1.setIcon(XIcon.getIcon(fallbackCoffeeLogo, 24, 24));
+        }
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
+        jLabel1.setVerticalTextPosition(javax.swing.SwingConstants.CENTER);
+        jLabel1.setIconTextGap(10); // Khoảng cách giữa icon và text
+
+        // Hiển thị ảnh đại diện và tên người dùng (nếu có)
+        // XIcon.setIcon(lblPhoto, urlImg + XAuth.user.getPhoto());
+        // lblFullname.setText(XAuth.user.getFullname());
+
+        System.out.println("User: " + XAuth.user.getFullname() + ", Role: " + XAuth.user.getRole());
+
+        User.Role role = XAuth.user.getRole();
+
+        btnDrinkManager.setVisible(false);
+        btnCategoryManager.setVisible(false);
+        btnCardManager.setVisible(false);
+        btnBillManager.setVisible(false);
+        btnUserManager.setVisible(false);
+        btnRevenueManager.setVisible(false);
+
+        btnSales.setVisible(true);
+        btnChangePassword.setVisible(true);
+        btnHistory.setVisible(true);
+        btnExit.setVisible(true);
+
+        // Phân quyền
+        if (role == User.Role.staff) {
+            // Nhân viên - chỉ thấy 4 nút cơ bản, không cần làm gì thêm
+        } else if (role == User.Role.branch_manager) {
+            System.out.println("Quản lý chi nhánh - hiển thị 1 phần chức năng");
+            btnDrinkManager.setVisible(true);
+            btnCategoryManager.setVisible(true);
+            btnCardManager.setVisible(true);
+            btnBillManager.setVisible(true);
+            btnRevenueManager.setVisible(true);
+        } else if (role.equals("owner")) {
+            System.out.println("Chủ sở hữu - hiển thị tất cả");
+            pnlManager.setVisible(true);
+        }
+
+        pnlManager.revalidate(); // Cập nhật layout
+        pnlManager.repaint(); // Vẽ lại
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -82,6 +102,7 @@ public void init() {
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -104,6 +125,7 @@ public void init() {
         btnRevenueManager = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
+        jSeparator2 = new javax.swing.JSeparator();
 
         javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
         jFrame1.getContentPane().setLayout(jFrame1Layout);
@@ -152,7 +174,7 @@ public void init() {
         pnlManager.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         backgroundManager.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        pnlManager.add(backgroundManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 80, 640, 480));
+        pnlManager.add(backgroundManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 90, 680, 490));
 
         jPanel1.setBackground(new java.awt.Color(245, 236, 213));
 
@@ -295,70 +317,75 @@ public void init() {
 
         pnlManager.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 210, 580));
         pnlManager.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 160, -1, -1));
+        pnlManager.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 70, 680, 10));
 
         getContentPane().add(pnlManager, new org.netbeans.lib.awtextra.AbsoluteConstraints(-2, 0, 890, 580));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnRevenueManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRevenueManagerActionPerformed
+    private void btnRevenueManagerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRevenueManagerActionPerformed
         // TODO add your handling code here:
         this.showRevenueManagerJDialog(this);
-    }//GEN-LAST:event_btnRevenueManagerActionPerformed
+    }// GEN-LAST:event_btnRevenueManagerActionPerformed
 
-    private void btnUserManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUserManagerActionPerformed
+    private void btnUserManagerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnUserManagerActionPerformed
         // TODO add your handling code here:
         this.showUserManagerJDialog(this);
-    }//GEN-LAST:event_btnUserManagerActionPerformed
+    }// GEN-LAST:event_btnUserManagerActionPerformed
 
-    private void btnBillManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBillManagerActionPerformed
+    private void btnBillManagerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnBillManagerActionPerformed
         // TODO add your handling code here:
         this.showBillManagerJDialog(this);
-    }//GEN-LAST:event_btnBillManagerActionPerformed
+    }// GEN-LAST:event_btnBillManagerActionPerformed
 
-    private void btnCardManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCardManagerActionPerformed
+    private void btnCardManagerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCardManagerActionPerformed
         // TODO add your handling code here:
         this.showCardManagerJDialog(this);
-    }//GEN-LAST:event_btnCardManagerActionPerformed
+    }// GEN-LAST:event_btnCardManagerActionPerformed
 
-    private void btnCategoryManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCategoryManagerActionPerformed
+    private void btnCategoryManagerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCategoryManagerActionPerformed
         // TODO add your handling code here:
         this.showCategoryManagerJDialog(this);
-    }//GEN-LAST:event_btnCategoryManagerActionPerformed
+    }// GEN-LAST:event_btnCategoryManagerActionPerformed
 
-    private void btnDrinkManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDrinkManagerActionPerformed
+    private void btnDrinkManagerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDrinkManagerActionPerformed
         // TODO add your handling code here:
         this.showDrinkManagerJDialog(this);
-    }//GEN-LAST:event_btnDrinkManagerActionPerformed
+    }// GEN-LAST:event_btnDrinkManagerActionPerformed
 
-    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnExitActionPerformed
         // TODO add your handling code here:
         exit();
-    }//GEN-LAST:event_btnExitActionPerformed
+    }// GEN-LAST:event_btnExitActionPerformed
 
-    private void btnHistoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistoryActionPerformed
+    private void btnHistoryActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnHistoryActionPerformed
         // TODO add your handling code here:
         this.showHistoryJDialog(this);
-    }//GEN-LAST:event_btnHistoryActionPerformed
+    }// GEN-LAST:event_btnHistoryActionPerformed
 
-    private void btnChangePasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePasswordActionPerformed
+    private void btnChangePasswordActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnChangePasswordActionPerformed
         // TODO add your handling code here:
         this.showChangePasswordJDialog(jFrame1);
-    }//GEN-LAST:event_btnChangePasswordActionPerformed
+    }// GEN-LAST:event_btnChangePasswordActionPerformed
 
-    private void btnSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalesActionPerformed
+    private void btnSalesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnSalesActionPerformed
         // TODO add your handling code here:
         this.showSalesJDialog(this);
-    }//GEN-LAST:event_btnSalesActionPerformed
+    }// GEN-LAST:event_btnSalesActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-//        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+        // /* Set the Nimbus look and feel */
+        // <editor-fold defaultstate="collapsed" desc=" Look and feel setting code
+        // (optional) ">
+        /*
+         * If Nimbus (introduced in Java SE 6) is not available, stay with the default
+         * look and feel.
+         * For details see
+         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -368,18 +395,22 @@ public void init() {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null,
+                    ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null,
+                    ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null,
+                    ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null,
+                    ex);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
+        // </editor-fold>
+        // </editor-fold>
+        // </editor-fold>
+        // </editor-fold>
         System.out.println("User logged in: " + XAuth.user);
         System.out.println("Is Manager? " + XAuth.user.isBranchManager());
         try {
@@ -390,15 +421,16 @@ public void init() {
                 }
             }
         } catch (Exception ex) {
-            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(PolyCafeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null,
+                    ex);
         }
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                    UIManager.put("Button.background", new Color(102, 153, 255));
-                    UIManager.put("Button.foreground", Color.WHITE);
-                    UIManager.put("Button.font", new Font("Segoe UI", Font.BOLD, 13));
+                UIManager.put("Button.background", new Color(102, 153, 255));
+                UIManager.put("Button.foreground", Color.WHITE);
+                UIManager.put("Button.font", new Font("Segoe UI", Font.BOLD, 13));
 
                 new PolyCafeJFrame().setVisible(true);
             }
@@ -424,6 +456,7 @@ public void init() {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JPanel pnlManager;
     // End of variables declaration//GEN-END:variables
 }
