@@ -22,4 +22,3 @@ public class Category {
         return name; // hoặc return getName();
     }
 }
-

@@ -59,22 +59,21 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         }
         this.fillBillDetails();
     }*/
-    
     @Override
     public void removeDrinks() { // xóa đồ uống được tích chọn
-    // ... (phần kiểm tra bill giữ nguyên)
+        // ... (phần kiểm tra bill giữ nguyên)
 
-    // Lấy ID trực tiếp từ bảng để xóa, tránh lỗi khi sắp xếp
-    for (int i = 0; i < tblBillDetails.getRowCount(); i++) {
-        Boolean checked = (Boolean) tblBillDetails.getValueAt(i, 0);
-        if (checked != null && checked) {
-            // Lấy ID từ cột thứ 2 (cột "Mã phiếu", index = 1)
-            Long billDetailId = (Long) tblBillDetails.getValueAt(i, 1);
-            billDetailDao.deleteById(billDetailId);
+        // Lấy ID trực tiếp từ bảng để xóa, tránh lỗi khi sắp xếp
+        for (int i = 0; i < tblBillDetails.getRowCount(); i++) {
+            Boolean checked = (Boolean) tblBillDetails.getValueAt(i, 0);
+            if (checked != null && checked) {
+                // Lấy ID từ cột thứ 2 (cột "Mã phiếu", index = 1)
+                Long billDetailId = (Long) tblBillDetails.getValueAt(i, 1);
+                billDetailDao.deleteById(billDetailId);
+            }
         }
+        this.fillBillDetails(); // Tải lại dữ liệu
     }
-    this.fillBillDetails(); // Tải lại dữ liệu
-}
 
     @Override
     public void showDrinkJDialog() { // hiển thị cửa sổ chọn và bổ sung đồ uống
@@ -112,39 +111,41 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
     }*/
     @Override
     public void updateQuantity() { // thay đổi số lượng đồ uống
-    int row = tblBillDetails.getSelectedRow();
-    if (row == -1) return;
+        int row = tblBillDetails.getSelectedRow();
+        if (row == -1) {
+            return;
+        }
 
-    if (bill != null && bill.getStatus() == 0) {
-        String input = XDialog.prompt("Số lượng mới?");
-        if (input != null && !input.isBlank()) {
-            try {
-                int newQuantity = Integer.parseInt(input);
-                if (newQuantity <= 0) {
-                    XDialog.alert("Số lượng phải lớn hơn 0.");
-                    return;
-                }
-                
-                // Lấy ID trực tiếp từ bảng
-                Long billDetailId = (Long) tblBillDetails.getValueAt(row, 1);
-                
-                // Tìm đúng đối tượng BillDetail để cập nhật
-                BillDetail detailToUpdate = billDetails.stream()
-                        .filter(d -> d.getId().equals(billDetailId))
-                        .findFirst()
-                        .orElse(null);
+        if (bill != null && bill.getStatus() == 0) {
+            String input = XDialog.prompt("Số lượng mới?");
+            if (input != null && !input.isBlank()) {
+                try {
+                    int newQuantity = Integer.parseInt(input);
+                    if (newQuantity <= 0) {
+                        XDialog.alert("Số lượng phải lớn hơn 0.");
+                        return;
+                    }
 
-                if (detailToUpdate != null) {
-                    detailToUpdate.setQuantity(newQuantity);
-                    billDetailDao.update(detailToUpdate);
-                    this.fillBillDetails(); // Tải lại
+                    // Lấy ID trực tiếp từ bảng
+                    Long billDetailId = (Long) tblBillDetails.getValueAt(row, 1);
+
+                    // Tìm đúng đối tượng BillDetail để cập nhật
+                    BillDetail detailToUpdate = billDetails.stream()
+                            .filter(d -> d.getId().equals(billDetailId))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (detailToUpdate != null) {
+                        detailToUpdate.setQuantity(newQuantity);
+                        billDetailDao.update(detailToUpdate);
+                        this.fillBillDetails(); // Tải lại
+                    }
+                } catch (NumberFormatException e) {
+                    XDialog.alert("Vui lòng nhập một số hợp lệ!");
                 }
-            } catch (NumberFormatException e) {
-                XDialog.alert("Vui lòng nhập một số hợp lệ!");
             }
         }
     }
-}
 
     @Override
     public void checkout() {
@@ -215,7 +216,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         txtCheckin.setEditable(false); // Không cho phép chỉnh sửa thời gian đặt hàng
         txtUsername.setText(bill.getUsername() != null ? bill.getUsername() : "");
         txtUsername.setEditable(false); // Không cho phép chỉnh sửa nhân viên
-        String[] statuses = { "Servicing", "Completed", "Canceled" };
+        String[] statuses = {"Servicing", "Completed", "Canceled"};
         txtStatus.setText(
                 bill.getStatus() >= 0 && bill.getStatus() < statuses.length ? statuses[bill.getStatus()] : "Unknown");
         txtStatus.setEditable(false); // Không cho phép chỉnh sửa trạng thái
@@ -228,8 +229,6 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         btnRemove.setEnabled(editable);
     }
 
-    
-    
     @Override
     public void open() {
         if (bill == null) {
@@ -275,44 +274,43 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
             }
         });
     }*/
+    void fillBillDetails() {
+        // 1. Giữ lại phần kiểm tra an toàn để tránh lỗi NullPointerException
+        if (bill == null || bill.getId() == null || bill.getId() <= 0) {
+            // Nếu không có hóa đơn hợp lệ, chỉ cần xóa trắng bảng chi tiết
+            ((DefaultTableModel) tblBillDetails.getModel()).setRowCount(0);
+            return;
+        }
 
-   void fillBillDetails() {
-    // 1. Giữ lại phần kiểm tra an toàn để tránh lỗi NullPointerException
-    if (bill == null || bill.getId() == null || bill.getId() <= 0) {
-        // Nếu không có hóa đơn hợp lệ, chỉ cần xóa trắng bảng chi tiết
-        ((DefaultTableModel) tblBillDetails.getModel()).setRowCount(0);
-        return;
+        // Tải chi tiết hóa đơn từ CSDL
+        billDetails = billDetailDao.findByBillId(bill.getId());
+
+        DefaultTableModel model = (DefaultTableModel) tblBillDetails.getModel();
+        model.setRowCount(0); // Xóa các dòng cũ
+
+        billDetails.forEach(d -> {
+            if (d != null) {
+                // 2. Sử dụng công thức tính giảm giá đúng (chia cho 100)
+                // Giả sử discount được lưu là số nguyên (ví dụ: 10 cho 10%)
+                Double amt = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount() / 100.0);
+
+                Object[] row = {
+                    false,
+                    d.getId(),
+                    d.getDrinkName(),
+                    // 3. Định dạng tiền tệ nhất quán theo VNĐ
+                    String.format("%,.0f VNĐ", d.getUnitPrice()),
+                    // 4. Hiển thị giảm giá khớp với cách lưu trữ
+                    String.format("%.0f%%", d.getDiscount()),
+                    d.getQuantity(),
+                    // 3. Định dạng tiền tệ nhất quán theo VNĐ
+                    String.format("%,.0f VNĐ", amt)
+                };
+                model.addRow(row);
+            }
+        });
     }
 
-    // Tải chi tiết hóa đơn từ CSDL
-    billDetails = billDetailDao.findByBillId(bill.getId());
-
-    DefaultTableModel model = (DefaultTableModel) tblBillDetails.getModel();
-    model.setRowCount(0); // Xóa các dòng cũ
-
-    billDetails.forEach(d -> {
-        if (d != null) {
-            // 2. Sử dụng công thức tính giảm giá đúng (chia cho 100)
-            // Giả sử discount được lưu là số nguyên (ví dụ: 10 cho 10%)
-            Double amt = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount() / 100.0);
-            
-            Object[] row = {
-                false,
-                d.getId(),
-                d.getDrinkName(),
-                // 3. Định dạng tiền tệ nhất quán theo VNĐ
-                String.format("%,.0f VNĐ", d.getUnitPrice()),
-                // 4. Hiển thị giảm giá khớp với cách lưu trữ
-                String.format("%.0f%%", d.getDiscount()),
-                d.getQuantity(),
-                // 3. Định dạng tiền tệ nhất quán theo VNĐ
-                String.format("%,.0f VNĐ", amt)
-            };
-            model.addRow(row);
-        }
-    });
-}
-    
     @Override
     public void setBill(Bill bill) {
         this.bill = bill;
@@ -566,20 +564,27 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
 
     private void btnCheckoutActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCheckoutActionPerformed
         // TODO add your handling code here:
-       String selected = (String) cbbThanhToan.getSelectedItem();
-    if ("Thanh toán QR".equals(selected) && bill != null) {
-        QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
-        qrDialog.setBill(bill);
-        qrDialog.open();
-        qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
-                BillJDialog.this.setForm(bill); // Refresh form after QR dialog closes
-            }
-        });
-    } else if ("Thanh toán tiền mặt".equals(selected)) {
-        this.checkout();
-    }
+        if (bill == null || bill.getId() == null) {
+            XDialog.alert("Không thể thanh toán khi chưa có phiếu bán hàng!");
+            return;
+        }
+
+        String selected = (String) cbbThanhToan.getSelectedItem();
+        if ("Thanh toán QR".equals(selected)) {
+            QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
+            qrDialog.setBill(bill);
+            qrDialog.open();
+            qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    BillJDialog.this.setForm(bill);
+                }
+            });
+        } else if ("Thanh toán tiền mặt".equals(selected)) {
+            this.checkout();
+        } else {
+            XDialog.alert("Vui lòng chọn phương thức thanh toán!");
+        }
     }// GEN-LAST:event_btnCheckoutActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCancelActionPerformed
