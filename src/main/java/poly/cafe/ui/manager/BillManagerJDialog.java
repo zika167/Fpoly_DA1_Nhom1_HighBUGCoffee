@@ -37,6 +37,9 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
     List<Bill> items = List.of();
     BillDetailDAO billDetailDao = new BillDetailDAOImpl();
     List<BillDetail> details = List.of(); // chi tiết phiếu bán hàng
+    // Khai báo SimpleDateFormat một lần duy nhất ở đây
+    private final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
+
     
     private String getStatusName(int status) {
         return switch (status) {
@@ -47,7 +50,7 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         };
     }
 
-    @Override
+    /*@Override
     public void fillBillDetails() {
         DefaultTableModel model = (DefaultTableModel) tblBillDetails.getModel();
         model.setRowCount(0);
@@ -66,9 +69,30 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
             };
             model.addRow(rowData);
         });
-    }
+    }*/
 
-    @Override
+     @Override
+    public void fillBillDetails() {
+        DefaultTableModel model = (DefaultTableModel) tblBillDetails.getModel();
+        model.setRowCount(0);
+        details = List.of();
+        if (!txtId.getText().isBlank()) {
+            Long billId = Long.valueOf(txtId.getText());
+            details = billDetailDao.findByBillId(billId);
+        }
+        details.forEach(d -> {
+            var amount = d.getUnitPrice() * d.getQuantity() * (1 - d.getDiscount() / 100.0);
+            Object[] rowData = {
+                d.getDrinkName(),
+                String.format("%,.0f VNĐ", d.getUnitPrice()),
+                String.format("%.0f%%", d.getDiscount()),
+                d.getQuantity(), String.format("%,.0f VNĐ", amount)
+            };
+            model.addRow(rowData);
+        });
+    }
+    
+    /*@Override
     public void selectTimeRange() {
         TimeRange range = TimeRange.today();
         switch (cboTimeRanges.getSelectedIndex()) {
@@ -81,11 +105,26 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         txtBegin.setText(XDate.format(range.getBegin(), "MM/dd/yyyy"));
         txtEnd.setText(XDate.format(range.getEnd(), "MM/dd/yyyy"));
         this.fillToTable();
-    }
+    }*/
 
-    @Override
+     @Override
+    public void selectTimeRange() {
+     TimeRange range = TimeRange.today();
+       switch (cboTimeRanges.getSelectedIndex()) {
+    case 0 -> range = TimeRange.today();
+    case 1 -> range = TimeRange.thisWeek();
+    case 2 -> range = TimeRange.thisMonth();
+    case 3 -> range = TimeRange.thisQuarter();
+    case 4 -> range = TimeRange.thisYear();
+     }
+        txtBegin.setText(XDate.format(range.getBegin(), "dd/MM/yyyy"));
+        txtEnd.setText(XDate.format(range.getEnd(), "dd/MM/yyyy"));
+        this.fillToTable();
+    }
+    
+   /* @Override
     public void fillToTable() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+        //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
         DefaultTableModel model = (DefaultTableModel) tblBills.getModel();
         model.setRowCount(0);
         Date begin = XDate.parse(txtBegin.getText(), "MM/dd/yyyy");
@@ -104,16 +143,49 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
             };
             model.addRow(rowData); 
         });
-    }
+    }*/
     
     @Override
+public void fillToTable() {
+    // Lấy model của bảng và xóa các dòng cũ
+    DefaultTableModel model = (DefaultTableModel) tblBills.getModel();
+    model.setRowCount(0);
+
+    // 1. Dùng định dạng "dd/MM/yyyy" thân thiện hơn với người dùng Việt Nam
+    Date begin = XDate.parse(txtBegin.getText(), "dd/MM/yyyy");
+    Date end = XDate.parse(txtEnd.getText(), "dd/MM/yyyy");
+
+    // Lấy danh sách hóa đơn từ CSDL
+    items = dao.findByTimeRange(begin, end);
+
+    // Duyệt qua danh sách và thêm từng hóa đơn vào bảng
+    items.forEach(item -> {
+        Object[] rowData = {
+            item.getId(),
+            // 2. Hiển thị "Card #" để rõ ràng hơn
+            "Card #" + item.getCardId(),
+            // 3. Định dạng ngày giờ checkin/checkout để dễ đọc
+            item.getCheckin() != null ? sdf.format(item.getCheckin()) : "",
+            item.getCheckout() != null ? sdf.format(item.getCheckout()) : "",
+            // 4. Dùng helper method để lấy tên trạng thái, giúp code sạch hơn
+            getStatusName(item.getStatus()),
+            item.getUsername(),
+            // 5. Giữ lại cột checkbox để thực hiện chức năng xóa nhiều mục
+            false
+        };
+        model.addRow(rowData);
+    });
+    // 6. Không gọi this.clear() ở đây để tránh xóa form không mong muốn
+}
+    
+    /*@Override
     public void setForm(Bill entity) {
         txtId.setText(String.valueOf(entity.getId()));
         txtUsername.setText(entity.getUsername());
         txtCardId.setText(String.valueOf(entity.getCardId()));
 
         // Checkin & Checkout
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
+        //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
         if (entity.getCheckin() != null) {
             txtCheckin.setText(sdf.format(entity.getCheckin()));
         } else {
@@ -133,7 +205,41 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
             default -> rdoServicing.setSelected(true); // Mặc định
         }
         this.fillBillDetails();
+    }*/
+
+   // Trong file BillManagerJDialog.java
+  @Override
+  public void setForm(Bill entity) {
+    if (entity == null) {
+        this.clear();
+        return;
     }
+    
+    // PHẦN SỬA LỖI QUAN TRỌNG:
+    // Nếu ID hoặc CardId là null, hiển thị chuỗi rỗng "" thay vì chữ "null"
+    txtId.setText(entity.getId() != null ? String.valueOf(entity.getId()) : "");
+    txtCardId.setText(entity.getCardId() != null ? String.valueOf(entity.getCardId()) : "");
+    txtUsername.setText(entity.getUsername() != null ? entity.getUsername() : "");
+
+    // Checkin & Checkout
+    txtCheckin.setText(entity.getCheckin() != null ? sdf.format(entity.getCheckin()) : "");
+    txtCheckout.setText(entity.getCheckout() != null ? sdf.format(entity.getCheckout()) : "");
+
+    // Trạng thái
+    if (entity.getStatus() != null) {
+        switch (entity.getStatus()) {
+            case 0 -> rdoServicing.setSelected(true);
+            case 1 -> rdoCompleted.setSelected(true);
+            case 2 -> rdoCanceled.setSelected(true);
+            default -> buttonGroup1.clearSelection();
+        }
+    } else {
+        buttonGroup1.clearSelection();
+    }
+    
+    this.fillBillDetails();
+}
+
 
     @Override
     public Bill getForm() {
@@ -150,7 +256,7 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         // Checkin & Checkout
         String dateStrCheckin = txtCheckin.getText().trim();
         String dateStrCheckout = txtCheckout.getText().trim();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
+        //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
         Date checkinDate = null;
         Date checkoutDate = null;
         try {
@@ -189,13 +295,37 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         this.clear();
     }
     
-    @Override
+   /* @Override
     public void edit() {
         Bill entity = items.get(tblBills.getSelectedRow());
         this.setForm(entity);
         this.setEditable(true);
         tabs.setSelectedIndex(1);
+    }*/
+    
+    // Sửa lại phương thức edit()
+  @Override
+  public void edit() {
+    int selectedRow = tblBills.getSelectedRow();
+    if (selectedRow == -1) return; // Không có dòng nào được chọn
+
+    // Lấy ID của hóa đơn trực tiếp từ cột 0 của bảng
+    Long billId = (Long) tblBills.getValueAt(selectedRow, 0);
+
+    // Tìm đúng hóa đơn trong danh sách 'items' bằng ID
+    Bill entityToEdit = items.stream()
+                           .filter(bill -> bill.getId().equals(billId))
+                           .findFirst()
+                           .orElse(null); // Trả về null nếu không tìm thấy
+
+    if (entityToEdit != null) {
+        this.setForm(entityToEdit);
+        this.setEditable(true);
+        tabs.setSelectedIndex(1); // Chuyển sang tab biểu mẫu
+    } else {
+        XDialog.alert("Không tìm thấy hóa đơn để sửa!");
     }
+}
     
     @Override
     public void create() {
@@ -274,6 +404,7 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         }
     }
     
+    @Override
     public void deleteCheckedItems() {
         if (XDialog.confirm("Bạn thực sự muốn xóa các mục chọn?")) {
             boolean deleted = false;
@@ -413,6 +544,11 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
                 return types [columnIndex];
             }
         });
+        tblBills.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblBillsMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblBills);
 
         jLabel1.setText("Từ ngày:");
@@ -420,6 +556,11 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         jLabel2.setText("Đến ngày:");
 
         btnFilter.setText("Lọc");
+        btnFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFilterActionPerformed(evt);
+            }
+        });
 
         cboTimeRanges.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Hôm nay", "Tuần này", "Tháng này", "Quý này", "Năm nay" }));
         cboTimeRanges.setSelectedIndex(4);
@@ -772,7 +913,21 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
 
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
         // TODO add your handling code here:
-        this.create();
+        //this.create();
+         // Lấy dữ liệu từ form người dùng đã nhập
+    Bill newBill = this.getForm(); 
+    if (newBill != null) {
+        try {
+            dao.create(newBill); // Lưu hóa đơn mới vào CSDL
+            XDialog.alert("Tạo mới hóa đơn thành công!");
+            this.fillToTable(); // Cập nhật lại bảng
+            this.clear();       // Xóa trắng form
+            tabs.setSelectedIndex(0); // Quay về tab danh sách
+        } catch (Exception e) {
+            XDialog.alert("Lỗi khi tạo mới hóa đơn!");
+            e.printStackTrace();
+        }
+      }
     }//GEN-LAST:event_btnCreateActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
@@ -787,7 +942,9 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         // TODO add your handling code here:
+        //this.clear();
         this.clear();
+        tabs.setSelectedIndex(1); // Chuyển sang tab biểu mẫu để người dùng nhập
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnMoveFirstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoveFirstActionPerformed
@@ -814,6 +971,16 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         // TODO add your handling code here:
         this.open();
     }//GEN-LAST:event_formWindowOpened
+
+    private void tblBillsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBillsMouseClicked
+        // TODO add your handling code here:
+        this.edit();
+    }//GEN-LAST:event_tblBillsMouseClicked
+
+    private void btnFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFilterActionPerformed
+        // TODO add your handling code here:
+        this.selectTimeRange();
+    }//GEN-LAST:event_btnFilterActionPerformed
 
     /**
      * @param args the command line arguments

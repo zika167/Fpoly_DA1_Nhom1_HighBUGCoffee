@@ -407,6 +407,9 @@
                     <Property name="horizontalAlignment" type="int" value="0"/>
                     <Property name="text" type="java.lang.String" value="H&#xcc;NH"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblImageMouseClicked"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel2">
                   <Properties>
@@ -471,17 +474,13 @@
                 <Component class="javax.swing.JComboBox" name="cboCategories">
                   <Properties>
                     <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                      <StringArray count="5">
-                        <StringItem index="0" value="Cafe"/>
-                        <StringItem index="1" value="N&#x1b0;&#x1edb;c ng&#x1ecd;t"/>
-                        <StringItem index="2" value="N&#x1b0;&#x1edb;c tr&#xe1;i c&#xe2;y"/>
-                        <StringItem index="3" value="Sinh t&#x1ed1;"/>
-                        <StringItem index="4" value="Tr&#xe0; s&#x1eef;a"/>
-                      </StringArray>
+                      <StringArray count="0"/>
                     </Property>
-                    <Property name="selectedIndex" type="int" value="2"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cboCategoriesActionPerformed"/>
+                  </Events>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
                   </AuxValues>

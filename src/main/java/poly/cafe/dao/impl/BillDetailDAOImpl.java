@@ -98,11 +98,22 @@ public class BillDetailDAOImpl implements BillDetailDAO {
         return XQuery.getSingleBean(BillDetail.class, findByIdSql, id);
     }
 
-    @Override
+    /*@Override
     public List<BillDetail> findByBillId(Long billId) {
         return XQuery.getBeanList(BillDetail.class, findByBillIdSql, billId);
-    }
+    }*/
 
+   @Override
+public List<BillDetail> findByBillId(Long billId) {
+    String sql = """
+                 SELECT bd.*, d.Name AS DrinkName
+                 FROM BillDetails bd
+                 JOIN Drinks d ON bd.DrinkId = d.Id
+                 WHERE bd.BillId = ?
+                 """;
+    return poly.cafe.util.XQuery.getBeanList(BillDetail.class, sql, billId);
+}
+    
     @Override
     public List<BillDetail> findByDrinkId(String drinkId) {
         return XQuery.getBeanList(BillDetail.class, findByDrinkIdSql, drinkId);
