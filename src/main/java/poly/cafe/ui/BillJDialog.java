@@ -566,27 +566,20 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
 
     private void btnCheckoutActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCheckoutActionPerformed
         // TODO add your handling code here:
-        if (bill == null || bill.getId() == null) {
-            XDialog.alert("Không thể thanh toán khi chưa có phiếu bán hàng!");
-            return;
-        }
-
-        String selected = (String) cbbThanhToan.getSelectedItem();
-        if ("Thanh toán QR".equals(selected)) {
-            QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
-            qrDialog.setBill(bill);
-            qrDialog.open();
-            qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosed(java.awt.event.WindowEvent e) {
-                    BillJDialog.this.setForm(bill);
-                }
-            });
-        } else if ("Thanh toán tiền mặt".equals(selected)) {
-            this.checkout();
-        } else {
-            XDialog.alert("Vui lòng chọn phương thức thanh toán!");
-        }
+       String selected = (String) cbbThanhToan.getSelectedItem();
+    if ("Thanh toán QR".equals(selected) && bill != null) {
+        QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
+        qrDialog.setBill(bill);
+        qrDialog.open();
+        qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                BillJDialog.this.setForm(bill); // Refresh form after QR dialog closes
+            }
+        });
+    } else if ("Thanh toán tiền mặt".equals(selected)) {
+        this.checkout();
+    }
     }// GEN-LAST:event_btnCheckoutActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnCancelActionPerformed
