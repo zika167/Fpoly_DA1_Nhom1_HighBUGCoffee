@@ -20,6 +20,8 @@ import poly.cafe.entity.Category;
 import poly.cafe.entity.Drink;
 import poly.cafe.util.XDialog;
 import poly.cafe.util.XIcon;
+import poly.cafe.util.IconUtils;
+import javax.swing.JButton;
 
 /**
  *
@@ -1101,13 +1103,13 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
      * Initialize icons for buttons
      */
     private void initIcons() {
-        btnCheckAll.setIcon(XIcon.getIcon("/poly/cafe/images/icons/list.png", 16, 16));
-        btnUncheckAll.setIcon(XIcon.getIcon("/poly/cafe/images/icons/refresh.png", 16, 16));
-        btnDeleteCheckedItems.setIcon(XIcon.getIcon("/poly/cafe/images/icons/delete.png", 16, 16));
-        btnCreate.setIcon(XIcon.getIcon("/poly/cafe/images/icons/add.png", 16, 16));
-        btnUpdate.setIcon(XIcon.getIcon("/poly/cafe/images/icons/edit.png", 16, 16));
-        btnDelete.setIcon(XIcon.getIcon("/poly/cafe/images/icons/delete.png", 16, 16));
-        btnClear.setIcon(XIcon.getIcon("/poly/cafe/images/icons/refresh.png", 16, 16));
+        IconUtils.setButtonIconSafe(btnCheckAll, "/poly/cafe/images/icons/list.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnUncheckAll, "/poly/cafe/images/icons/refresh.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnDeleteCheckedItems, "/poly/cafe/images/icons/delete.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnCreate, "/poly/cafe/images/icons/add.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnUpdate, "/poly/cafe/images/icons/edit.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnDelete, "/poly/cafe/images/icons/delete.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnClear, "/poly/cafe/images/icons/refresh.png", 16, 16);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
