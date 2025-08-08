@@ -119,8 +119,6 @@
             </Property>
             <Property name="text" type="java.lang.String" value="Back"/>
           </Properties>
-<<<<<<< HEAD:src/main/java/poly/cafe/ui/manager/NewEmployeeBranchManagerJDialog.form
-=======
           <Events>
             <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btnBackMouseClicked"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBackActionPerformed"/>
@@ -128,7 +126,6 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="NewEmployeeBranchManagerJDialog_btnBack"/>
           </AuxValues>
->>>>>>> 474b5d2d490cd841835c57b5e777ae802576a3c3:src/main/java/poly/cafe/ui/NewEmployeeBranchManagerJDialog.form
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
