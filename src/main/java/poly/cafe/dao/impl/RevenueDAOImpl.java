@@ -19,8 +19,7 @@ public class RevenueDAOImpl implements RevenueDAO {
 
     @Override
     public List<ByCategory> getByCategory(Date begin, Date end) {
-        String revenueByCategorySql
-                = "SELECT category.Name AS Category, "
+        String revenueByCategorySql = "SELECT category.Name AS `Category`, "
                 + "   sum(detail.UnitPrice*detail.Quantity*(1-detail.Discount)) AS Revenue,"
                 + "   sum(detail.Quantity) AS Quantity,"
                 + "   min(detail.UnitPrice) AS MinPrice,"
@@ -37,10 +36,10 @@ public class RevenueDAOImpl implements RevenueDAO {
                 + "ORDER BY Revenue DESC";
         return XQuery.getBeanList(ByCategory.class, revenueByCategorySql, begin, end);
     }
+
     @Override
     public List<ByUser> getByUser(Date begin, Date end) {
-        String revenueByUserSql
-                = "SELECT bill.Username AS [User], "
+        String revenueByUserSql = "SELECT bill.Username AS `User`, "
                 + "   sum(detail.UnitPrice*detail.Quantity*(1-detail.Discount)) AS Revenue,"
                 + "   count(DISTINCT detail.BillId) AS Quantity,"
                 + "   min(bill.Checkin) AS FirstTime,"
@@ -55,4 +54,3 @@ public class RevenueDAOImpl implements RevenueDAO {
         return XQuery.getBeanList(ByUser.class, revenueByUserSql, begin, end);
     }
 }
-
