@@ -19,6 +19,9 @@ import poly.cafe.util.TimeRange;
 import poly.cafe.util.XDate;
 import poly.cafe.util.XDialog;
 import poly.cafe.util.XIcon;
+import poly.cafe.util.IconUtils;
+import javax.swing.JButton;
+import poly.cafe.entity.User;
 
 /**
  *
@@ -35,12 +38,27 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         initIcons();
     }
 
+    /**
+     * Set thông tin user hiện tại đang đăng nhập
+     * 
+     * @param user     User đang đăng nhập
+     * @param branchId ID chi nhánh của user
+     */
+    public void setCurrentUser(User user, String branchId) {
+        this.currentUser = user;
+        this.currentUserBranch = branchId;
+    }
+
     BillDAO dao = new BillDAOImpl();
     List<Bill> items = List.of();
     BillDetailDAO billDetailDao = new BillDetailDAOImpl();
     List<BillDetail> details = List.of(); // chi tiết phiếu bán hàng
     // Khai báo SimpleDateFormat một lần duy nhất ở đây
     private final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", Locale.ENGLISH);
+
+    // Thêm field để lưu thông tin user hiện tại
+    private poly.cafe.entity.User currentUser;
+    private String currentUserBranch;
 
     private String getStatusName(int status) {
         return switch (status) {
@@ -97,8 +115,14 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         Date begin = XDate.parse(txtBegin.getText(), "dd/MM/yyyy");
         Date end = XDate.parse(txtEnd.getText(), "dd/MM/yyyy");
 
-        // Lấy danh sách hóa đơn từ CSDL
-        items = dao.findByTimeRange(begin, end);
+        // Lấy danh sách hóa đơn từ CSDL theo shopId của user hiện tại
+        if (currentUser != null && currentUser.getRole() != User.Role.chain_manager && currentUserBranch != null) {
+            // Nếu là branch_manager, chỉ lấy bill của chi nhánh đó
+            items = dao.findByShopAndTimeRange(currentUserBranch, begin, end);
+        } else {
+            // Nếu là chain_manager hoặc không có thông tin shop, lấy tất cả
+            items = dao.findByTimeRange(begin, end);
+        }
 
         // Duyệt qua danh sách và thêm từng hóa đơn vào bảng
         items.forEach(item -> {
@@ -237,6 +261,28 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
     @Override
     public void open() {
         this.setLocationRelativeTo(null);
+
+        // Kiểm tra quyền truy cập
+        if (currentUser == null) {
+            XDialog.alert("Không có thông tin người dùng!");
+            this.dispose();
+            return;
+        }
+
+        // Chỉ cho phép chain_manager và branch_manager truy cập
+        if (currentUser.getRole() != User.Role.chain_manager && currentUser.getRole() != User.Role.branch_manager) {
+            XDialog.alert("Bạn không có quyền truy cập vào quản lý phiếu bán hàng!");
+            this.dispose();
+            return;
+        }
+
+        // Cập nhật title để hiển thị thông tin chi nhánh
+        String title = "Quản lý phiếu bán hàng";
+        if (currentUser.getRole() == User.Role.branch_manager && currentUserBranch != null) {
+            title += " - Chi nhánh: " + currentUserBranch;
+        }
+        this.setTitle(title);
+
         this.selectTimeRange();
         this.fillBillDetails();
         this.fillToTable();
@@ -522,7 +568,6 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         btnCheckAll.setBackground(new java.awt.Color(63, 195, 107));
         btnCheckAll.setForeground(new java.awt.Color(255, 255, 255));
         btnCheckAll.setText("Chọn tất cả");
-        btnCheckAll.setIcon(XIcon.getIcon("/poly/cafe/images/icons/list.png", 16, 16));
         btnCheckAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCheckAllActionPerformed(evt);
@@ -532,7 +577,6 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         btnUncheckAll.setBackground(new java.awt.Color(247, 181, 58));
         btnUncheckAll.setForeground(new java.awt.Color(255, 255, 255));
         btnUncheckAll.setText("Bỏ chọn tất cả");
-        btnUncheckAll.setIcon(XIcon.getIcon("/poly/cafe/images/icons/refresh.png", 16, 16));
         btnUncheckAll.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnUncheckAllActionPerformed(evt);
@@ -542,7 +586,6 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         btnDeleteCheckedItems.setBackground(new java.awt.Color(218, 68, 68));
         btnDeleteCheckedItems.setForeground(new java.awt.Color(255, 255, 255));
         btnDeleteCheckedItems.setText("Xóa các mục chọn");
-        btnDeleteCheckedItems.setIcon(XIcon.getIcon("/poly/cafe/images/icons/delete.png", 16, 16));
         btnDeleteCheckedItems.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeleteCheckedItemsActionPerformed(evt);
@@ -699,7 +742,6 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         btnCreate.setBackground(new java.awt.Color(122, 92, 62));
         btnCreate.setForeground(new java.awt.Color(255, 255, 255));
         btnCreate.setText("Tạo mới");
-        btnCreate.setIcon(XIcon.getIcon("/poly/cafe/images/icons/add.png", 16, 16));
         btnCreate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCreateActionPerformed(evt);
@@ -709,7 +751,6 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         btnUpdate.setBackground(new java.awt.Color(122, 92, 62));
         btnUpdate.setForeground(new java.awt.Color(255, 255, 255));
         btnUpdate.setText("Cập nhật");
-        btnUpdate.setIcon(XIcon.getIcon("/poly/cafe/images/icons/edit.png", 16, 16));
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnUpdateActionPerformed(evt);
@@ -719,7 +760,6 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         btnDelete.setBackground(new java.awt.Color(122, 92, 62));
         btnDelete.setForeground(new java.awt.Color(255, 255, 255));
         btnDelete.setText("Xóa");
-        btnDelete.setIcon(XIcon.getIcon("/poly/cafe/images/icons/delete.png", 16, 16));
         btnDelete.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDeleteActionPerformed(evt);
@@ -729,7 +769,6 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
         btnClear.setBackground(new java.awt.Color(122, 92, 62));
         btnClear.setForeground(new java.awt.Color(255, 255, 255));
         btnClear.setText("Nhập mới");
-        btnClear.setIcon(XIcon.getIcon("/poly/cafe/images/icons/refresh.png", 16, 16));
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClearActionPerformed(evt);
@@ -1133,13 +1172,13 @@ public class BillManagerJDialog extends javax.swing.JDialog implements BillManag
      * Initialize icons for buttons
      */
     private void initIcons() {
-        btnCheckAll.setIcon(XIcon.getIcon("/poly/cafe/images/icons/list.png", 16, 16));
-        btnUncheckAll.setIcon(XIcon.getIcon("/poly/cafe/images/icons/refresh.png", 16, 16));
-        btnDeleteCheckedItems.setIcon(XIcon.getIcon("/poly/cafe/images/icons/delete.png", 16, 16));
-        btnCreate.setIcon(XIcon.getIcon("/poly/cafe/images/icons/add.png", 16, 16));
-        btnUpdate.setIcon(XIcon.getIcon("/poly/cafe/images/icons/edit.png", 16, 16));
-        btnDelete.setIcon(XIcon.getIcon("/poly/cafe/images/icons/delete.png", 16, 16));
-        btnClear.setIcon(XIcon.getIcon("/poly/cafe/images/icons/refresh.png", 16, 16));
+        IconUtils.setButtonIconSafe(btnCheckAll, "/poly/cafe/images/icons/list.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnUncheckAll, "/poly/cafe/images/icons/refresh.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnDeleteCheckedItems, "/poly/cafe/images/icons/delete.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnCreate, "/poly/cafe/images/icons/add.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnUpdate, "/poly/cafe/images/icons/edit.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnDelete, "/poly/cafe/images/icons/delete.png", 16, 16);
+        IconUtils.setButtonIconSafe(btnClear, "/poly/cafe/images/icons/refresh.png", 16, 16);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
