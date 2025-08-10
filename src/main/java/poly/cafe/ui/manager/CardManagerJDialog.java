@@ -70,25 +70,28 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
         items = dao.findAll();
         // Lọc theo shopId hiện tại
         String shopId = XAuth.user != null ? XAuth.user.getShopId() : null;
-        int minId = 0, maxId = 0;
         if (shopId != null) {
             try {
                 int sid = Integer.parseInt(shopId);
-                minId = sid * 100 + 1;
-                maxId = sid * 100 + 15;
+                int minId = sid * 100 + 1;
+                int maxId = sid * 100 + 99; // Giới hạn 99 bàn cho mỗi shop
+                final int fMinId = minId;
+                final int fMaxId = maxId;
+                items = items.stream()
+                        .filter(card -> card.getId() != null && card.getId() >= fMinId && card.getId() <= fMaxId)
+                        .toList();
             } catch (NumberFormatException e) {
-                minId = Integer.MIN_VALUE;
-                maxId = Integer.MAX_VALUE;
+                // Nếu không parse được shopId, hiển thị tất cả
+                items = items.stream()
+                        .filter(card -> card.getId() != null)
+                        .toList();
             }
         } else {
-            minId = Integer.MIN_VALUE;
-            maxId = Integer.MAX_VALUE;
+            // Nếu không có shopId, hiển thị tất cả
+            items = items.stream()
+                    .filter(card -> card.getId() != null)
+                    .toList();
         }
-        final int fMinId = minId;
-        final int fMaxId = maxId;
-        items = items.stream()
-                .filter(card -> card.getId() != null && card.getId() >= fMinId && card.getId() <= fMaxId)
-                .toList();
 
         items.forEach(item -> {
             Object[] rowData = {
@@ -102,7 +105,18 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
 
     @Override
     public void edit() {
-        Card entity = items.get(tblCards.getSelectedRow());
+        int selectedRow = tblCards.getSelectedRow();
+        if (selectedRow < 0) {
+            XDialog.alert("Vui lòng chọn một bàn để chỉnh sửa!");
+            return;
+        }
+
+        if (selectedRow >= items.size()) {
+            XDialog.alert("Dữ liệu không hợp lệ!");
+            return;
+        }
+
+        Card entity = items.get(selectedRow);
         this.setForm(entity);
         this.setEditable(true);
         tabs.setSelectedIndex(1);
@@ -126,24 +140,44 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
 
     @Override
     public void deleteCheckedItems() {
-        if (XDialog.confirm("Bạn thực sự muốn xóa các mục chọn?")) {
+        // Kiểm tra xem có item nào được chọn không
+        boolean hasCheckedItems = false;
+        for (int i = 0; i < tblCards.getRowCount(); i++) {
+            if ((Boolean) tblCards.getValueAt(i, 2)) {
+                hasCheckedItems = true;
+                break;
+            }
+        }
+
+        if (!hasCheckedItems) {
+            XDialog.alert("Vui lòng chọn ít nhất một bàn để xóa!");
+            return;
+        }
+
+        if (XDialog.confirm("Bạn thực sự muốn xóa các bàn đã chọn?")) {
             for (int i = 0; i < tblCards.getRowCount(); i++) {
                 if ((Boolean) tblCards.getValueAt(i, 2)) {
                     dao.deleteById(items.get(i).getId());
                 }
             }
             this.fillToTable();
+            XDialog.alert("Xóa các bàn đã chọn thành công!");
         }
     }
 
     @Override
     public void setForm(Card entity) {
-        txtId.setText(String.valueOf(entity.getId()));
+        if (entity.getId() != null) {
+            txtId.setText(String.valueOf(entity.getId()));
+        } else {
+            txtId.setText("");
+        }
         int status = entity.getStatus();
         switch (status) {
             case 0 -> rdoOperate.setSelected(true);
             case 1 -> rdoError.setSelected(true);
             case 2 -> rdoLose.setSelected(true);
+            default -> rdoOperate.setSelected(true); // Mặc định là Operating
         }
     }
 
@@ -158,21 +192,20 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
 
         try {
             int id = Integer.parseInt(idText);
+            if (id <= 0) {
+                XDialog.alert("Mã số bàn phải là số nguyên dương!");
+                return null;
+            }
+
             Card entity = new Card();
             entity.setId(id);
-            int status = 0; // mặc định
+            int status = 0; // mặc định là Operating
             if (rdoError.isSelected()) {
                 status = 1;
             } else if (rdoLose.isSelected()) {
                 status = 2;
             }
             entity.setStatus(status);
-
-            // Kiểm tra trùng lặp ID
-            if (isIdExists(id)) {
-                XDialog.alert("Mã số bàn đã tồn tại!");
-                return null;
-            }
 
             return entity;
         } catch (NumberFormatException e) {
@@ -189,25 +222,47 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
     @Override
     public void create() {
         Card entity = this.getForm();
-        dao.create(entity);
-        this.fillToTable();
-        this.clear();
+        if (entity != null) {
+            // Kiểm tra trùng lặp ID trước khi tạo
+            if (isIdExists(entity.getId())) {
+                XDialog.alert("Mã số bàn đã tồn tại!");
+                return;
+            }
+            dao.create(entity);
+            this.fillToTable();
+            this.clear();
+            XDialog.alert("Tạo mới thành công!");
+        }
     }
 
     @Override
     public void update() {
         Card entity = this.getForm();
-        dao.update(entity);
-        this.fillToTable();
+        if (entity != null) {
+            dao.update(entity);
+            this.fillToTable();
+            XDialog.alert("Cập nhật thành công!");
+        }
     }
 
     @Override
     public void delete() {
-        if (XDialog.confirm("Bạn thực sự muốn xóa?")) {
-            Integer id = Integer.valueOf(txtId.getText());
-            dao.deleteById(id);
-            this.fillToTable();
-            this.clear();
+        String idText = txtId.getText().trim();
+        if (idText.isEmpty()) {
+            XDialog.alert("Vui lòng chọn bàn cần xóa!");
+            return;
+        }
+
+        if (XDialog.confirm("Bạn thực sự muốn xóa bàn này?")) {
+            try {
+                Integer id = Integer.valueOf(idText);
+                dao.deleteById(id);
+                this.fillToTable();
+                this.clear();
+                XDialog.alert("Xóa thành công!");
+            } catch (NumberFormatException e) {
+                XDialog.alert("Mã số bàn không hợp lệ!");
+            }
         }
     }
 
@@ -253,9 +308,15 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
 
     @Override
     public void moveTo(int index) {
+        int rowCount = tblCards.getRowCount();
+        if (rowCount == 0) {
+            XDialog.alert("Không có dữ liệu để di chuyển!");
+            return;
+        }
+
         if (index < 0) {
             this.moveLast();
-        } else if (index >= tblCards.getRowCount()) {
+        } else if (index >= rowCount) {
             this.moveFirst();
         } else {
             tblCards.clearSelection();

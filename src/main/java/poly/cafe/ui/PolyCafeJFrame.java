@@ -36,6 +36,11 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
             return;
         }
 
+        // Đảm bảo frame hiển thị ở trên cùng
+        this.setAlwaysOnTop(true);
+        this.toFront();
+        this.requestFocus();
+
         // Đường dẫn tuyệt đối cho máy local
         String urlCoffeeLogo = "file:/C:/Users/Tan Phat Computer Q8/Fpoly_DA1_Nhom1_PolyCafe/src/main/java/poly/cafe/images/icons/coffee.png";
 
@@ -219,6 +224,18 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
         this.revalidate();
         this.repaint();
 
+        // Đảm bảo frame hiển thị ở trên cùng sau khi khởi tạo xong
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                // Đảm bảo frame hiển thị ở trên cùng
+                setAlwaysOnTop(false); // Tắt always on top sau khi đã focus
+                toFront();
+                requestFocus();
+                setVisible(true);
+            }
+        });
+
         // Thêm một delay nhỏ để đảm bảo UI được khởi tạo hoàn toàn
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -246,6 +263,22 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
                 }
             }
         });
+    }
+
+    @Override
+    public void exit() {
+        if (poly.cafe.util.XDialog.confirm("Bạn muốn đăng xuất?")) {
+            try {
+                // Đóng frame hiện tại
+                this.dispose();
+            } finally {
+                // Mở lại màn hình đăng nhập
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    LoginJDialog login = new LoginJDialog(null, true);
+                    login.setVisible(true);
+                });
+            }
+        }
     }
 
     /**
@@ -837,7 +870,24 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
                 UIManager.put("Button.foreground", Color.WHITE);
                 UIManager.put("Button.font", new Font("Segoe UI", Font.BOLD, 13));
 
-                new PolyCafeJFrame().setVisible(true);
+                PolyCafeJFrame frame = new PolyCafeJFrame();
+                frame.setVisible(true);
+
+                // Đảm bảo frame hiển thị ở trên cùng
+                frame.setAlwaysOnTop(true);
+                frame.toFront();
+                frame.requestFocus();
+
+                // Tắt always on top sau khi đã focus
+                javax.swing.Timer focusTimer = new javax.swing.Timer(100, new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        frame.setAlwaysOnTop(false);
+                        ((javax.swing.Timer) e.getSource()).stop();
+                    }
+                });
+                focusTimer.setRepeats(false);
+                focusTimer.start();
             }
         });
     }
