@@ -73,10 +73,18 @@ public class XJdbc {
     public static Connection openConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
             connection = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-
         }
         return connection;
-
+    }
+    
+    public static void closeConnection() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // UPDATE, INSERT, DELETE
@@ -88,6 +96,11 @@ public class XJdbc {
             throw new RuntimeException(e);
 
         }
+    }
+    
+    // Alias for executeUpdate for backward compatibility
+    public static int update(String sql, Object... values) {
+        return executeUpdate(sql, values);
     }
 
     // SELECT → Trả về ResultSet (nếu cần dùng ngoài)

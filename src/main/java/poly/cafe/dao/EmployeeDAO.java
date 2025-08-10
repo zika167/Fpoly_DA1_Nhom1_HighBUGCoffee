@@ -16,5 +16,9 @@ public interface EmployeeDAO {
     boolean delete(String username);
     List<Employee> findAll();
     Employee findByFullname(String fullname);
+    Employee findByUsername(String username);
+    List<Employee> findByShopId(String shopId);
+    String getRoleByUsername(String username);
+    String getShopIdByUsername(String username);
 }
 
