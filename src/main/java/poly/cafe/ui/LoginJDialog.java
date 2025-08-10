@@ -4,9 +4,14 @@
  */
 package poly.cafe.ui;
 
+import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import poly.cafe.ui.manager.HomepageBranchManagerJFrame;
 import java.util.Arrays;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import poly.cafe.dao.UserDAO;
 import poly.cafe.dao.impl.UserDAOImpl;
 import poly.cafe.entity.User;
@@ -22,18 +27,44 @@ public class LoginJDialog extends javax.swing.JDialog implements LoginController
     /**
      * Creates new form LoginJDialog1
      */
+    private static final int CUSTOM_WIDTH = 0;   // ví dụ: 800
+    private static final int CUSTOM_HEIGHT = 0;  // ví dụ: 400
     public LoginJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         this.open();
         this.init();
+        
     }
     
-    public void init() {
-        // Gọi WelcomeJDialog, sử dụng parent frame hoặc null
-        this.showWelcomeJDialog((JFrame) this.getParent()); // Truyền parent frame
+     public void init() {
+        // Gọi WelcomeJDialog
+        this.showWelcomeJDialog((JFrame) this.getParent());
+
+        // Đặt ảnh vừa với label khi mở cửa sổ
+        SwingUtilities.invokeLater(this::resizeLogo);
+
+        // Tự resize ảnh khi thay đổi kích thước label
+        lblLogo.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                resizeLogo();
+            }
+        });
     }
-    
+ private void resizeLogo() {
+        ImageIcon originalIcon = new ImageIcon(
+            "D:\\Duan1_nhom1\\Fpoly_DA1_Nhom1_PolyCafe\\src\\main\\java\\poly\\cafe\\images\\logo\\logo.jpg"
+        );
+
+        int width = (CUSTOM_WIDTH > 0) ? CUSTOM_WIDTH : lblLogo.getWidth();
+        int height = (CUSTOM_HEIGHT > 0) ? CUSTOM_HEIGHT : lblLogo.getHeight();
+
+        if (width > 0 && height > 0) {
+            Image scaledImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            lblLogo.setIcon(new ImageIcon(scaledImage));
+        }
+    }
     @Override
     public void open() {
         this.setLocationRelativeTo(null);
@@ -100,7 +131,7 @@ public class LoginJDialog extends javax.swing.JDialog implements LoginController
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         txtPassword = new javax.swing.JPasswordField();
-        jLabel5 = new javax.swing.JLabel();
+        lblLogo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Đăng nhập");
@@ -140,12 +171,9 @@ public class LoginJDialog extends javax.swing.JDialog implements LoginController
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addGap(12, 12, 12))))
+                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGap(12, 12, 12))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(61, 61, 61)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -189,11 +217,11 @@ public class LoginJDialog extends javax.swing.JDialog implements LoginController
 
         jPanel2.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(379, 0, -1, 490));
 
-        jLabel5.setBackground(new java.awt.Color(204, 204, 204));
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("Logo nhóm");
-        jLabel5.setOpaque(true);
-        jPanel2.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 340, 340));
+        lblLogo.setBackground(new java.awt.Color(204, 204, 204));
+        lblLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblLogo.setIcon(new javax.swing.ImageIcon("D:\\Duan1_nhom1\\Fpoly_DA1_Nhom1_PolyCafe\\src\\main\\java\\poly\\cafe\\images\\logo\\logo.jpg")); // NOI18N
+        lblLogo.setOpaque(true);
+        jPanel2.add(lblLogo, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 340, 370));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -267,11 +295,11 @@ public class LoginJDialog extends javax.swing.JDialog implements LoginController
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblLogo;
     private javax.swing.JPasswordField txtPassword;
     private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
