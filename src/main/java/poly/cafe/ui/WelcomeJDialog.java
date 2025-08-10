@@ -4,6 +4,12 @@
  */
 package poly.cafe.ui;
 
+import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import javax.swing.ImageIcon;
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author wangquockhanh
@@ -13,12 +19,39 @@ public class WelcomeJDialog extends javax.swing.JDialog implements WelcomeContro
     /**
      * Creates new form WelcomeJDialog1
      */
+    private static final int CUSTOM_WIDTH = 0;   // ví dụ: 800
+    private static final int CUSTOM_HEIGHT = 0;  // ví dụ: 400
     public WelcomeJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         progressBar.setUI(new javax.swing.plaf.basic.BasicProgressBarUI()); 
-        
+         SwingUtilities.invokeLater(this::resizeImageToLabel);
+
+        // Khi thay đổi kích thước cửa sổ -> set lại ảnh
+        jLabel4.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                resizeImageToLabel();
+            }
+        });
     }
+
+    // Hàm tự động resize ảnh
+    private void resizeImageToLabel() {
+        ImageIcon originalIcon = new ImageIcon(
+            "D:\\Duan1_nhom1\\Fpoly_DA1_Nhom1_PolyCafe\\src\\main\\java\\poly\\cafe\\images\\backgrounds\\wellcome.jpg"
+        );
+
+        int width = (CUSTOM_WIDTH > 0) ? CUSTOM_WIDTH : jLabel4.getWidth();
+        int height = (CUSTOM_HEIGHT > 0) ? CUSTOM_HEIGHT : jLabel4.getHeight();
+
+        if (width > 0 && height > 0) {
+            Image scaledImage = originalIcon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+            jLabel4.setIcon(new ImageIcon(scaledImage));
+        }
+    }
+
+    
 
     
     @Override
@@ -84,38 +117,34 @@ public class WelcomeJDialog extends javax.swing.JDialog implements WelcomeContro
         progressBar.setOpaque(true);
 
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Banner");
+        jLabel4.setIcon(new javax.swing.ImageIcon("D:\\Duan1_nhom1\\Fpoly_DA1_Nhom1_PolyCafe\\src\\main\\java\\poly\\cafe\\images\\backgrounds\\wellcome.jpg")); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 875, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGap(0, 120, Short.MAX_VALUE)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(316, 316, 316))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 516, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(101, 101, 101))))))
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(215, 215, 215))
+                    .addComponent(progressBar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 516, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(177, 177, 177))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(57, 57, 57)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(33, 33, 33)
+                .addContainerGap()
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 455, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(86, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
