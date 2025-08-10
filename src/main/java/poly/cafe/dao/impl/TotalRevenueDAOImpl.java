@@ -58,7 +58,8 @@ public class TotalRevenueDAOImpl implements TotalRevenueDAO{
         """;
         
         List<RevenueReportItem> list = new ArrayList<>();
-        try (ResultSet rs = XJdbc.executeQuery(sql, shopId, begin, end)) {
+        try {
+            ResultSet rs = XJdbc.executeQuery(sql, shopId, begin, end);
             while (rs.next()) {
                 RevenueReportItem item = new RevenueReportItem();
                 item.setCategoryName(rs.getString("categoryName"));
@@ -67,6 +68,7 @@ public class TotalRevenueDAOImpl implements TotalRevenueDAO{
                 item.setTotalRevenue(rs.getDouble("totalRevenue"));
                 list.add(item);
             }
+            // Don't close the ResultSet here as it's managed by XJdbc
         } catch (SQLException ex) {
             throw new RuntimeException("Lỗi truy vấn dữ liệu doanh thu", ex);
         }

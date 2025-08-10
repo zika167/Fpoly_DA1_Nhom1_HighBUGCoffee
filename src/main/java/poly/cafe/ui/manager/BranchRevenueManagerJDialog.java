@@ -112,7 +112,7 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -147,16 +147,6 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
             }
         ));
         jScrollPane2.setViewportView(tblBranch);
-        
-        // Thêm listener cho bảng chi nhánh
-        tblBranch.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                if (!evt.getValueIsAdjusting()) {
-                    updateSummaryInfo();
-                    fillRevenueReport();
-                }
-            }
-        });
 
         lblBranchName.setText("jLabel3");
 
@@ -254,11 +244,11 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel6)
                             .addComponent(lblBranchName))
-                        .addGap(18, 18, 18)
+                        .addGap(28, 28, 28)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
                             .addComponent(lblAddress))
-                        .addGap(42, 42, 42)
+                        .addGap(32, 32, 32)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
                             .addComponent(lblManagerName))
@@ -319,7 +309,28 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
         tblBranchModel = (DefaultTableModel) tblBranch.getModel();
         tblRevenueModel = (DefaultTableModel) tblRevenue.getModel();
         
-        // Không cần set lại column identifiers vì đã được định nghĩa trong initComponents()
+        // Set up custom renderer for revenue column
+        NumberFormat currencyFormatter = new java.text.DecimalFormat("#,##0 VNĐ");
+        tblRevenue.getColumnModel().getColumn(3).setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(javax.swing.JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (value instanceof Number) {
+                    setText(currencyFormatter.format(value));
+                } else {
+                    setText(value != null ? value.toString() : "");
+                }
+                return this;
+            }
+        });
+        
+        // Set up table selection listener
+        tblBranch.getSelectionModel().addListSelectionListener((ListSelectionListener) (e) -> {
+            if (!e.getValueIsAdjusting()) {
+                updateSummaryInfo();
+                fillRevenueReport();
+            }
+        });
         
         cboTimeRanges.setSelectedIndex(4); // Mặc định chọn "Năm nay"
         selectPredefinedTimeRange();
@@ -380,23 +391,37 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
             List<RevenueReportItem> reportItems = totalRevenueDAO.getRevenueByShopAndDateRange(shopId, beginDate, endDate);
             double totalRevenue = 0;
             
-                         // Tạo formatter tùy chỉnh để hiển thị VNĐ thay vì đ
-             NumberFormat currencyFormatter = new java.text.DecimalFormat("#,##0 VNĐ");
+            // Tạo formatter tùy chỉnh để hiển thị VNĐ
+            NumberFormat currencyFormatter = new java.text.DecimalFormat("#,##0 VNĐ");
 
             for (RevenueReportItem item : reportItems) {
+                // Ensure the values are not null and handle them properly
+                String categoryName = item.getCategoryName() != null ? item.getCategoryName() : "";
+                String drinkName = item.getDrinkName() != null ? item.getDrinkName() : "";
+                Integer quantitySold = item.getQuantitySold();
+                
+                // Check if totalRevenue is valid
+                double revenue = item.getTotalRevenue();
+                if (Double.isNaN(revenue) || Double.isInfinite(revenue)) {
+                    revenue = 0.0;
+                }
+                
+                System.out.println("Adding row: " + categoryName + ", " + drinkName + ", " + quantitySold + ", " + revenue);
+                
                 tblRevenueModel.addRow(new Object[]{
-                    item.getCategoryName(),
-                    item.getDrinkName(),
-                    item.getQuantitySold(),
-                    currencyFormatter.format(item.getTotalRevenue())
+                    categoryName,
+                    drinkName,
+                    quantitySold,
+                    revenue
                 });
-                totalRevenue += item.getTotalRevenue();
+                totalRevenue += revenue;
             }
             
             lblTotalRevenue.setText(currencyFormatter.format(totalRevenue));
             
         } catch (Exception e) {
             System.err.println("Lỗi tải báo cáo doanh thu: " + e.getMessage());
+            e.printStackTrace();
             lblTotalRevenue.setText("0 VNĐ");
         }
     }
