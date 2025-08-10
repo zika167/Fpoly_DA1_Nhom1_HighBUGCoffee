@@ -244,6 +244,8 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
         txtUnitPrice.setText(String.valueOf(entity.getUnitPrice()));
         // Slider
         sldDiscount.setValue((int) entity.getDiscount());
+        // Cập nhật label lbPercent theo giá trị slider
+        lbPercent.setText((int) entity.getDiscount() + "%");
         // Combobox
         for (int i = 0; i < cboCategories.getItemCount(); i++) {
             Object obj = cboCategories.getItemAt(i);
@@ -502,6 +504,7 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -541,6 +544,7 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
         btnMovePrevious = new javax.swing.JButton();
         btnMoveNext = new javax.swing.JButton();
         btnMoveLast = new javax.swing.JButton();
+        lbPercent = new javax.swing.JLabel();
 
         jRadioButton2.setText("jRadioButton2");
 
@@ -639,15 +643,14 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
                                                         150, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(btnCheckAll, javax.swing.GroupLayout.PREFERRED_SIZE, 144,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(15, 15, 15))
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGroup(jPanel2Layout.createSequentialGroup()
                                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 141,
                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(15, 15, 15)
                                                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 513,
-                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(15, 15, 15)))));
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(15, 15, 15)));
         jPanel2Layout.setVerticalGroup(
                 jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel2Layout.createSequentialGroup()
@@ -788,6 +791,9 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
             }
         });
 
+        lbPercent.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lbPercent.setText("(%)");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -811,25 +817,29 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
                                                         .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE,
                                                                 javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(txtUnitPrice))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32,
-                                                        Short.MAX_VALUE)
+                                                .addGap(32, 32, 32)
                                                 .addGroup(jPanel3Layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(jPanel3Layout
                                                                 .createParallelGroup(
                                                                         javax.swing.GroupLayout.Alignment.LEADING,
                                                                         false)
-                                                                .addComponent(jLabel5,
-                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                        Short.MAX_VALUE)
-                                                                .addComponent(sldDiscount,
-                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                        Short.MAX_VALUE)
                                                                 .addComponent(jLabel6,
                                                                         javax.swing.GroupLayout.PREFERRED_SIZE, 200,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                                                        .addComponent(jLabel5,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                61,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addPreferredGap(
+                                                                                javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                Short.MAX_VALUE)
+                                                                        .addComponent(lbPercent,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                61,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)))
                                                         .addGroup(jPanel3Layout
                                                                 .createParallelGroup(
                                                                         javax.swing.GroupLayout.Alignment.LEADING)
@@ -844,7 +854,9 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
                                                                         .addComponent(rdoAvailable)
                                                                         .addPreferredGap(
                                                                                 javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                        .addComponent(rdoOutOfStock)))))
+                                                                        .addComponent(rdoOutOfStock)))
+                                                        .addComponent(sldDiscount, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                         .addGroup(jPanel3Layout.createSequentialGroup()
                                                 .addComponent(btnCreate, javax.swing.GroupLayout.PREFERRED_SIZE, 105,
                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -880,7 +892,8 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
                                                 .addGroup(jPanel3Layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(jLabel2)
-                                                        .addComponent(jLabel5))
+                                                        .addComponent(jLabel5)
+                                                        .addComponent(lbPercent))
                                                 .addGap(12, 12, 12)
                                                 .addGroup(jPanel3Layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1033,8 +1046,9 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
     }
 
     private void sldDiscountStateChanged(javax.swing.event.ChangeEvent evt) {// GEN-FIRST:event_sldDiscountStateChanged
-        // TODO add your handling code here:
-
+        // Cập nhật label lbPercent theo giá trị slider
+        int value = sldDiscount.getValue();
+        lbPercent.setText(value + "%");
     }// GEN-LAST:event_sldDiscountStateChanged
 
     private void lblImageMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_lblImageMouseClicked
@@ -1139,6 +1153,7 @@ public class DrinkManagerJDialog extends javax.swing.JDialog implements DrinkMan
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel lbPercent;
     private javax.swing.JLabel lblImage;
     private javax.swing.JRadioButton rdoAvailable;
     private javax.swing.JRadioButton rdoOutOfStock;

@@ -11,6 +11,7 @@ import java.util.List;
 import poly.cafe.dao.BillDAO;
 import poly.cafe.entity.Bill;
 import poly.cafe.util.XAuth;
+import poly.cafe.util.XDialog;
 import poly.cafe.util.XJdbc;
 import poly.cafe.util.XQuery;
 
@@ -39,34 +40,35 @@ public class BillDAOImpl implements BillDAO {
         return XQuery.getBeanList(Bill.class, findByTimeRangeSql, begin, end);
     }
 
-   /* @Override
-    public Bill create(Bill entity) {
-        Object[] values = {
-                entity.getUsername(),
-                entity.getCardId(),
-                entity.getCheckin(),
-                entity.getCheckout(),
-                entity.getStatus(),
-                entity.getPaymentId()
-        };
-        XJdbc.executeUpdate(createSql, values);
-
-        // Lấy ID vừa được tạo tự động
-        String getLastIdSql = "SELECT LAST_INSERT_ID()";
-        Object generatedIdObj = XJdbc.getValue(getLastIdSql);
-        if (generatedIdObj instanceof BigInteger) {
-            entity.setId(((BigInteger) generatedIdObj).longValue());
-        } else if (generatedIdObj instanceof Long) {
-            entity.setId((Long) generatedIdObj);
-        } else if (generatedIdObj instanceof Integer) {
-            entity.setId(((Integer) generatedIdObj).longValue());
-        } else {
-            entity.setId(Long.valueOf(generatedIdObj.toString()));
-        }
-
-        return entity;
-    }*/
-    
+    /*
+     * @Override
+     * public Bill create(Bill entity) {
+     * Object[] values = {
+     * entity.getUsername(),
+     * entity.getCardId(),
+     * entity.getCheckin(),
+     * entity.getCheckout(),
+     * entity.getStatus(),
+     * entity.getPaymentId()
+     * };
+     * XJdbc.executeUpdate(createSql, values);
+     * 
+     * // Lấy ID vừa được tạo tự động
+     * String getLastIdSql = "SELECT LAST_INSERT_ID()";
+     * Object generatedIdObj = XJdbc.getValue(getLastIdSql);
+     * if (generatedIdObj instanceof BigInteger) {
+     * entity.setId(((BigInteger) generatedIdObj).longValue());
+     * } else if (generatedIdObj instanceof Long) {
+     * entity.setId((Long) generatedIdObj);
+     * } else if (generatedIdObj instanceof Integer) {
+     * entity.setId(((Integer) generatedIdObj).longValue());
+     * } else {
+     * entity.setId(Long.valueOf(generatedIdObj.toString()));
+     * }
+     * 
+     * return entity;
+     * }
+     */
 
     @Override
     public void update(Bill entity) {
@@ -107,21 +109,23 @@ public class BillDAOImpl implements BillDAO {
         return XQuery.getBeanList(Bill.class, findByCardIdSql, cardId);
     }
 
-   /* @Override
-    public Bill findServicingByCardId(Integer cardId) {
-        String sql = "SELECT * FROM Bills WHERE CardId=? AND Status=0";
-        Bill bill = XQuery.getSingleBean(Bill.class, sql, cardId);
-        if (bill == null) { // không tìm thấy -> tạo mới
-            Bill newBill = new Bill();
-            newBill.setCardId(cardId);
-            newBill.setCheckin(new Date()); // Set thời gian hiện tại khi tạo mới
-            newBill.setStatus(0); // đang phục vụ
-            newBill.setUsername(XAuth.user.getUsername());
-            newBill.setPaymentId(null); // Chưa thanh toán
-            bill = this.create(newBill); // insert và lấy ID được tạo
-        }
-        return bill;
-    }*/
+    /*
+     * @Override
+     * public Bill findServicingByCardId(Integer cardId) {
+     * String sql = "SELECT * FROM Bills WHERE CardId=? AND Status=0";
+     * Bill bill = XQuery.getSingleBean(Bill.class, sql, cardId);
+     * if (bill == null) { // không tìm thấy -> tạo mới
+     * Bill newBill = new Bill();
+     * newBill.setCardId(cardId);
+     * newBill.setCheckin(new Date()); // Set thời gian hiện tại khi tạo mới
+     * newBill.setStatus(0); // đang phục vụ
+     * newBill.setUsername(XAuth.user.getUsername());
+     * newBill.setPaymentId(null); // Chưa thanh toán
+     * bill = this.create(newBill); // insert và lấy ID được tạo
+     * }
+     * return bill;
+     * }
+     */
 
     /*
      * @Override
@@ -217,64 +221,46 @@ public class BillDAOImpl implements BillDAO {
         }
         return results;
     }
-    
-    // File: poly.cafe.dao.impl.BillDAOImpl.java
 
-// ... (Các phương thức khác giữ nguyên)
+    @Override
+    public Bill create(Bill entity) {
+        Object[] values = {
+                entity.getUsername(),
+                entity.getCardId(),
+                entity.getCheckin(),
+                entity.getCheckout(),
+                entity.getStatus(),
+                entity.getPaymentId()
+        };
 
-@Override
-public Bill create(Bill entity) {
-    // Câu lệnh INSERT
-    String createSql = "INSERT INTO Bills (Username, CardId, Checkin, Checkout, Status, PaymentId) VALUES (?, ?, ?, ?, ?, ?)";
-    
-    Object[] values = {
-        entity.getUsername(),
-        entity.getCardId(),
-        entity.getCheckin(),
-        entity.getCheckout(),
-        entity.getStatus(),
-        entity.getPaymentId()
-    };
-    
-    // Gọi phương thức trong XJdbc để chèn và lấy ID được tạo ra ngay lập tức
-    long generatedId = poly.cafe.util.XJdbc.executeInsertAndGetGeneratedId(createSql, values);
-    
-    // In ra console để kiểm tra
-    System.out.println("ID mới được tạo từ CSDL: " + generatedId);
-    
-    // Cập nhật ID này vào đối tượng Bill trong bộ nhớ Java
-    entity.setId(generatedId);
-    
-    // Trả về chính đối tượng đã được cập nhật ID
-    return entity;
-}
-
-@Override
-public Bill findServicingByCardId(Integer cardId) {
-    String sql = "SELECT * FROM Bills WHERE CardId=? AND Status=0";
-    Bill bill = poly.cafe.util.XQuery.getSingleBean(Bill.class, sql, cardId);
-    
-    if (bill == null) { // Nếu không tìm thấy hóa đơn nào đang phục vụ
-        // Kiểm tra xem người dùng đã đăng nhập chưa để tránh lỗi
-        if (poly.cafe.util.XAuth.user == null) {
-            poly.cafe.util.XDialog.alert("Vui lòng đăng nhập để thực hiện chức năng này!");
-            return null;
-        }
-
-        // Tạo một đối tượng Bill mới
-        Bill newBill = new Bill();
-        newBill.setCardId(cardId);
-        newBill.setCheckin(new java.util.Date()); 
-        newBill.setStatus(0); // Trạng thái: đang phục vụ
-        newBill.setUsername(poly.cafe.util.XAuth.user.getUsername());
-        
-        // Gọi phương thức create và gán lại kết quả cho biến 'bill'
-        // Điều này đảm bảo 'bill' luôn là đối tượng đã được cập nhật ID
-        bill = this.create(newBill); 
+        // Sử dụng executeInsertAndGetGeneratedId để lấy ID được tạo tự động
+        long generatedId = XJdbc.executeInsertAndGetGeneratedId(createSql, values);
+        entity.setId(generatedId);
+        return entity;
     }
-    return bill;
-}
 
-// ... (Các phương thức còn lại)
+    @Override
+    public Bill findServicingByCardId(Integer cardId) {
+        String sql = "SELECT * FROM Bills WHERE CardId=? AND Status=0";
+        Bill bill = XQuery.getSingleBean(Bill.class, sql, cardId);
 
+        if (bill == null) { // Nếu không tìm thấy hóa đơn nào đang phục vụ
+            // Kiểm tra xem người dùng đã đăng nhập chưa để tránh lỗi
+            if (XAuth.user == null) {
+                XDialog.alert("Vui lòng đăng nhập để thực hiện chức năng này!");
+                return null;
+            }
+
+            // Tạo một đối tượng Bill mới
+            Bill newBill = new Bill();
+            newBill.setCardId(cardId);
+            newBill.setCheckin(new Date());
+            newBill.setStatus(0); // Trạng thái: đang phục vụ
+            newBill.setUsername(XAuth.user.getUsername());
+
+            // Gọi phương thức create và gán lại kết quả cho biến 'bill'
+            bill = this.create(newBill);
+        }
+        return bill;
+    }
 }
