@@ -24,6 +24,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
+import java.text.SimpleDateFormat;
 /**
  *
  * @author Admin
@@ -113,28 +114,45 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
     
     private void setForm() {
         if (bill == null) return;
-        
-        lblMaPhieu.setText(String.valueOf(bill.getId()));
-        lblThoiGian.setText(bill.getCheckin() != null ? XDate.format(bill.getCheckin(), "HH:mm:ss dd-MM-yyyy") : "Chưa có");
+    
+    lblMaPhieu.setText(String.valueOf(bill.getId()));
+    lblThoiGian.setText(bill.getCheckin() != null ? XDate.format(bill.getCheckin(), "HH:mm:ss dd-MM-yyyy") : "Chưa có");
 
-        // TÍNH TỔNG TIỀN BẰNG double
-        double total = billDetails.stream()
-                .mapToDouble(d -> d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount() / 100.0))
-                .sum();
+    // TÍNH TỔNG TIỀN BẰNG double
+    double total = billDetails.stream()
+            .mapToDouble(d -> d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount() / 100.0))
+            .sum();
 
-        // ĐỊNH DẠNG TỔNG TIỀN THEO VNĐ
-        lblTongCong.setText(String.format("%,.0f VNĐ", total));
-        
-        // Tạo và hiển thị mã QR
-        try {
-            String qrContent = "Bill ID: " + bill.getId() + ", Total: " + String.format("%.0f", total) + " VND";
-            BufferedImage qrImage = generateQRCode(qrContent, lblQR.getWidth(), lblQR.getHeight());
-            lblQR.setIcon(new ImageIcon(qrImage));
-            lblQR.setText("");
-        } catch (Exception e) {
-            lblQR.setText("Lỗi tạo QR");
-            XDialog.alert("Không thể tạo mã QR: " + e.getMessage());
+    // ĐỊNH DẠNG TỔNG TIỀN THEO VNĐ
+    lblTongCong.setText(String.format("%,.0f VNĐ", total));
+    
+    // Tạo nội dung QR đầy đủ
+    StringBuilder qrContent = new StringBuilder();
+    qrContent.append("Số hóa đơn: ").append(bill.getId()).append("\n");
+    qrContent.append("Ngày in: ").append(new SimpleDateFormat("HH:mm:ss dd-MM-yyyy").format(new java.util.Date())).append("\n");
+    qrContent.append("Người in: ").append(bill.getUsername() != null ? bill.getUsername() : "Không xác định").append("\n");
+    qrContent.append("Tổng tiền: ").append(String.format("%,.0f VNĐ", total)).append("\n");
+    qrContent.append("Chi tiết sản phẩm:\n");
+    
+    for (BillDetail d : billDetails) {
+        if (d != null) {
+            qrContent.append("- ").append(d.getDrinkName() != null ? d.getDrinkName() : "N/A")
+                     .append(": SL ").append(d.getQuantity())
+                     .append(", Giá: ").append(String.format("%,.0f VNĐ", d.getUnitPrice()))
+                     .append(", Giảm: ").append(String.format("%.0f%%", d.getDiscount()))
+                     .append("\n");
         }
+    }
+    
+    // Tạo và hiển thị mã QR
+    try {
+        BufferedImage qrImage = generateQRCode(qrContent.toString(), lblQR.getWidth(), lblQR.getHeight());
+        lblQR.setIcon(new ImageIcon(qrImage));
+        lblQR.setText("");
+    } catch (Exception e) {
+        lblQR.setText("Lỗi tạo QR");
+        XDialog.alert("Không thể tạo mã QR: " + e.getMessage());
+    }
     }
 
     private BufferedImage generateQRCode(String content, int width, int height) throws WriterException {

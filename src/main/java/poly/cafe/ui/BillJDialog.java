@@ -23,6 +23,8 @@ import poly.cafe.ui.ThankJJDialog;
 import poly.cafe.util.XDate;
 import poly.cafe.util.XDialog;
 import poly.cafe.util.XQuery;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *
@@ -150,36 +152,57 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
     @Override
     public void checkout() {
         if (bill == null || bill.getId() == null) {
-            XDialog.alert("Không thể thanh toán khi chưa có phiếu bán hàng!");
-            return;
-        }
+        XDialog.alert("Không thể thanh toán khi chưa có phiếu bán hàng!");
+        return;
+    }
 
-        if (XDialog.confirm("Bạn muốn thanh toán phiếu bán hàng?")) {
-            bill.setStatus(Bill.Status.Completed.ordinal());
-            bill.setCheckout(new Date());
-            billDao.update(bill);
-            this.setForm(bill);
-            // Open ThankJJDialog after successful checkout
-            ThankJJDialog thankDialog = new ThankJJDialog((Frame) this.getOwner(), true);
-            thankDialog.setVisible(true);
-            thankDialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosed(java.awt.event.WindowEvent e) {
-                    BillJDialog.this.dispose(); // Close BillJDialog after ThankJJDialog closes
-                    // Cập nhật trạng thái bàn sau khi thanh toán
-                    if (getOwner() instanceof javax.swing.JFrame) {
-                        // Tìm SalesJDialog trong parent windows để refresh
-                        java.awt.Window[] windows = getOwner().getOwnedWindows();
-                        for (java.awt.Window window : windows) {
-                            if (window instanceof SalesJDialog) {
-                                ((SalesJDialog) window).loadCards();
-                                break;
-                            }
+    if (XDialog.confirm("Bạn muốn thanh toán phiếu bán hàng?")) {
+        bill.setStatus(Bill.Status.Completed.ordinal());
+        bill.setCheckout(new Date());
+        billDao.update(bill);
+        this.setForm(bill);  // Cập nhật form BillJDialog
+        
+        // Ẩn BillJDialog tạm thời để hiển thị Thank
+        this.setVisible(false);
+        
+        // Mở ThankJJDialog
+        ThankJJDialog thankDialog = new ThankJJDialog((Frame) this.getOwner(), true);
+        thankDialog.setVisible(true);
+        
+        // Tự động đóng Thank sau 5 giây
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                thankDialog.dispose();  // Đóng Thank
+            }
+        }, 5000);  // 5000 ms = 5 giây
+        
+        // Sau khi Thank đóng (dù tự động hay manual), quay lại BillJDialog
+        thankDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                // Hiển thị lại BillJDialog
+                BillJDialog.this.setVisible(true);
+                
+                // Optional: Reset bill hoặc tải lại dữ liệu nếu cần (ví dụ: clear bill để tạo mới)
+                // bill = null;  
+                // fillBillDetails();  
+                // setForm(bill);
+                
+                // Optional: Refresh SalesJDialog nếu vẫn muốn
+                if (getOwner() instanceof javax.swing.JFrame) {
+                    java.awt.Window[] windows = getOwner().getOwnedWindows();
+                    for (java.awt.Window window : windows) {
+                        if (window instanceof SalesJDialog) {
+                            ((SalesJDialog) window).loadCards();
+                            break;
                         }
                     }
                 }
-            });
-        }
+            }
+        });
+    }
     }
 
     @Override
