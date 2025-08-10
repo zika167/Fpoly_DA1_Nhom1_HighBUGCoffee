@@ -18,39 +18,41 @@ import poly.cafe.util.XQuery;
 public class RevenueDAOImpl implements RevenueDAO {
 
     @Override
-    public List<ByCategory> getByCategory(Date begin, Date end) {
+    public List<ByCategory> getByCategory(Date begin, Date end, String shopId) {
         String revenueByCategorySql = "SELECT category.Name AS `Category`, "
-                + "   sum(detail.UnitPrice*detail.Quantity*(1-detail.Discount)) AS Revenue,"
+                + "   drink.Name AS DrinkName,"
                 + "   sum(detail.Quantity) AS Quantity,"
-                + "   min(detail.UnitPrice) AS MinPrice,"
-                + "   max(detail.UnitPrice) AS MaxPrice,"
-                + "   avg(detail.UnitPrice) AS AvgPrice "
+                + "   sum(drink.UnitPrice*detail.Quantity*(1-drink.Discount/100)) AS Revenue "
                 + "FROM BillDetails detail "
                 + "   JOIN Drinks drink ON drink.Id=detail.DrinkId"
                 + "   JOIN Categories category ON category.Id=drink.CategoryId"
                 + "   JOIN Bills bill ON bill.Id=detail.BillId "
+                + "   JOIN Users u ON u.Username = bill.Username "
                 + "WHERE bill.Status = 1 "
                 + "   AND bill.Checkout IS NOT NULL "
                 + "   AND bill.Checkout BETWEEN ? AND ? "
-                + "GROUP BY category.Name "
-                + "ORDER BY Revenue DESC";
-        return XQuery.getBeanList(ByCategory.class, revenueByCategorySql, begin, end);
+                + "   AND u.ShopId = ? "
+                + "GROUP BY category.Name, drink.Name "
+                + "ORDER BY category.Name, Revenue DESC";
+        return XQuery.getBeanList(ByCategory.class, revenueByCategorySql, begin, end, shopId);
     }
 
     @Override
-    public List<ByUser> getByUser(Date begin, Date end) {
+    public List<ByUser> getByUser(Date begin, Date end, String shopId) {
         String revenueByUserSql = "SELECT bill.Username AS `User`, "
-                + "   sum(detail.UnitPrice*detail.Quantity*(1-detail.Discount)) AS Revenue,"
+                + "   user.FullName AS EmployeeName,"
                 + "   count(DISTINCT detail.BillId) AS Quantity,"
-                + "   min(bill.Checkin) AS FirstTime,"
-                + "   max(bill.Checkin) AS LastTime "
+                + "   sum(drink.UnitPrice*detail.Quantity*(1-drink.Discount/100)) AS Revenue "
                 + "FROM BillDetails detail "
+                + "   JOIN Drinks drink ON drink.Id=detail.DrinkId "
                 + "   JOIN Bills bill ON bill.Id=detail.BillId "
+                + "   JOIN Users user ON user.Username = bill.Username "
                 + "WHERE bill.Status=1 "
                 + "   AND bill.Checkout IS NOT NULL "
                 + "   AND bill.Checkout BETWEEN ? AND ? "
-                + "GROUP BY bill.Username "
+                + "   AND user.ShopId = ? "
+                + "GROUP BY bill.Username, user.FullName "
                 + "ORDER BY Revenue DESC";
-        return XQuery.getBeanList(ByUser.class, revenueByUserSql, begin, end);
+        return XQuery.getBeanList(ByUser.class, revenueByUserSql, begin, end, shopId);
     }
 }

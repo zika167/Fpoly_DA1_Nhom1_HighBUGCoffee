@@ -97,7 +97,7 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
                         "Card #" + b.getCardId(),
                         b.getUsername() != null ? b.getUsername() : "N/A",
                         b.getCheckin() != null ? XDate.format(b.getCheckin(), "HH:mm:ss dd-MM-yyyy") : "N/A",
-                        b.getCheckout() != null ? XDate.format(b.getCheckout(), "HH:mm:ss dd-MM-yyyy") : "N/A",
+                        b.getCheckout() != null ? XDate.format(b.getCheckout(), "HH:mm:ss dd-MM-yyyy") : "",
                         getShopNameForUser(b.getUsername()), // Lấy tên cửa hàng từ username
                         statuses[b.getStatus()]
                 };
@@ -122,7 +122,7 @@ public class HistoryJDialog extends javax.swing.JDialog implements HistoryContro
                         "Card #" + row[2], // CardId
                         row[1] != null ? row[1].toString() : "N/A", // Username
                         row[3] != null ? XDate.format((Date) row[3], "HH:mm:ss dd-MM-yyyy") : "N/A", // Checkin
-                        row[4] != null ? XDate.format((Date) row[4], "HH:mm:ss dd-MM-yyyy") : "N/A", // Checkout
+                        row[4] != null ? XDate.format((Date) row[4], "HH:mm:ss dd-MM-yyyy") : "", // Checkout
                         row[8] != null ? row[8].toString() : "N/A", // ShopName
                         statuses[(Integer) row[5]] // Status
                 };

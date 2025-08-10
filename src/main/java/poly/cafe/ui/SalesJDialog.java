@@ -164,91 +164,95 @@ public class SalesJDialog extends javax.swing.JDialog implements SalesController
         }
     }
 
-    /*public void loadCards() {// tải và hiển thị các thẻ lên cửa sổ bán hàng
-        CardDAO dao = new CardDAOImpl();
-        BillDAO billDao = new BillDAOImpl();
-        List<Card> cards = dao.findAll();
-        // Thay vì dao.findAll()
-        // Lọc theo shopId hiện tại
+    /*
+     * public void loadCards() {// tải và hiển thị các thẻ lên cửa sổ bán hàng
+     * CardDAO dao = new CardDAOImpl();
+     * BillDAO billDao = new BillDAOImpl();
+     * List<Card> cards = dao.findAll();
+     * // Thay vì dao.findAll()
+     * // Lọc theo shopId hiện tại
+     * String shopId = XAuth.user != null ? XAuth.user.getShopId() : null;
+     * int minId = 0, maxId = 0;
+     * if (shopId != null) {
+     * try {
+     * int sid = Integer.parseInt(shopId);
+     * minId = sid * 100 + 1;
+     * maxId = sid * 100 + 15;
+     * } catch (NumberFormatException e) {
+     * minId = Integer.MIN_VALUE;
+     * maxId = Integer.MAX_VALUE;
+     * }
+     * } else {
+     * minId = Integer.MIN_VALUE;
+     * maxId = Integer.MAX_VALUE;
+     * }
+     * final int fMinId = minId;
+     * final int fMaxId = maxId;
+     * cards = cards.stream()
+     * .filter(card -> card.getId() != null && card.getId() >= fMinId &&
+     * card.getId() <= fMaxId)
+     * .toList();
+     * 
+     * pnlCards.removeAll();
+     * cards.forEach(card -> {
+     * // Kiểm tra xem thẻ có đang được sử dụng không (chỉ kiểm tra, không tạo mới)
+     * String sql = "SELECT * FROM Bills WHERE CardId=? AND Status=0";
+     * Bill servicingBill = XQuery.getSingleBean(Bill.class, sql, card.getId());
+     * boolean isServicing = (servicingBill != null && servicingBill.getId() !=
+     * null);
+     * pnlCards.add(this.createButton(card, isServicing));
+     * });
+     * }
+     */
+    public void loadCards() {
+        // ----- BƯỚC 1: KHAI BÁO VÀ TÍNH TOÁN KHOẢNG ID CHO CHI NHÁNH -----
+        CardDAO cardDao = new CardDAOImpl();
         String shopId = XAuth.user != null ? XAuth.user.getShopId() : null;
-        int minId = 0, maxId = 0;
+        int minId, maxId; // Khai báo biến
+
         if (shopId != null) {
             try {
                 int sid = Integer.parseInt(shopId);
                 minId = sid * 100 + 1;
-                maxId = sid * 100 + 15;
+                maxId = sid * 100 + 99; // Tăng giới hạn để hiển thị nhiều bàn hơn
             } catch (NumberFormatException e) {
+                // Trường hợp dự phòng nếu shopId không hợp lệ
                 minId = Integer.MIN_VALUE;
                 maxId = Integer.MAX_VALUE;
             }
         } else {
+            // Dành cho vai trò không thuộc chi nhánh nào, ví dụ: quản lý chuỗi
             minId = Integer.MIN_VALUE;
             maxId = Integer.MAX_VALUE;
         }
-        final int fMinId = minId;
-        final int fMaxId = maxId;
-        cards = cards.stream()
-                .filter(card -> card.getId() != null && card.getId() >= fMinId && card.getId() <= fMaxId)
-                .toList();
 
-        pnlCards.removeAll();
-        cards.forEach(card -> {
-            // Kiểm tra xem thẻ có đang được sử dụng không (chỉ kiểm tra, không tạo mới)
-            String sql = "SELECT * FROM Bills WHERE CardId=? AND Status=0";
-            Bill servicingBill = XQuery.getSingleBean(Bill.class, sql, card.getId());
-            boolean isServicing = (servicingBill != null && servicingBill.getId() != null);
+        // ----- BƯỚC 2: TẢI DỮ LIỆU HIỆU QUẢ TỪ DATABASE -----
+
+        // Chỉ lấy các thẻ của chi nhánh hiện tại (1 truy vấn)
+        List<Card> cardsInShop = cardDao.findByIdRange(minId, maxId);
+
+        // Lấy TẤT CẢ các hóa đơn đang phục vụ của shop này (1 truy vấn)
+        String servicingBillsSql = "SELECT * FROM Bills WHERE CardId BETWEEN ? AND ? AND Status = 0";
+        List<Bill> servicingBills = XQuery.getBeanList(Bill.class, servicingBillsSql, minId, maxId);
+
+        // Chuyển danh sách ID thẻ đang phục vụ vào một Set để tra cứu nhanh hơn
+        java.util.Set<Integer> servicingCardIds = servicingBills.stream()
+                .map(Bill::getCardId)
+                .collect(java.util.stream.Collectors.toSet());
+
+        // ----- BƯỚC 3: VẼ LẠI GIAO DIỆN -----
+        pnlCards.removeAll(); // Xóa các nút cũ
+
+        cardsInShop.forEach(card -> {
+            // Kiểm tra trạng thái thẻ ngay trong bộ nhớ, không cần truy vấn CSDL nữa
+            boolean isServicing = servicingCardIds.contains(card.getId());
             pnlCards.add(this.createButton(card, isServicing));
         });
-    }*/
-    public void loadCards() {
-    // ----- BƯỚC 1: KHAI BÁO VÀ TÍNH TOÁN KHOẢNG ID CHO CHI NHÁNH -----
-    CardDAO cardDao = new CardDAOImpl();
-    String shopId = XAuth.user != null ? XAuth.user.getShopId() : null;
-    int minId, maxId; // Khai báo biến
 
-    if (shopId != null) {
-        try {
-            int sid = Integer.parseInt(shopId);
-            minId = sid * 100 + 1;
-            maxId = sid * 100 + 15; // Hoặc số lượng bàn tối đa của bạn
-        } catch (NumberFormatException e) {
-            // Trường hợp dự phòng nếu shopId không hợp lệ
-            minId = Integer.MIN_VALUE;
-            maxId = Integer.MAX_VALUE;
-        }
-    } else {
-        // Dành cho vai trò không thuộc chi nhánh nào, ví dụ: quản lý chuỗi
-        minId = Integer.MIN_VALUE;
-        maxId = Integer.MAX_VALUE;
+        // Yêu cầu panel vẽ lại các thành phần con của nó
+        pnlCards.revalidate();
+        pnlCards.repaint();
     }
-
-    // ----- BƯỚC 2: TẢI DỮ LIỆU HIỆU QUẢ TỪ DATABASE -----
-
-    // Chỉ lấy các thẻ của chi nhánh hiện tại (1 truy vấn)
-    List<Card> cardsInShop = cardDao.findByIdRange(minId, maxId);
-
-    // Lấy TẤT CẢ các hóa đơn đang phục vụ của shop này (1 truy vấn)
-    String servicingBillsSql = "SELECT * FROM Bills WHERE CardId BETWEEN ? AND ? AND Status = 0";
-    List<Bill> servicingBills = XQuery.getBeanList(Bill.class, servicingBillsSql, minId, maxId);
-
-    // Chuyển danh sách ID thẻ đang phục vụ vào một Set để tra cứu nhanh hơn
-    java.util.Set<Integer> servicingCardIds = servicingBills.stream()
-            .map(Bill::getCardId)
-            .collect(java.util.stream.Collectors.toSet());
-
-    // ----- BƯỚC 3: VẼ LẠI GIAO DIỆN -----
-    pnlCards.removeAll(); // Xóa các nút cũ
-
-    cardsInShop.forEach(card -> {
-        // Kiểm tra trạng thái thẻ ngay trong bộ nhớ, không cần truy vấn CSDL nữa
-        boolean isServicing = servicingCardIds.contains(card.getId());
-        pnlCards.add(this.createButton(card, isServicing));
-    });
-
-    // Yêu cầu panel vẽ lại các thành phần con của nó
-    pnlCards.revalidate();
-    pnlCards.repaint();
-}
 
     private JButton createButton(Card card, boolean isServicing) { // tạo Jbutton cho thẻ
         JButton btnCard = new JButton();
@@ -262,13 +266,13 @@ public class SalesJDialog extends javax.swing.JDialog implements SalesController
             btnCard.setBackground(Color.LIGHT_GRAY);
             btnCard.setForeground(Color.DARK_GRAY);
         } else if (isServicing) {
-            // Thẻ đang được sử dụng (có phiếu đang phục vụ)
-            btnCard.setBackground(new Color(255, 165, 0)); // Màu cam
+            // Thẻ đang được sử dụng (có phiếu đang phục vụ) - Màu cam đậm
+            btnCard.setBackground(new Color(255, 140, 0)); // Màu cam đậm
             btnCard.setForeground(Color.WHITE);
         } else {
-            // Thẻ sẵn sàng
-            btnCard.setBackground(Color.getHSBColor(0.1083f, 0.75f, 0.89f)); // Màu xanh lá
-            btnCard.setForeground(Color.WHITE);
+            // Thẻ sẵn sàng (chưa đặt) - Màu cam nhạt
+            btnCard.setBackground(new Color(255, 200, 100)); // Màu cam nhạt
+            btnCard.setForeground(Color.BLACK);
         }
 
         btnCard.setActionCommand(String.valueOf(card.getId()));

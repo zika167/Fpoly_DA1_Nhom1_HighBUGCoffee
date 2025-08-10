@@ -140,7 +140,22 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             items = java.util.List.of(); // staff không được xem danh sách
         }
 
-        items.forEach(item -> {
+        // Sắp xếp danh sách để branch-manager lên đầu tiên
+        List<User> sortedItems = items.stream()
+                .sorted((u1, u2) -> {
+                    // branch-manager lên đầu
+                    if (u1.getRole() == User.Role.branch_manager && u2.getRole() != User.Role.branch_manager) {
+                        return -1;
+                    }
+                    if (u1.getRole() != User.Role.branch_manager && u2.getRole() == User.Role.branch_manager) {
+                        return 1;
+                    }
+                    // Sau đó sắp xếp theo username
+                    return u1.getUsername().compareTo(u2.getUsername());
+                })
+                .collect(Collectors.toList());
+
+        sortedItems.forEach(item -> {
             Object[] rowData = {
                     item.getUsername(),
                     item.getPassword(),
@@ -389,6 +404,15 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         } else {
             entity.setRole(User.Role.staff); // Mặc định là nhân viên
         }
+
+        // Tự động gán ShopID cho user mới được tạo
+        if (currentUser != null) {
+            entity.setShopId(currentUser.getShopId());
+            System.out.println("Setting ShopID for new user: " + currentUser.getShopId());
+        } else {
+            System.out.println("Warning: currentUser is null, cannot set ShopID");
+        }
+
         return entity;
     }
 
@@ -410,6 +434,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             return;
         }
 
+        System.out.println("Creating user with ShopID: " + entity.getShopId());
         dao.create(entity);
         this.fillToTable();
         this.clear();
