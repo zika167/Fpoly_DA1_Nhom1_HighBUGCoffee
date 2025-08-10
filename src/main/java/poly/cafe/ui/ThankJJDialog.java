@@ -126,6 +126,7 @@ public class ThankJJDialog extends javax.swing.JDialog {
 
     private void btnNewTransactionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewTransactionActionPerformed
         // TODO add your handling code here:
+        this.dispose();
        
     }//GEN-LAST:event_btnNewTransactionActionPerformed
 
