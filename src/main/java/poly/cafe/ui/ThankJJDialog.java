@@ -125,9 +125,16 @@ public class ThankJJDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewTransactionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewTransactionActionPerformed
-        // TODO add your handling code here:
+        // Đóng dialog hiện tại và mở SalesJDialog
         this.dispose();
-       
+        // Lấy parent window và chuyển đổi thành Frame nếu có thể
+        java.awt.Window owner = this.getOwner();
+        java.awt.Frame parentFrame = null;
+        if (owner instanceof java.awt.Frame) {
+            parentFrame = (java.awt.Frame) owner;
+        }
+        SalesJDialog salesDialog = new SalesJDialog(parentFrame, true);
+        salesDialog.setVisible(true);
     }//GEN-LAST:event_btnNewTransactionActionPerformed
 
     /**
