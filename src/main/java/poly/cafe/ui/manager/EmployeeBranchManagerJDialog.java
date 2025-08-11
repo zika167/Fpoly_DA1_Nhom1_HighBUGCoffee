@@ -9,11 +9,13 @@ import java.io.File;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.table.DefaultTableModel;
-import poly.cafe.dao.EmployeeDAO;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import poly.cafe.dao.UserDAO;
 import poly.cafe.dao.ShopDAO;
-import poly.cafe.dao.impl.EmployeeDAOImpl;
+import poly.cafe.dao.impl.UserDAOImpl;
 import poly.cafe.dao.impl.ShopDAOImpl;
-import poly.cafe.entity.Employee;
+import poly.cafe.entity.User;
 import poly.cafe.entity.Shop;
 import poly.cafe.util.XDialog;
 
@@ -23,16 +25,17 @@ import poly.cafe.util.XDialog;
  */
 public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
 
-    private final EmployeeDAO employeeDAO;
+    private final UserDAO userDAO;
     private final ShopDAO shopDAO;
     private DefaultTableModel tblEmployeeModel;
+    private javax.swing.Timer searchTimer;
 
     /**
      * Creates new form HomePage
      */
     public EmployeeBranchManagerJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        this.employeeDAO = new EmployeeDAOImpl();
+        this.userDAO = new UserDAOImpl();
         this.shopDAO = new ShopDAOImpl();
         initComponents();
         this.init();
@@ -60,7 +63,27 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
         lblBranchManager = new javax.swing.JTable();
         btnExit = new javax.swing.JButton();
         jlabel1 = new javax.swing.JLabel();
-        txtSearch = new javax.swing.JTextField();
+                 txtSearch = new javax.swing.JTextField();
+         txtSearch.setToolTipText("Nhập tên, username hoặc số điện thoại để tìm kiếm");
+         txtSearch.addKeyListener(new java.awt.event.KeyAdapter() {
+             public void keyPressed(java.awt.event.KeyEvent evt) {
+                 txtSearchKeyPressed(evt);
+             }
+         });
+         txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+             @Override
+             public void insertUpdate(DocumentEvent e) {
+                 searchTimer.restart();
+             }
+             @Override
+             public void removeUpdate(DocumentEvent e) {
+                 searchTimer.restart();
+             }
+             @Override
+             public void changedUpdate(DocumentEvent e) {
+                 searchTimer.restart();
+             }
+         });
         btnSearch = new javax.swing.JButton();
         lblFullName = new javax.swing.JLabel();
         txtRole = new javax.swing.JLabel();
@@ -129,7 +152,12 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
         jlabel1.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
         jlabel1.setText("Họ tên:");
 
-        btnSearch.setText("Tìm kiếm");
+                 btnSearch.setText("Tìm kiếm");
+         btnSearch.addActionListener(new java.awt.event.ActionListener() {
+             public void actionPerformed(java.awt.event.ActionEvent evt) {
+                 btnSearchActionPerformed(evt);
+             }
+         });
 
         lblFullName.setText("jLabel3");
 
@@ -289,6 +317,10 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
         
         tblEmployeeModel = (DefaultTableModel) lblBranchManager.getModel();
         
+        // Khởi tạo timer cho tìm kiếm real-time
+        searchTimer = new javax.swing.Timer(300, e -> searchEmployees(false)); // Không hiển thị thông báo khi tìm kiếm real-time
+        searchTimer.setRepeats(false);
+        
         loadEmployeeTable();
         clearEmployeeInfo();
     }
@@ -296,29 +328,46 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
     private void loadEmployeeTable() {
         tblEmployeeModel.setRowCount(0);
         try {
-            List<Employee> employees = employeeDAO.findAll();
-            for (Employee employee : employees) {
-                // Lấy thông tin chi nhánh nếu có
-                String shopName = "Chưa phân công";
-                String role = "Quản lý chi nhánh"; // Tất cả đều là branch manager
+            List<User> users = userDAO.findAll();
+            System.out.println("Tổng số users: " + users.size());
+            
+            for (User user : users) {
+                System.out.println("User: " + user.getUsername() + ", Role: " + user.getRole() + ", Fullname: " + user.getFullname() + ", ShopId: " + user.getShopId());
                 
-                if (employee.getUsername() != null) {
-                    // Lấy ShopId và ShopName từ database
-                    String shopId = employeeDAO.getShopIdByUsername(employee.getUsername());
-                    if (shopId != null) {
-                        Shop shop = shopDAO.findById(shopId);
-                        if (shop != null) {
-                            shopName = shop.getShopName();
+                // Chỉ hiển thị branch_manager
+                if (user.getRole() != null && user.getRole() == User.Role.branch_manager) {
+                    System.out.println("Found branch_manager: " + user.getFullname());
+                    
+                    // Lấy thông tin chi nhánh nếu có
+                    String shopName = "Chưa phân công";
+                    String role = "Quản lý chi nhánh"; // Tất cả đều là branch manager
+                    
+                    if (user.getUsername() != null) {
+                        // Lấy ShopId và ShopName từ database
+                        String shopId = user.getShopId();
+                        System.out.println("ShopId for " + user.getUsername() + ": " + shopId);
+                        
+                        if (shopId != null) {
+                            System.out.println("Looking for shop with ID: " + shopId + " (type: " + shopId.getClass().getSimpleName() + ")");
+                            Shop shop = shopDAO.findById(shopId);
+                            if (shop != null) {
+                                shopName = shop.getShopName();
+                                System.out.println("Found shop: " + shopName);
+                            } else {
+                                System.out.println("Shop not found for ID: " + shopId);
+                            }
                         }
                     }
+                    
+                    tblEmployeeModel.addRow(new Object[]{
+                        user.getFullname(),
+                        role,
+                        shopName
+                    });
                 }
-                
-                tblEmployeeModel.addRow(new Object[]{
-                    employee.getFullname(),
-                    role,
-                    shopName
-                });
             }
+            
+            System.out.println("Total rows added to table: " + tblEmployeeModel.getRowCount());
         } catch (Exception e) {
             XDialog.alert("Lỗi tải danh sách quản lý chi nhánh!");
             e.printStackTrace();
@@ -335,20 +384,20 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
         lblPhoto.setIcon(null);
     }
     
-    private void displayEmployeeInfo(Employee employee) {
-        if (employee != null) {
-            lblFullName.setText(employee.getFullname());
+    private void displayEmployeeInfo(User user) {
+        if (user != null) {
+            lblFullName.setText(user.getFullname());
             
             // Hiển thị vai trò (tất cả đều là quản lý chi nhánh)
             txtRole.setText("Quản lý chi nhánh");
             
             // Hiển thị trạng thái
-            lblStatus.setText(employee.isActive() ? "Hoạt động" : "Không hoạt động");
+            lblStatus.setText(user.isEnabled() ? "Hoạt động" : "Không hoạt động");
             
             // Lấy thông tin chi nhánh
             String shopName = "Chưa phân công";
-            if (employee.getUsername() != null) {
-                String shopId = employeeDAO.getShopIdByUsername(employee.getUsername());
+            if (user.getUsername() != null) {
+                String shopId = user.getShopId();
                 if (shopId != null) {
                     Shop shop = shopDAO.findById(shopId);
                     if (shop != null) {
@@ -359,7 +408,7 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
             lblStoreManagement.setText(shopName);
             
             // Hiển thị số điện thoại
-            String phone = employee.getPhone();
+            String phone = user.getPhone();
             if (phone != null && !phone.trim().isEmpty()) {
                 lblPhone.setText(phone);
             } else {
@@ -367,50 +416,80 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
             }
             
             // Hiển thị ảnh
-            loadEmployeePhoto(employee.getUsername());
+            loadEmployeePhoto(user.getUsername());
         }
     }
     
     private void searchEmployees() {
+        searchEmployees(false);
+    }
+    
+    private void searchEmployees(boolean showAlert) {
         String searchText = txtSearch.getText().trim();
+        System.out.println("Searching for: '" + searchText + "' (showAlert: " + showAlert + ")");
+        
         if (searchText.isEmpty()) {
+            System.out.println("Search text is empty, loading all employees");
             loadEmployeeTable();
             return;
         }
         
         tblEmployeeModel.setRowCount(0);
         try {
-            List<Employee> employees = employeeDAO.findAll();
+            List<User> users = userDAO.findAll();
             String searchLower = searchText.toLowerCase(); // Chuyển về chữ thường một lần
+            System.out.println("Searching in " + users.size() + " users");
             
-            for (Employee employee : employees) {
-                String fullname = employee.getFullname();
-                if (fullname != null && fullname.toLowerCase().contains(searchLower)) {
-                    // Lấy thông tin chi nhánh nếu có
-                    String shopName = "Chưa phân công";
-                    String role = "Quản lý chi nhánh"; // Tất cả đều là branch manager
+            int foundCount = 0;
+            for (User user : users) {
+                // Chỉ tìm kiếm trong branch_manager
+                if (user.getRole() != null && user.getRole() == User.Role.branch_manager) {
+                    String fullname = user.getFullname();
+                    String username = user.getUsername();
+                    String phone = user.getPhone();
                     
-                    if (employee.getUsername() != null) {
-                        // Lấy ShopId và ShopName từ database
-                        String shopId = employeeDAO.getShopIdByUsername(employee.getUsername());
-                        if (shopId != null) {
-                            Shop shop = shopDAO.findById(shopId);
-                            if (shop != null) {
-                                shopName = shop.getShopName();
-                            }
-                        }
+                    // Tìm kiếm trong tên, username, và số điện thoại
+                    boolean isMatch = false;
+                    if (fullname != null && fullname.toLowerCase().contains(searchLower)) {
+                        isMatch = true;
+                    } else if (username != null && username.toLowerCase().contains(searchLower)) {
+                        isMatch = true;
+                    } else if (phone != null && phone.toLowerCase().contains(searchLower)) {
+                        isMatch = true;
                     }
                     
-                    tblEmployeeModel.addRow(new Object[]{
-                        employee.getFullname(),
-                        role,
-                        shopName
-                    });
+                    if (isMatch) {
+                        System.out.println("Found match: " + fullname + " (username: " + username + ", phone: " + phone + ")");
+                        foundCount++;
+                        
+                        // Lấy thông tin chi nhánh nếu có
+                        String shopName = "Chưa phân công";
+                        String role = "Quản lý chi nhánh"; // Tất cả đều là branch manager
+                        
+                        if (user.getUsername() != null) {
+                            // Lấy ShopId và ShopName từ database
+                            String shopId = user.getShopId();
+                            if (shopId != null) {
+                                Shop shop = shopDAO.findById(shopId);
+                                if (shop != null) {
+                                    shopName = shop.getShopName();
+                                }
+                            }
+                        }
+                        
+                        tblEmployeeModel.addRow(new Object[]{
+                            user.getFullname(),
+                            role,
+                            shopName
+                        });
+                    }
                 }
             }
             
-            // Hiển thị thông báo nếu không tìm thấy kết quả
-            if (tblEmployeeModel.getRowCount() == 0) {
+            System.out.println("Found " + foundCount + " matching branch managers");
+            
+            // Chỉ hiển thị thông báo nếu showAlert = true và không tìm thấy kết quả
+            if (showAlert && tblEmployeeModel.getRowCount() == 0) {
                 XDialog.alert("Không tìm thấy quản lý chi nhánh nào có tên chứa: '" + searchText + "'");
             }
         } catch (Exception e) {
@@ -499,16 +578,23 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
         int selectedRow = lblBranchManager.getSelectedRow();
         if (selectedRow >= 0) {
             String fullname = (String) lblBranchManager.getValueAt(selectedRow, 0);
-            Employee employee = employeeDAO.findByFullname(fullname);
-            if (employee != null) {
-                displayEmployeeInfo(employee);
+            User user = userDAO.findByFullname(fullname);
+            if (user != null && user.getRole() != null && user.getRole() == User.Role.branch_manager) {
+                displayEmployeeInfo(user);
             }
         }
     }//GEN-LAST:event_lblBranchManagerMouseClicked
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        searchEmployees();
+        System.out.println("Search button clicked");
+        searchEmployees(true); // Hiển thị thông báo khi nhấn nút tìm kiếm
     }//GEN-LAST:event_btnSearchActionPerformed
+
+    private void txtSearchKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchKeyPressed
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+            searchEmployees(true); // Hiển thị thông báo khi nhấn Enter
+        }
+    }//GEN-LAST:event_txtSearchKeyPressed
 
     /**
      * @param args the command line arguments
