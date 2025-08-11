@@ -42,6 +42,9 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
 
     @Setter
     Bill bill; // bill được truyền từ bên ngoài vào
+    
+    @Setter
+    SalesJDialog salesJDialog; // reference đến SalesJDialog để có thể mở lại
 
     BillDAO billDao = new BillDAOImpl();
     BillDetailDAO billDetailDao = new BillDetailDAOImpl();
@@ -673,10 +676,11 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         // Đóng dialog hiện tại
         this.dispose();
 
-        // Focus lại vào SalesJDialog nếu có
-        if (this.getOwner() != null) {
-            this.getOwner().toFront();
-            this.getOwner().requestFocus();
+        // Mở lại SalesJDialog nếu có reference
+        if (salesJDialog != null) {
+            salesJDialog.setVisible(true);
+            salesJDialog.toFront();
+            salesJDialog.requestFocus();
         }
     }// GEN-LAST:event_btnBackActionPerformed
 
@@ -701,13 +705,9 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         if ("Thanh toán QR".equals(selected)) {
             QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
             qrDialog.setBill(bill);
+            qrDialog.setBillJDialog(this); // Truyền reference của BillJDialog
+            qrDialog.setSalesJDialog(salesJDialog); // Truyền reference của SalesJDialog
             qrDialog.open();
-            qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosed(java.awt.event.WindowEvent e) {
-                    BillJDialog.this.setForm(bill);
-                }
-            });
         } else if ("Thanh toán tiền mặt".equals(selected)) {
             this.checkout();
         } else {

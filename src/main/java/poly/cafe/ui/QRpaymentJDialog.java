@@ -35,6 +35,12 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
     private final BillDAO billDao = new BillDAOImpl();
     private final BillDetailDAO billDetailDao = new BillDetailDAOImpl();
     private List<BillDetail> billDetails = Collections.emptyList();
+    
+    @Setter
+    private BillJDialog billJDialog; // Reference đến BillJDialog để đóng nó
+    
+    @Setter
+    private SalesJDialog salesJDialog; // Reference đến SalesJDialog để mở nó
 
     public QRpaymentJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -72,7 +78,22 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
                 bill.setCheckout(new java.util.Date());
                 billDao.update(bill);
                 XDialog.alert("Thanh toán QR thành công!");
+                
+                // Đóng QRpaymentJDialog
                 this.dispose();
+                
+                // Đóng BillJDialog nếu có reference
+                if (billJDialog != null) {
+                    billJDialog.dispose();
+                }
+                
+                // Mở SalesJDialog nếu có reference
+                if (salesJDialog != null) {
+                    salesJDialog.setVisible(true);
+                    salesJDialog.toFront();
+                    salesJDialog.requestFocus();
+                    salesJDialog.loadCards(); // Refresh lại trạng thái các bàn
+                }
             } catch (Exception e) {
                 XDialog.alert("Lỗi khi cập nhật hóa đơn: " + e.getMessage());
             }
