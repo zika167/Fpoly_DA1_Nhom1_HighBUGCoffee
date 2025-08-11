@@ -370,18 +370,26 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
 
     @Override
     public void fillRevenueReport() {
+        System.out.println("=== fillRevenueReport() called ===");
         tblRevenueModel.setRowCount(0);
         int selectedRow = tblBranch.getSelectedRow();
         if (selectedRow < 0) {
+            System.out.println("No branch selected");
             lblTotalRevenue.setText("0 VNĐ");
             return;
         }
         
         String shopId = (String) tblBranch.getValueAt(selectedRow, 0);
+        System.out.println("Selected ShopId: " + shopId);
+        
         Date beginDate = XDate.parse(txtBegin.getText(), "dd-MM-yyyy");
         Date endDate = XDate.parse(txtEnd.getText(), "dd-MM-yyyy");
+        
+        System.out.println("Begin date text: " + txtBegin.getText() + " -> parsed: " + beginDate);
+        System.out.println("End date text: " + txtEnd.getText() + " -> parsed: " + endDate);
 
         if (beginDate == null || endDate == null) {
+            System.out.println("Invalid date format");
             lblTotalRevenue.setText("0 VNĐ");
             return;
         }
@@ -389,6 +397,8 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
         try {
             // Sử dụng DAO đã đổi tên
             List<RevenueReportItem> reportItems = totalRevenueDAO.getRevenueByShopAndDateRange(shopId, beginDate, endDate);
+            System.out.println("Report items returned: " + reportItems.size());
+            
             double totalRevenue = 0;
             
             // Tạo formatter tùy chỉnh để hiển thị VNĐ
@@ -417,6 +427,7 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
                 totalRevenue += revenue;
             }
             
+            System.out.println("Total revenue: " + totalRevenue);
             lblTotalRevenue.setText(currencyFormatter.format(totalRevenue));
             
         } catch (Exception e) {
