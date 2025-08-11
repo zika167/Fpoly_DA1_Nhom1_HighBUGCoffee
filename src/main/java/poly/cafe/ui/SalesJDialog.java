@@ -147,14 +147,23 @@ public class SalesJDialog extends javax.swing.JDialog implements SalesController
         try {
             BillDAO dao = new BillDAOImpl();
             Bill bill = dao.findServicingByCardId(cardId); // tải bill đang phục vụ của thẻ hoặc tạo mới
+            
+            // Tạo BillJDialog và truyền reference của SalesJDialog để có thể mở lại
             BillJDialog dialog = new BillJDialog((Frame) this.getOwner(), true);
             dialog.setBill(bill); // Cần khai báo vào BillJDialog @Setter Bill bill
+            dialog.setSalesJDialog(this); // Truyền reference của SalesJDialog
+            
+            // Đóng SalesJDialog trước khi mở BillJDialog
+            this.setVisible(false);
+            
+            // Mở BillJDialog
             dialog.setVisible(true);
-
-            // Cập nhật lại trạng thái bàn sau khi đóng dialog
+            
+            // Khi BillJDialog đóng, mở lại SalesJDialog
             dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosed(java.awt.event.WindowEvent e) {
+                    SalesJDialog.this.setVisible(true); // Mở lại SalesJDialog
                     SalesJDialog.this.loadCards(); // Refresh lại trạng thái các bàn
                 }
             });
