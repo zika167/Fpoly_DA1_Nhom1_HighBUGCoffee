@@ -78,21 +78,30 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
                 bill.setCheckout(new java.util.Date());
                 billDao.update(bill);
                 XDialog.alert("Thanh toán QR thành công!");
-                
-                // Đóng QRpaymentJDialog
-                this.dispose();
-                
-                // Đóng BillJDialog nếu có reference
+
+                // Hiển thị màn hình cảm ơn (modal) trong 5s, sau đó quay lại SalesJDialog
+                java.awt.Frame parentFrame = null;
+                java.awt.Window owner = this.getOwner();
+                if (owner instanceof java.awt.Frame) {
+                    parentFrame = (java.awt.Frame) owner;
+                }
+                ThankJJDialog thank = new ThankJJDialog(parentFrame, true);
+                thank.setLocationRelativeTo(parentFrame);
+                // Hiển thị và chờ đến khi dialog đóng lại (modal)
+                thank.setVisible(true);
+
+                // Khi ThankJJDialog đóng, đóng BillJDialog và QRpayment, sau đó focus về SalesJDialog
                 if (billJDialog != null) {
                     billJDialog.dispose();
                 }
-                
-                // Mở SalesJDialog nếu có reference
+                // Đóng QRPayment
+                this.dispose();
+                // Quay lại SalesJDialog
                 if (salesJDialog != null) {
                     salesJDialog.setVisible(true);
                     salesJDialog.toFront();
                     salesJDialog.requestFocus();
-                    salesJDialog.loadCards(); // Refresh lại trạng thái các bàn
+                    salesJDialog.loadCards();
                 }
             } catch (Exception e) {
                 XDialog.alert("Lỗi khi cập nhật hóa đơn: " + e.getMessage());
