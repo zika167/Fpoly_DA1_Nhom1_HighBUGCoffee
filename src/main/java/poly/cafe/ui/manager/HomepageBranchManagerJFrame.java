@@ -275,12 +275,14 @@ public class HomepageBranchManagerJFrame extends javax.swing.JFrame {
     private void btnBranchManagerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnBranchManagerActionPerformed
         BranchRevenueManagerJDialog dialog = new BranchRevenueManagerJDialog(this, true);
         dialog.setLocationRelativeTo(this);
+        this.dispose(); // Đóng HomepageBranchManagerJFrame
         dialog.setVisible(true);
     }// GEN-LAST:event_btnBranchManagerActionPerformed
 
     private void btnEmployeeBranchManagerActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnEmployeeBranchManagerActionPerformed
         EmployeeBranchManagerJDialog dialog = new EmployeeBranchManagerJDialog(this, true);
         dialog.setLocationRelativeTo(this);
+        this.dispose(); // Đóng HomepageBranchManagerJFrame
         dialog.setVisible(true);
     }// GEN-LAST:event_btnEmployeeBranchManagerActionPerformed
 
