@@ -16,9 +16,9 @@ import poly.cafe.util.XQuery;
  */
 public class UserDAOImpl implements UserDAO {
 
-    String createSql = "INSERT INTO Users (Username, Password, Enabled, Fullname, Photo, Role) VALUES (?, ?, ?, ?, ?, ?)";
+    String createSql = "INSERT INTO Users (Username, Password, Enabled, Fullname, Photo, Role, ShopID) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    String updateSql = "UPDATE Users SET Password = ?, Enabled = ?, Fullname = ?, Photo = ?, Role = ? WHERE Username = ?";
+    String updateSql = "UPDATE Users SET Password = ?, Enabled = ?, Fullname = ?, Photo = ?, Role = ?, ShopID = ? WHERE Username = ?";
 
     String deleteSql = "DELETE FROM Users WHERE Username = ?";
     String findAllSql = "SELECT * FROM Users";
@@ -32,8 +32,10 @@ public class UserDAOImpl implements UserDAO {
                 entity.isEnabled(),
                 entity.getFullname(),
                 entity.getPhoto(),
-                entity.getRole() != null ? entity.getRole().name() : null // Chuyển Enum thành String
+                entity.getRole() != null ? entity.getRole().name() : null, // Chuyển Enum thành String
+                entity.getShopId() // Thêm ShopID vào values
         };
+        System.out.println("Creating user in database with ShopID: " + entity.getShopId());
         XJdbc.executeUpdate(createSql, values);
         return entity;
     }
@@ -46,6 +48,7 @@ public class UserDAOImpl implements UserDAO {
                 entity.getFullname(),
                 entity.getPhoto(),
                 entity.getRole() != null ? entity.getRole().name() : null, // Chuyển Enum thành String
+                entity.getShopId(), // Thêm ShopID vào values
                 entity.getUsername()
         };
         XJdbc.executeUpdate(updateSql, values);

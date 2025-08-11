@@ -23,6 +23,8 @@ import poly.cafe.ui.ThankJJDialog;
 import poly.cafe.util.XDate;
 import poly.cafe.util.XDialog;
 import poly.cafe.util.XQuery;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *
@@ -45,20 +47,22 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
     BillDetailDAO billDetailDao = new BillDetailDAOImpl();
     List<BillDetail> billDetails = List.of();
 
-    /*@Override
-    public void removeDrinks() { // xóa đồ uống được tích chọn
-        if (bill == null || bill.getId() == null) {
-            XDialog.alert("Không thể xóa đồ uống khi chưa có phiếu bán hàng!");
-            return;
-        }
-
-        for (int i = 0; i < tblBillDetails.getRowCount(); i++) {
-            Boolean checked = (Boolean) tblBillDetails.getValueAt(i, 0);
-            if (checked && i < billDetails.size())
-                billDetailDao.deleteById(billDetails.get(i).getId());
-        }
-        this.fillBillDetails();
-    }*/
+    /*
+     * @Override
+     * public void removeDrinks() { // xóa đồ uống được tích chọn
+     * if (bill == null || bill.getId() == null) {
+     * XDialog.alert("Không thể xóa đồ uống khi chưa có phiếu bán hàng!");
+     * return;
+     * }
+     * 
+     * for (int i = 0; i < tblBillDetails.getRowCount(); i++) {
+     * Boolean checked = (Boolean) tblBillDetails.getValueAt(i, 0);
+     * if (checked && i < billDetails.size())
+     * billDetailDao.deleteById(billDetails.get(i).getId());
+     * }
+     * this.fillBillDetails();
+     * }
+     */
     @Override
     public void removeDrinks() { // xóa đồ uống được tích chọn
         // ... (phần kiểm tra bill giữ nguyên)
@@ -93,22 +97,24 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         });
     }
 
-    /*@Override
-    public void updateQuantity() { // thay đổi số lượng đồ uống
-        int row = tblBillDetails.getSelectedRow();
-        if (row == -1)
-            return; // chưa chọn
-
-        if (bill != null && bill.getStatus() == 0) {
-            String input = XDialog.prompt("Số lượng mới?");
-            if (input != null && !input.isBlank()) {
-                BillDetail detail = billDetails.get(row);
-                detail.setQuantity(Integer.parseInt(input));
-                billDetailDao.update(detail);
-                this.fillBillDetails();
-            }
-        }
-    }*/
+    /*
+     * @Override
+     * public void updateQuantity() { // thay đổi số lượng đồ uống
+     * int row = tblBillDetails.getSelectedRow();
+     * if (row == -1)
+     * return; // chưa chọn
+     * 
+     * if (bill != null && bill.getStatus() == 0) {
+     * String input = XDialog.prompt("Số lượng mới?");
+     * if (input != null && !input.isBlank()) {
+     * BillDetail detail = billDetails.get(row);
+     * detail.setQuantity(Integer.parseInt(input));
+     * billDetailDao.update(detail);
+     * this.fillBillDetails();
+     * }
+     * }
+     * }
+     */
     @Override
     public void updateQuantity() { // thay đổi số lượng đồ uống
         int row = tblBillDetails.getSelectedRow();
@@ -158,17 +164,39 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
             bill.setStatus(Bill.Status.Completed.ordinal());
             bill.setCheckout(new Date());
             billDao.update(bill);
-            this.setForm(bill);
-            // Open ThankJJDialog after successful checkout
+            this.setForm(bill); // Cập nhật form BillJDialog
+
+            // Ẩn BillJDialog tạm thời để hiển thị Thank
+            this.setVisible(false);
+
+            // Mở ThankJJDialog
             ThankJJDialog thankDialog = new ThankJJDialog((Frame) this.getOwner(), true);
             thankDialog.setVisible(true);
+
+            // Tự động đóng Thank sau 5 giây
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    thankDialog.dispose(); // Đóng Thank
+                }
+            }, 5000); // 5000 ms = 5 giây
+
+            // Sau khi Thank đóng (dù tự động hay manual), quay lại BillJDialog
             thankDialog.addWindowListener(new java.awt.event.WindowAdapter() {
                 @Override
                 public void windowClosed(java.awt.event.WindowEvent e) {
-                    BillJDialog.this.dispose(); // Close BillJDialog after ThankJJDialog closes
-                    // Cập nhật trạng thái bàn sau khi thanh toán
+                    // Hiển thị lại BillJDialog
+                    BillJDialog.this.setVisible(true);
+
+                    // Optional: Reset bill hoặc tải lại dữ liệu nếu cần (ví dụ: clear bill để tạo
+                    // mới)
+                    // bill = null;
+                    // fillBillDetails();
+                    // setForm(bill);
+
+                    // Optional: Refresh SalesJDialog nếu vẫn muốn
                     if (getOwner() instanceof javax.swing.JFrame) {
-                        // Tìm SalesJDialog trong parent windows để refresh
                         java.awt.Window[] windows = getOwner().getOwnedWindows();
                         for (java.awt.Window window : windows) {
                             if (window instanceof SalesJDialog) {
@@ -216,7 +244,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         txtCheckin.setEditable(false); // Không cho phép chỉnh sửa thời gian đặt hàng
         txtUsername.setText(bill.getUsername() != null ? bill.getUsername() : "");
         txtUsername.setEditable(false); // Không cho phép chỉnh sửa nhân viên
-        String[] statuses = {"Servicing", "Completed", "Canceled"};
+        String[] statuses = { "Servicing", "Completed", "Canceled" };
         txtStatus.setText(
                 bill.getStatus() >= 0 && bill.getStatus() < statuses.length ? statuses[bill.getStatus()] : "Unknown");
         txtStatus.setEditable(false); // Không cho phép chỉnh sửa trạng thái
@@ -249,31 +277,33 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         }
     }
 
-    /*void fillBillDetails() {
-        if (bill == null || bill.getId() == null || bill.getId() == 0) {
-            ((DefaultTableModel) tblBillDetails.getModel()).setRowCount(0);
-            return;
-        }
-        billDetails = billDetailDao.findByBillId(bill.getId());
-
-        DefaultTableModel model = (DefaultTableModel) tblBillDetails.getModel();
-        model.setRowCount(0);
-        billDetails.forEach(d -> {
-            if (d != null) {
-                Double amt = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount());
-                Object[] row = {
-                        false,
-                        d.getId(),
-                        d.getDrinkName(),
-                        String.format("%,.0f VNĐ", d.getUnitPrice()),
-                        String.format("%.0f%%", d.getDiscount() * 100),
-                        d.getQuantity(),
-                        String.format("$%.2f", amt)
-                };
-                model.addRow(row);
-            }
-        });
-    }*/
+    /*
+     * void fillBillDetails() {
+     * if (bill == null || bill.getId() == null || bill.getId() == 0) {
+     * ((DefaultTableModel) tblBillDetails.getModel()).setRowCount(0);
+     * return;
+     * }
+     * billDetails = billDetailDao.findByBillId(bill.getId());
+     * 
+     * DefaultTableModel model = (DefaultTableModel) tblBillDetails.getModel();
+     * model.setRowCount(0);
+     * billDetails.forEach(d -> {
+     * if (d != null) {
+     * Double amt = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount());
+     * Object[] row = {
+     * false,
+     * d.getId(),
+     * d.getDrinkName(),
+     * String.format("%,.0f VNĐ", d.getUnitPrice()),
+     * String.format("%.0f%%", d.getDiscount() * 100),
+     * d.getQuantity(),
+     * String.format("$%.2f", amt)
+     * };
+     * model.addRow(row);
+     * }
+     * });
+     * }
+     */
     void fillBillDetails() {
         // 1. Giữ lại phần kiểm tra an toàn để tránh lỗi NullPointerException
         if (bill == null || bill.getId() == null || bill.getId() <= 0) {
@@ -295,16 +325,16 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
                 Double amt = d.getQuantity() * d.getUnitPrice() * (1 - d.getDiscount() / 100.0);
 
                 Object[] row = {
-                    false,
-                    d.getId(),
-                    d.getDrinkName(),
-                    // 3. Định dạng tiền tệ nhất quán theo VNĐ
-                    String.format("%,.0f VNĐ", d.getUnitPrice()),
-                    // 4. Hiển thị giảm giá khớp với cách lưu trữ
-                    String.format("%.0f%%", d.getDiscount()),
-                    d.getQuantity(),
-                    // 3. Định dạng tiền tệ nhất quán theo VNĐ
-                    String.format("%,.0f VNĐ", amt)
+                        false,
+                        d.getId(),
+                        d.getDrinkName(),
+                        // 3. Định dạng tiền tệ nhất quán theo VNĐ
+                        String.format("%,.0f VNĐ", d.getUnitPrice()),
+                        // 4. Hiển thị giảm giá khớp với cách lưu trữ
+                        String.format("%.0f%%", d.getDiscount()),
+                        d.getQuantity(),
+                        // 3. Định dạng tiền tệ nhất quán theo VNĐ
+                        String.format("%,.0f VNĐ", amt)
                 };
                 model.addRow(row);
             }
@@ -323,7 +353,8 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
@@ -346,6 +377,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         jLabel6 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         cbbThanhToan = new javax.swing.JComboBox<>();
+        btnBack = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Phiếu bán hàng");
@@ -353,6 +385,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
             public void windowClosed(java.awt.event.WindowEvent evt) {
                 formWindowClosed(evt);
             }
+
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -415,22 +448,22 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         jLabel5.setText("Trạng thái");
 
         tblBillDetails.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
-            },
-            new String [] {
-                "", "Mã phiếu", "Đồ uống", "Đơn giá", "Giảm giá", "Số lượng", "Thành tiền"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Boolean.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
+                new Object[][] {
+                        { null, null, null, null, null, null, null },
+                        { null, null, null, null, null, null, null },
+                        { null, null, null, null, null, null, null },
+                        { null, null, null, null, null, null, null }
+                },
+                new String[] {
+                        "", "Mã phiếu", "Đồ uống", "Đơn giá", "Giảm giá", "Số lượng", "Thành tiền"
+                }) {
+            Class[] types = new Class[] {
+                    java.lang.Boolean.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class,
+                    java.lang.Object.class, java.lang.Object.class, java.lang.Object.class
             };
 
             public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
+                return types[columnIndex];
             }
         });
         tblBillDetails.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -447,110 +480,205 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         cbbThanhToan.setBackground(new java.awt.Color(238, 142, 41));
         cbbThanhToan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         cbbThanhToan.setForeground(new java.awt.Color(255, 255, 255));
-        cbbThanhToan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Chọn kiểu thanh toán", "Thanh toán tiền mặt", "Thanh toán QR", " ", " " }));
+        cbbThanhToan.setModel(new javax.swing.DefaultComboBoxModel<>(
+                new String[] { "Chọn kiểu thanh toán", "Thanh toán tiền mặt", "Thanh toán QR", " ", " " }));
         cbbThanhToan.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbbThanhToanActionPerformed(evt);
             }
         });
 
+        btnBack.setBackground(new java.awt.Color(122, 92, 62));
+        btnBack.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnBack.setForeground(new java.awt.Color(255, 255, 255));
+        btnBack.setText("Quay lại");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                                            .addComponent(txtUsername))
-                                        .addGap(12, 12, 12)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                                            .addComponent(txtId))
-                                        .addGap(12, 12, 12)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(txtCardId, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                                    .addComponent(txtCheckout, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-                                    .addComponent(txtCheckin))))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnRemove)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnAdd)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(cbbThanhToan, 0, 158, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(btnCheckout)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCancel)))
-                .addContainerGap())
-        );
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                                jPanel1Layout.createSequentialGroup()
+                                                        .addGap(0, 0, Short.MAX_VALUE)
+                                                        .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                189, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGroup(jPanel1Layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                                                false)
+                                                        .addComponent(jScrollPane1,
+                                                                javax.swing.GroupLayout.Alignment.LEADING,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, 595,
+                                                                Short.MAX_VALUE)
+                                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                .addGroup(jPanel1Layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                                .addGroup(jPanel1Layout
+                                                                                        .createParallelGroup(
+                                                                                                javax.swing.GroupLayout.Alignment.LEADING,
+                                                                                                false)
+                                                                                        .addComponent(jLabel4,
+                                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                                190, Short.MAX_VALUE)
+                                                                                        .addComponent(txtUsername))
+                                                                                .addGap(12, 12, 12)
+                                                                                .addGroup(jPanel1Layout
+                                                                                        .createParallelGroup(
+                                                                                                javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                        .addComponent(jLabel5,
+                                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                                185,
+                                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                        .addComponent(txtStatus,
+                                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                                191,
+                                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                                .addGroup(jPanel1Layout
+                                                                                        .createParallelGroup(
+                                                                                                javax.swing.GroupLayout.Alignment.LEADING,
+                                                                                                false)
+                                                                                        .addComponent(jLabel1,
+                                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                                190, Short.MAX_VALUE)
+                                                                                        .addComponent(txtId))
+                                                                                .addGap(12, 12, 12)
+                                                                                .addGroup(jPanel1Layout
+                                                                                        .createParallelGroup(
+                                                                                                javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                        .addComponent(jLabel2,
+                                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                                185,
+                                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                        .addComponent(txtCardId,
+                                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                                191,
+                                                                                                javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                                .addPreferredGap(
+                                                                        javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                .addGroup(jPanel1Layout.createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING,
+                                                                        false)
+                                                                        .addComponent(jLabel6,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                190, Short.MAX_VALUE)
+                                                                        .addComponent(txtCheckout,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                190, Short.MAX_VALUE)
+                                                                        .addComponent(jLabel3,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                190, Short.MAX_VALUE)
+                                                                        .addComponent(txtCheckin))))
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addGroup(jPanel1Layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING,
+                                                                false)
+                                                        .addComponent(btnRemove, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(btnAdd, javax.swing.GroupLayout.DEFAULT_SIZE, 189,
+                                                                Short.MAX_VALUE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 189,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout
+                                                .createSequentialGroup()
+                                                .addGap(201, 201, 201)
+                                                .addComponent(cbbThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE, 189,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addComponent(btnCheckout, javax.swing.GroupLayout.PREFERRED_SIZE, 189,
+                                                        javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap()));
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCardId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCheckin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCheckout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnRemove)
-                    .addComponent(btnAdd)
-                    .addComponent(btnCheckout)
-                    .addComponent(btnCancel)
-                    .addComponent(cbbThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(102, Short.MAX_VALUE))
-        );
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jLabel3))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtCardId, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtCheckin, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel4)
+                                        .addComponent(jLabel5)
+                                        .addComponent(jLabel6))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(txtUsername, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtStatus, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtCheckout, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 184,
+                                        javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnAdd)
+                                        .addComponent(btnCheckout)
+                                        .addComponent(cbbThanhToan, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(btnRemove)
+                                        .addComponent(btnCancel))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnBack)
+                                .addContainerGap(15, Short.MAX_VALUE)));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnBackActionPerformed
+        // Đóng dialog hiện tại
+        this.dispose();
+
+        // Focus lại vào SalesJDialog nếu có
+        if (this.getOwner() != null) {
+            this.getOwner().toFront();
+            this.getOwner().requestFocus();
+        }
+    }// GEN-LAST:event_btnBackActionPerformed
 
     private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRemoveActionPerformed
         // TODO add your handling code here:
@@ -612,25 +740,29 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
 
     private void cbbThanhToanActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_cbbThanhToanActionPerformed
         // TODO add your handling code here:
-        /*if (bill == null || bill.getId() == null) {
-            XDialog.alert("Không thể thanh toán khi chưa có phiếu bán hàng!");
-            return;
-        }
-
-        String selected = (String) cbbThanhToan.getSelectedItem();
-        if ("Thanh toán QR".equals(selected)) {
-            QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(), true);
-            qrDialog.setBill(bill);
-            qrDialog.open();
-            qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosed(java.awt.event.WindowEvent e) {
-                    BillJDialog.this.setForm(bill);
-                }
-            });
-        } else if ("Thanh toán tiền mặt".equals(selected)) {
-            this.checkout();
-        }*/
+        /*
+         * if (bill == null || bill.getId() == null) {
+         * XDialog.alert("Không thể thanh toán khi chưa có phiếu bán hàng!");
+         * return;
+         * }
+         * 
+         * String selected = (String) cbbThanhToan.getSelectedItem();
+         * if ("Thanh toán QR".equals(selected)) {
+         * QRpaymentJDialog qrDialog = new QRpaymentJDialog((Frame) this.getOwner(),
+         * true);
+         * qrDialog.setBill(bill);
+         * qrDialog.open();
+         * qrDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+         * 
+         * @Override
+         * public void windowClosed(java.awt.event.WindowEvent e) {
+         * BillJDialog.this.setForm(bill);
+         * }
+         * });
+         * } else if ("Thanh toán tiền mặt".equals(selected)) {
+         * this.checkout();
+         * }
+         */
     }// GEN-LAST:event_cbbThanhToanActionPerformed
 
     private void txtCheckoutActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_txtCheckoutActionPerformed
@@ -690,6 +822,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnBack;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnCheckout;
     private javax.swing.JButton btnRemove;

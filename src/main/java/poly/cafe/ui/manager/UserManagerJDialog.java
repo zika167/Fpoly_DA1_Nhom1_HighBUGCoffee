@@ -140,7 +140,22 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             items = java.util.List.of(); // staff không được xem danh sách
         }
 
-        items.forEach(item -> {
+        // Sắp xếp danh sách để branch-manager lên đầu tiên
+        List<User> sortedItems = items.stream()
+                .sorted((u1, u2) -> {
+                    // branch-manager lên đầu
+                    if (u1.getRole() == User.Role.branch_manager && u2.getRole() != User.Role.branch_manager) {
+                        return -1;
+                    }
+                    if (u1.getRole() != User.Role.branch_manager && u2.getRole() == User.Role.branch_manager) {
+                        return 1;
+                    }
+                    // Sau đó sắp xếp theo username
+                    return u1.getUsername().compareTo(u2.getUsername());
+                })
+                .collect(Collectors.toList());
+
+        sortedItems.forEach(item -> {
             Object[] rowData = {
                     item.getUsername(),
                     item.getPassword(),
@@ -307,13 +322,9 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             System.out.println("No avatar name provided for user: " + entity.getUsername());
         }
 
-        // Vai trò
+        // Vai trò: chỉ hiển thị lựa chọn Nhân viên trong view này
         User.Role role = entity.getRole();
-        if (role == User.Role.chain_manager || role == User.Role.branch_manager) {
-            rdoManager.setSelected(true);
-        } else {
-            rdoStaff.setSelected(true);
-        }
+        rdoStaff.setSelected(role == User.Role.staff);
         // Trạng thái
         if (entity.isEnabled()) {
             rdoActive.setSelected(true); // Hoạt động
@@ -365,10 +376,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             XDialog.alert("Ảnh đại diện không được để trống!");
             return null;
         }
-        if (!rdoManager.isSelected() && !rdoStaff.isSelected()) {
-            XDialog.alert("Vui lòng chọn vai trò (Quản lý hoặc Nhân viên)!");
-            return null;
-        }
+        // Không yêu cầu chọn vai trò; mặc định tạo/cập nhật là Nhân viên
         if (!rdoActive.isSelected() && !rdoInactive.isSelected()) {
             XDialog.alert("Vui lòng chọn trạng thái (Hoạt động hoặc Tạm dừng)!");
             return null;
@@ -381,14 +389,17 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         entity.setPhoto(photo);
         entity.setEnabled(rdoActive.isSelected());
 
-        // Xử lý role
-        if (rdoManager.isSelected()) {
-            entity.setRole(User.Role.branch_manager); // Quản lý chi nhánh
-        } else if (rdoStaff.isSelected()) {
-            entity.setRole(User.Role.staff); // Nhân viên
+        // Vai trò: luôn gán Nhân viên trong view này
+        entity.setRole(User.Role.staff);
+
+        // Tự động gán ShopID cho user mới được tạo
+        if (currentUser != null) {
+            entity.setShopId(currentUser.getShopId());
+            System.out.println("Setting ShopID for new user: " + currentUser.getShopId());
         } else {
-            entity.setRole(User.Role.staff); // Mặc định là nhân viên
+            System.out.println("Warning: currentUser is null, cannot set ShopID");
         }
+
         return entity;
     }
 
@@ -410,6 +421,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
             return;
         }
 
+        System.out.println("Creating user with ShopID: " + entity.getShopId());
         dao.create(entity);
         this.fillToTable();
         this.clear();
@@ -495,7 +507,6 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         txtFullname.setEnabled(true);
         txtPassword.setEnabled(true);
         txtConfirmPassword.setEnabled(true);
-        rdoManager.setEnabled(true);
         rdoActive.setEnabled(true);
 
         btnCreate.setEnabled(!editable);
@@ -551,6 +562,7 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -585,7 +597,6 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         jLabel5 = new javax.swing.JLabel();
         lblImg = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        rdoManager = new javax.swing.JRadioButton();
         rdoStaff = new javax.swing.JRadioButton();
         txtPassword = new javax.swing.JPasswordField();
         txtConfirmPassword = new javax.swing.JPasswordField();
@@ -789,9 +800,6 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
 
         jLabel7.setText("Vai trò");
 
-        buttonGroup1.add(rdoManager);
-        rdoManager.setText("Quản lý");
-
         buttonGroup1.add(rdoStaff);
         rdoStaff.setText("Nhân viên");
 
@@ -808,22 +816,25 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(35, 35, 35)
                                                 .addGroup(jPanel2Layout
-                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING,
-                                                                false)
-                                                        .addComponent(txtUsername)
-                                                        .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(jLabel7)
-                                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                                                .addComponent(rdoManager)
-                                                                .addPreferredGap(
-                                                                        javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                                .addComponent(rdoStaff))
-                                                        .addComponent(txtPassword,
-                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 200,
-                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(jPanel2Layout
+                                                                .createParallelGroup(
+                                                                        javax.swing.GroupLayout.Alignment.LEADING,
+                                                                        false)
+                                                                .addComponent(txtUsername)
+                                                                .addComponent(jLabel5,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        Short.MAX_VALUE)
+                                                                .addComponent(jLabel3,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                        Short.MAX_VALUE)
+                                                                .addComponent(jLabel7)
+                                                                .addComponent(txtPassword,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 200,
+                                                                        javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(rdoStaff))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35,
                                                         Short.MAX_VALUE)
                                                 .addGroup(jPanel2Layout
@@ -913,7 +924,6 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
                                                 .addGap(18, 18, 18)
                                                 .addGroup(jPanel2Layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(rdoManager)
                                                         .addComponent(rdoStaff)
                                                         .addComponent(rdoActive)
                                                         .addComponent(rdoInactive)))
@@ -1143,7 +1153,6 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
     private javax.swing.JLabel lblImg;
     private javax.swing.JRadioButton rdoActive;
     private javax.swing.JRadioButton rdoInactive;
-    private javax.swing.JRadioButton rdoManager;
     private javax.swing.JRadioButton rdoStaff;
     private javax.swing.JTabbedPane tabs;
     private javax.swing.JTable tblUsers;

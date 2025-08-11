@@ -16,55 +16,57 @@ import poly.cafe.util.XQuery;
  */
 public class BillDetailDAOImpl implements BillDetailDAO {
 
-    String createSql = "INSERT INTO BillDetails (Id, BillId, DrinkId, UnitPrice, Discount, Quantity) VALUES (?, ?, ?, ?, ?, ?)";
-    String updateSql = "UPDATE BillDetails SET BillId=?, DrinkId=?, UnitPrice=?, Discount=?, Quantity=? WHERE Id=?";
+    String createSql = "INSERT INTO BillDetails (Id, BillId, DrinkId, Quantity) VALUES (?, ?, ?, ?)";
+    String updateSql = "UPDATE BillDetails SET BillId=?, DrinkId=?, Quantity=? WHERE Id=?";
     String deleteSql = "DELETE FROM BillDetails WHERE Id=?";
-    
-    String findAllSql = 
-            """
-                SELECT 
-                    bd.*
-                    ,d.name as drinkName
+
+    String findAllSql = """
+                SELECT
+                    bd.*,
+                    d.Name AS drinkName,
+                    d.UnitPrice AS unitPrice,
+                    d.Discount AS discount
                 FROM BillDetails bd
                 JOIN Drinks d ON bd.DrinkId = d.Id
             """;
-    String findByIdSql = 
-            """
-                SELECT 
-                    bd.*
-                    ,d.name AS drinkName 
-                FROM BillDetails bd 
-                JOIN Drinks d ON d.Id = bd.DrinkId
-                WHERE Id=?
-            """;
-    String findByBillIdSql = 
-            """
-                SELECT 
-                    bd.*
-                    ,d.name AS drinkName
-                FROM BillDetails bd
-                JOIN Drinks d ON d.Id = bd.DrinkId
-                WHERE BillId=?
-            """;
-    String findByDrinkIdSql = 
-            """
+    String findByIdSql = """
                 SELECT
-                    bd.*
-                    ,d.name AS drinkName
+                    bd.*,
+                    d.Name AS drinkName,
+                    d.UnitPrice AS unitPrice,
+                    d.Discount AS discount
                 FROM BillDetails bd
                 JOIN Drinks d ON d.Id = bd.DrinkId
-                WHERE DrinkId=?
+                WHERE bd.Id=?
+            """;
+    String findByBillIdSql = """
+                SELECT
+                    bd.*,
+                    d.Name AS drinkName,
+                    d.UnitPrice AS unitPrice,
+                    d.Discount AS discount
+                FROM BillDetails bd
+                JOIN Drinks d ON d.Id = bd.DrinkId
+                WHERE bd.BillId=?
+            """;
+    String findByDrinkIdSql = """
+                SELECT
+                    bd.*,
+                    d.Name AS drinkName,
+                    d.UnitPrice AS unitPrice,
+                    d.Discount AS discount
+                FROM BillDetails bd
+                JOIN Drinks d ON d.Id = bd.DrinkId
+                WHERE bd.DrinkId=?
             """;
 
     @Override
     public BillDetail create(BillDetail entity) {
         Object[] values = {
-            entity.getId(),
-            entity.getBillId(),
-            entity.getDrinkId(),
-            entity.getUnitPrice(),
-            entity.getDiscount(),
-            entity.getQuantity()
+                entity.getId(),
+                entity.getBillId(),
+                entity.getDrinkId(),
+                entity.getQuantity()
         };
         XJdbc.executeUpdate(createSql, values);
         return entity;
@@ -73,12 +75,10 @@ public class BillDetailDAOImpl implements BillDetailDAO {
     @Override
     public void update(BillDetail entity) {
         Object[] values = {
-            entity.getBillId(),
-            entity.getDrinkId(),
-            entity.getUnitPrice(),
-            entity.getDiscount(),
-            entity.getQuantity(),
-            entity.getId()
+                entity.getBillId(),
+                entity.getDrinkId(),
+                entity.getQuantity(),
+                entity.getId()
         };
         XJdbc.executeUpdate(updateSql, values);
     }
@@ -98,22 +98,28 @@ public class BillDetailDAOImpl implements BillDetailDAO {
         return XQuery.getSingleBean(BillDetail.class, findByIdSql, id);
     }
 
-    /*@Override
-    public List<BillDetail> findByBillId(Long billId) {
-        return XQuery.getBeanList(BillDetail.class, findByBillIdSql, billId);
-    }*/
+    /*
+     * @Override
+     * public List<BillDetail> findByBillId(Long billId) {
+     * return XQuery.getBeanList(BillDetail.class, findByBillIdSql, billId);
+     * }
+     */
 
-   @Override
-public List<BillDetail> findByBillId(Long billId) {
-    String sql = """
-                 SELECT bd.*, d.Name AS DrinkName
-                 FROM BillDetails bd
-                 JOIN Drinks d ON bd.DrinkId = d.Id
-                 WHERE bd.BillId = ?
-                 """;
-    return poly.cafe.util.XQuery.getBeanList(BillDetail.class, sql, billId);
-}
-    
+    @Override
+    public List<BillDetail> findByBillId(Long billId) {
+        String sql = """
+                SELECT
+                   bd.*,
+                   d.Name AS drinkName,
+                   d.UnitPrice AS unitPrice,
+                   d.Discount AS discount
+                FROM BillDetails bd
+                JOIN Drinks d ON bd.DrinkId = d.Id
+                WHERE bd.BillId = ?
+                """;
+        return poly.cafe.util.XQuery.getBeanList(BillDetail.class, sql, billId);
+    }
+
     @Override
     public List<BillDetail> findByDrinkId(String drinkId) {
         return XQuery.getBeanList(BillDetail.class, findByDrinkIdSql, drinkId);

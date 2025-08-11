@@ -153,7 +153,6 @@
               <Font name="Segoe UI" size="24" style="1"/>
             </Property>
             <Property name="horizontalAlignment" type="int" value="0"/>
-            <Property name="text" type="java.lang.String" value="Banner"/>
             <Property name="opaque" type="boolean" value="true"/>
           </Properties>
         </Component>
