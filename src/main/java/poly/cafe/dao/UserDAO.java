@@ -11,6 +11,6 @@ import poly.cafe.entity.User;
  * @author wangquockhanh
  */
 public interface UserDAO extends CrudDAO<User, String>{
-    
+    User findByFullname(String fullname);
 }
 

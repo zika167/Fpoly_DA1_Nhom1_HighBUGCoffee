@@ -33,18 +33,41 @@ public class TotalRevenueDAOImpl implements TotalRevenueDAO{
 
     @Override
     public List<RevenueReportItem> getRevenueByShopAndDateRange(String shopId, Date begin, Date end) {
+        System.out.println("=== TotalRevenueDAO.getRevenueByShopAndDateRange ===");
+        System.out.println("ShopId: " + shopId);
+        System.out.println("Begin Date: " + begin);
+        System.out.println("End Date: " + end);
+        
         // Câu lệnh SQL này JOIN nhiều bảng để lấy được thông tin cần thiết:
         // - Lấy tổng số lượng và tổng doanh thu từ BillDetails.
         // - Lấy tên đồ uống và loại từ Drinks và Categories.
         // - Lọc theo ShopId thông qua bảng Users và Bills.
         // - Chỉ tính những hóa đơn đã hoàn thành (Status = 1).
         // - Lọc theo khoảng thời gian thanh toán (Checkout).
+        // Trước tiên, hãy kiểm tra xem có dữ liệu không
+        String checkSql = """
+            SELECT COUNT(*) as total_bills 
+            FROM Bills b 
+            JOIN Users u ON b.Username = u.Username 
+            WHERE u.ShopId = ? AND b.Status = 1
+        """;
+        
+        try {
+            ResultSet checkRs = XJdbc.executeQuery(checkSql, shopId);
+            if (checkRs.next()) {
+                int totalBills = checkRs.getInt("total_bills");
+                System.out.println("Total bills for shop " + shopId + ": " + totalBills);
+            }
+        } catch (SQLException ex) {
+            System.err.println("Error checking bills: " + ex.getMessage());
+        }
+        
         String sql = """
             SELECT
                 c.Name AS categoryName,
                 d.Name AS drinkName,
                 SUM(bd.Quantity) AS quantitySold,
-                SUM(bd.Quantity * bd.UnitPrice * (1 - bd.Discount / 100.0)) AS totalRevenue
+                SUM(bd.Quantity * d.UnitPrice * (1 - d.Discount / 100.0)) AS totalRevenue
             FROM BillDetails bd
             JOIN Drinks d ON bd.DrinkId = d.Id
             JOIN Categories c ON d.CategoryId = c.Id
@@ -57,9 +80,12 @@ public class TotalRevenueDAOImpl implements TotalRevenueDAO{
             ORDER BY totalRevenue DESC;
         """;
         
+        System.out.println("SQL Query: " + sql);
+        
         List<RevenueReportItem> list = new ArrayList<>();
         try {
             ResultSet rs = XJdbc.executeQuery(sql, shopId, begin, end);
+            int count = 0;
             while (rs.next()) {
                 RevenueReportItem item = new RevenueReportItem();
                 item.setCategoryName(rs.getString("categoryName"));
@@ -67,9 +93,19 @@ public class TotalRevenueDAOImpl implements TotalRevenueDAO{
                 item.setQuantitySold(rs.getInt("quantitySold"));
                 item.setTotalRevenue(rs.getDouble("totalRevenue"));
                 list.add(item);
+                count++;
+                
+                System.out.println("Found item " + count + ": " + 
+                    item.getCategoryName() + " - " + 
+                    item.getDrinkName() + " - " + 
+                    item.getQuantitySold() + " - " + 
+                    item.getTotalRevenue());
             }
+            System.out.println("Total items found: " + count);
             // Don't close the ResultSet here as it's managed by XJdbc
         } catch (SQLException ex) {
+            System.err.println("SQL Error: " + ex.getMessage());
+            ex.printStackTrace();
             throw new RuntimeException("Lỗi truy vấn dữ liệu doanh thu", ex);
         }
         return list;

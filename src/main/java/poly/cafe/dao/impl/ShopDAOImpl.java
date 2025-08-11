@@ -4,11 +4,12 @@
  */
 package poly.cafe.dao.impl;
 
+import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 import poly.cafe.dao.ShopDAO;
 import poly.cafe.entity.Shop;
 import poly.cafe.util.XJdbc;
-import poly.cafe.util.XQuery;
 
 /**
  *
@@ -52,12 +53,37 @@ public class ShopDAOImpl implements ShopDAO {
 
     @Override
     public List<Shop> findAll() {
-        return XQuery.getBeanList(Shop.class, findAllSql);
+        List<Shop> shops = new ArrayList<>();
+        try (ResultSet rs = XJdbc.executeQuery(findAllSql)) {
+            while (rs.next()) {
+                Shop shop = new Shop();
+                shop.setId(rs.getString("Id"));
+                shop.setShopName(rs.getString("ShopName"));
+                shop.setAddress(rs.getString("Address"));
+                shop.setManagerUsername(rs.getString("ManagerUsername"));
+                shops.add(shop);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return shops;
     }
 
     @Override
     public Shop findById(String id) {
-        return XQuery.getSingleBean(Shop.class, findByIdSql, id);
+        try (ResultSet rs = XJdbc.executeQuery(findByIdSql, id)) {
+            if (rs.next()) {
+                Shop shop = new Shop();
+                shop.setId(rs.getString("Id"));
+                shop.setShopName(rs.getString("ShopName"));
+                shop.setAddress(rs.getString("Address"));
+                shop.setManagerUsername(rs.getString("ManagerUsername"));
+                return shop;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 } 
