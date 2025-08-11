@@ -16,6 +16,7 @@ public class ThankJJDialog extends javax.swing.JDialog {
     public ThankJJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        init();
     }
 
     /**
@@ -29,11 +30,11 @@ public class ThankJJDialog extends javax.swing.JDialog {
 
         jPanel1 = new javax.swing.JPanel();
         jSeparator2 = new javax.swing.JSeparator();
-        jLabel1 = new javax.swing.JLabel();
+        lbChainName = new javax.swing.JLabel();
         btnNewTransaction = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        lbLogo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -42,11 +43,11 @@ public class ThankJJDialog extends javax.swing.JDialog {
         jSeparator2.setForeground(new java.awt.Color(0, 0, 0));
         jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
-        jLabel1.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("HighBUG");
-        jLabel1.setOpaque(true);
+        lbChainName.setBackground(new java.awt.Color(255, 255, 255));
+        lbChainName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lbChainName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbChainName.setText("HighBUG");
+        lbChainName.setOpaque(true);
 
         btnNewTransaction.setBackground(new java.awt.Color(122, 92, 62));
         btnNewTransaction.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -64,10 +65,10 @@ public class ThankJJDialog extends javax.swing.JDialog {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
         jLabel3.setText("Hẹn gặp lại quý khách !");
 
-        jLabel5.setBackground(new java.awt.Color(204, 204, 204));
-        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setOpaque(true);
+        lbLogo.setBackground(new java.awt.Color(204, 204, 204));
+        lbLogo.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        lbLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbLogo.setOpaque(true);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -76,31 +77,36 @@ public class ThankJJDialog extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbChainName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnNewTransaction, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(31, 31, 31)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 111, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(49, 49, 49)
-                        .addComponent(jLabel3))
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(108, 108, 108))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 111, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(49, 49, 49)
+                                .addComponent(jLabel3))
+                            .addComponent(jLabel2))
+                        .addGap(108, 108, 108))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(98, 98, 98)
+                        .addComponent(lbLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 440, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lbChainName, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnNewTransaction, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(28, 28, 28))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(61, 61, 61)
-                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -125,17 +131,89 @@ public class ThankJJDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewTransactionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewTransactionActionPerformed
-        // Đóng dialog hiện tại và mở SalesJDialog
+        // Đóng dialog hiện tại. Việc focus/mở lại SalesJDialog sẽ do luồng gọi xử lý (ví dụ QRpayment)
         this.dispose();
-        // Lấy parent window và chuyển đổi thành Frame nếu có thể
-        java.awt.Window owner = this.getOwner();
-        java.awt.Frame parentFrame = null;
-        if (owner instanceof java.awt.Frame) {
-            parentFrame = (java.awt.Frame) owner;
-        }
-        SalesJDialog salesDialog = new SalesJDialog(parentFrame, true);
-        salesDialog.setVisible(true);
     }//GEN-LAST:event_btnNewTransactionActionPerformed
+
+    private void init() {
+        // Canh giữa màn hình
+        this.setLocationRelativeTo(getOwner());
+
+        // Thiết lập logo cho lbLogo từ images/logo (ưu tiên logo4)
+        try {
+            javax.swing.ImageIcon logo = null;
+            String[] candidatePaths = new String[] {
+                "/poly/cafe/images/logo/logo4.png",
+                "/poly/cafe/images/logo/logo.png",
+                "/poly/cafe/images/logo/logo.jpg"
+            };
+            for (String p : candidatePaths) {
+                java.net.URL url = getClass().getResource(p);
+                if (url != null) { logo = new javax.swing.ImageIcon(url); break; }
+            }
+            if (logo == null) {
+                java.io.File f1 = new java.io.File("src/main/java/poly/cafe/images/logo/logo4.png");
+                java.io.File f2 = new java.io.File("src/main/java/poly/cafe/images/logo/logo.png");
+                java.io.File f3 = new java.io.File("src/main/java/poly/cafe/images/logo/logo.jpg");
+                for (java.io.File f : new java.io.File[]{f1,f2,f3}) {
+                    if (f.exists()) { logo = new javax.swing.ImageIcon(f.getAbsolutePath()); break; }
+                }
+            }
+            if (logo != null && logo.getImage() != null) {
+                int w = lbLogo.getWidth() > 0 ? lbLogo.getWidth() : 296;
+                int h = lbLogo.getHeight() > 0 ? lbLogo.getHeight() : 200;
+                java.awt.Image scaled = logo.getImage().getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH);
+                lbLogo.setIcon(new javax.swing.ImageIcon(scaled));
+                lbLogo.setText("");
+            }
+        } catch (Exception ignore) {}
+
+        // Thiết lập icon coffee cho lbChainName từ images/icons/coffee.png
+        try {
+            javax.swing.ImageIcon icon = null;
+            String[] candidatePaths = new String[] {
+                "/poly/cafe/images/icons/coffee.png",
+                "/poly/cafe/images/logo/coffee.png"
+            };
+            for (String p : candidatePaths) {
+                java.net.URL url = getClass().getResource(p);
+                if (url != null) { icon = new javax.swing.ImageIcon(url); break; }
+            }
+            if (icon == null) {
+                String[] fileCandidates = new String[] {
+                    "src/main/java/poly/cafe/images/icons/coffee.png",
+                    "src/main/java/poly/cafe/images/logo/coffee.png"
+                };
+                for (String fp : fileCandidates) {
+                    java.io.File f = new java.io.File(fp);
+                    if (f.exists()) { icon = new javax.swing.ImageIcon(f.getAbsolutePath()); break; }
+                }
+            }
+            if (icon != null && icon.getImage() != null) {
+                java.awt.Image scaled = icon.getImage().getScaledInstance(24, 24, java.awt.Image.SCALE_SMOOTH);
+                lbChainName.setIcon(new javax.swing.ImageIcon(scaled));
+                lbChainName.setIconTextGap(8);
+            }
+        } catch (Exception ignore) {}
+
+        // Thiết lập đếm ngược 5s dưới nút btnNewTransaction và tự đóng
+        final int[] seconds = new int[]{5};
+        btnNewTransaction.setText("Thực hiện giao dịch mới (" + seconds[0] + "s)");
+        javax.swing.Timer t = new javax.swing.Timer(1000, new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                seconds[0]--;
+                btnNewTransaction.setText("Thực hiện giao dịch mới (" + seconds[0] + "s)");
+                if (seconds[0] <= 0) {
+                    ((javax.swing.Timer)e.getSource()).stop();
+                    // Mô phỏng click nút để quay lại SalesJDialog và focus
+                    btnNewTransaction.doClick();
+                }
+            }
+        });
+        t.setInitialDelay(0);
+        t.start();
+    }
 
     /**
      * @param args the command line arguments
@@ -181,11 +259,11 @@ public class ThankJJDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnNewTransaction;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JLabel lbChainName;
+    private javax.swing.JLabel lbLogo;
     // End of variables declaration//GEN-END:variables
 }

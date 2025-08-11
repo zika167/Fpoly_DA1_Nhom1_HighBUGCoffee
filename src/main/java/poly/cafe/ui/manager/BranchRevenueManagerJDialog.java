@@ -393,6 +393,9 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
             lblTotalRevenue.setText("0 VNĐ");
             return;
         }
+        // Normalize date range to cover full days: [00:00:00.000, 23:59:59.999]
+        beginDate = atStartOfDay(beginDate);
+        endDate = atEndOfDay(endDate);
         
         try {
             // Sử dụng DAO đã đổi tên
@@ -538,6 +541,27 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
         // Chọn khoảng thời gian định sẵn
         selectPredefinedTimeRange();
     }//GEN-LAST:event_cboTimeRangesActionPerformed
+
+    // Helpers to normalize date range to full day
+    private Date atStartOfDay(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    private Date atEndOfDay(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 23);
+        cal.set(Calendar.MINUTE, 59);
+        cal.set(Calendar.SECOND, 59);
+        cal.set(Calendar.MILLISECOND, 999);
+        return cal.getTime();
+    }
 
     /**
      * @param args the command line arguments
