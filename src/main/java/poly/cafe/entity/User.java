@@ -27,6 +27,7 @@ public class User {
     private String password;
     private boolean enabled;
     private String fullname;
+    private String phone; // Thêm trường số điện thoại
 
     @Builder.Default
     private String photo = "hinh2.jpg";

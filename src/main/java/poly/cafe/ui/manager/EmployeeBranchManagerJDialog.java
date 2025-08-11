@@ -4,18 +4,38 @@
  */
 package poly.cafe.ui.manager;
 
+import java.awt.Image;
+import java.io.File;
+import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.table.DefaultTableModel;
+import poly.cafe.dao.EmployeeDAO;
+import poly.cafe.dao.ShopDAO;
+import poly.cafe.dao.impl.EmployeeDAOImpl;
+import poly.cafe.dao.impl.ShopDAOImpl;
+import poly.cafe.entity.Employee;
+import poly.cafe.entity.Shop;
+import poly.cafe.util.XDialog;
+
 /**
  *
  * @author dthie
  */
 public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
 
+    private final EmployeeDAO employeeDAO;
+    private final ShopDAO shopDAO;
+    private DefaultTableModel tblEmployeeModel;
+
     /**
      * Creates new form HomePage
      */
     public EmployeeBranchManagerJDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        this.employeeDAO = new EmployeeDAOImpl();
+        this.shopDAO = new ShopDAOImpl();
         initComponents();
+        this.init();
     }
 
     /**
@@ -28,108 +48,109 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
-        jButton4 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         jLabel1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        lblFullname = new javax.swing.JLabel();
         lblPhoto = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        lblBranchManager = new javax.swing.JTable();
+        btnExit = new javax.swing.JButton();
+        jlabel1 = new javax.swing.JLabel();
+        txtSearch = new javax.swing.JTextField();
+        btnSearch = new javax.swing.JButton();
+        lblFullName = new javax.swing.JLabel();
+        txtRole = new javax.swing.JLabel();
+        lblStoreManagement = new javax.swing.JLabel();
+        lblStatus = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        lblPhone = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Quản lý nhân viên các chi nhánh");
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
-        jButton1.setText("Create New Shop Branch");
-
-        jButton2.setText("Create New Branch Manager");
-
-        jButton3.setBackground(new java.awt.Color(122, 92, 62));
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("Back");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        jLabel2.setText("HighBUG");
-
         jPanel5.setBackground(new java.awt.Color(245, 236, 213));
 
         jSeparator1.setBackground(new java.awt.Color(0, 0, 0));
         jSeparator1.setForeground(new java.awt.Color(0, 0, 0));
 
-        jButton4.setBackground(new java.awt.Color(122, 92, 62));
-        jButton4.setForeground(new java.awt.Color(255, 255, 255));
-        jButton4.setText("New Employee");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
-            }
-        });
-
-        jTextField1.setText("Search");
-
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel3.setText("Cửa hàng 1");
-
         jSeparator2.setForeground(new java.awt.Color(0, 0, 0));
         jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
         jLabel1.setText("Chức vụ:");
 
-        jLabel4.setText("Điện thoại:");
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        jLabel4.setText("Cửa hàng đang quản lí:");
 
-        jLabel5.setText("Tổng thời gian làm việc:");
-
-        jLabel7.setText("Chú thích:");
-
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
         jLabel6.setText("Trạng thái:");
-
-        jButton5.setBackground(new java.awt.Color(122, 92, 62));
-        jButton5.setForeground(new java.awt.Color(255, 255, 255));
-        jButton5.setText("Nhắn tin");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
-            }
-        });
-
-        jButton6.setBackground(new java.awt.Color(122, 92, 62));
-        jButton6.setForeground(new java.awt.Color(255, 255, 255));
-        jButton6.setText("Gọi điện");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
-            }
-        });
-
-        lblFullname.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
-        lblFullname.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblFullname.setText("(Tên người dùng)");
 
         lblPhoto.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lblPhoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblPhoto.setText("HÌNH");
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 3, 36)); // NOI18N
+        jLabel2.setText("HighBUG");
+
+        lblBranchManager.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Họ và tên", "Vai Trò", "Chi nhánh"
+            }
+        ));
+        lblBranchManager.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblBranchManagerMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(lblBranchManager);
+
+        btnExit.setBackground(new java.awt.Color(122, 92, 62));
+        btnExit.setForeground(new java.awt.Color(255, 255, 255));
+        btnExit.setText("Back");
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExitActionPerformed(evt);
+            }
+        });
+
+        jlabel1.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        jlabel1.setText("Họ tên:");
+
+        btnSearch.setText("Tìm kiếm");
+        btnSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSearchActionPerformed(evt);
+            }
+        });
+
+        lblFullName.setText("jLabel3");
+
+        txtRole.setText("jLabel5");
+
+        lblStoreManagement.setText("jLabel7");
+
+        lblStatus.setText("jLabel8");
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 3, 14)); // NOI18N
+        jLabel3.setText("Số điện thoại:");
+
+        lblPhone.setText("jLabel5");
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 3, 18)); // NOI18N
+        jLabel5.setText("Danh sách quản lí chi nhánh");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -137,137 +158,119 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator1)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(312, 312, 312)
+                .addComponent(jLabel2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnExit)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel5)
+                                .addComponent(txtSearch))
+                            .addGap(18, 18, 18)
+                            .addComponent(btnSearch))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblPhoto, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(132, 132, 132))
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addGap(187, 187, 187)
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12)
+                        .addGap(39, 39, 39)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblPhoto, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(lblFullname, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 303, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGap(12, 12, 12)
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtRole, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblStoreManagement, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel7)
-                                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addComponent(jButton6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)))))
-                        .addContainerGap(12, Short.MAX_VALUE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jTextField1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton4)
-                        .addGap(12, 12, 12))))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jLabel3)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(lblPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jlabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(lblFullName, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(jLabel6)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 13, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton4)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(9, 9, 9)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator2)
                     .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
+                        .addComponent(lblPhoto, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(5, 5, 5)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jlabel1)
                             .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(lblPhoto, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(12, 12, 12)
-                                .addComponent(lblFullname)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel7)))
+                                .addComponent(lblFullName, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(1, 1, 1)))
+                        .addGap(26, 26, 26)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(txtRole, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel4)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addComponent(lblStoreManagement, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(1, 1, 1)))
+                        .addGap(12, 12, 12)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton6)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
+                            .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGap(50, 50, 50)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(28, 28, 28)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnExit))
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addContainerGap())
         );
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null},
-                {null},
-                {null},
-                {null}
-            },
-            new String [] {
-                "Quản lý chi nhánh"
-            }
-        ));
-        jScrollPane1.setViewportView(jTable1);
-
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null},
-                {null},
-                {null},
-                {null}
-            },
-            new String [] {
-                "Quản lý nhân viên"
-            }
-        ));
-        jScrollPane2.setViewportView(jTable2);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(66, 66, 66)
-                        .addComponent(jButton3)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0))
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(jLabel2)
-                .addGap(24, 24, 24)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton2)
-                .addGap(24, 24, 24)
-                .addComponent(jButton3)
-                .addGap(30, 30, 30))
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -280,27 +283,237 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 482, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void init() {
+        this.setLocationRelativeTo(null);
+        
+        tblEmployeeModel = (DefaultTableModel) lblBranchManager.getModel();
+        
+        loadEmployeeTable();
+        clearEmployeeInfo();
+    }
+    
+    private void loadEmployeeTable() {
+        tblEmployeeModel.setRowCount(0);
+        try {
+            List<Employee> employees = employeeDAO.findAll();
+            for (Employee employee : employees) {
+                // Lấy thông tin chi nhánh nếu có
+                String shopName = "Chưa phân công";
+                String role = "Quản lý chi nhánh"; // Tất cả đều là branch manager
+                
+                if (employee.getUsername() != null) {
+                    // Lấy ShopId và ShopName từ database
+                    String shopId = employeeDAO.getShopIdByUsername(employee.getUsername());
+                    if (shopId != null) {
+                        Shop shop = shopDAO.findById(shopId);
+                        if (shop != null) {
+                            shopName = shop.getShopName();
+                        }
+                    }
+                }
+                
+                tblEmployeeModel.addRow(new Object[]{
+                    employee.getFullname(),
+                    role,
+                    shopName
+                });
+            }
+        } catch (Exception e) {
+            XDialog.alert("Lỗi tải danh sách quản lý chi nhánh!");
+            e.printStackTrace();
+        }
+    }
+    
+    private void clearEmployeeInfo() {
+        lblFullName.setText("Chưa chọn quản lý");
+        txtRole.setText("...");
+        lblStoreManagement.setText("...");
+        lblStatus.setText("...");
+        lblPhone.setText("...");
+        lblPhoto.setText("HÌNH");
+        lblPhoto.setIcon(null);
+    }
+    
+    private void displayEmployeeInfo(Employee employee) {
+        if (employee != null) {
+            lblFullName.setText(employee.getFullname());
+            
+            // Hiển thị vai trò (tất cả đều là quản lý chi nhánh)
+            txtRole.setText("Quản lý chi nhánh");
+            
+            // Hiển thị trạng thái
+            lblStatus.setText(employee.isActive() ? "Hoạt động" : "Không hoạt động");
+            
+            // Lấy thông tin chi nhánh
+            String shopName = "Chưa phân công";
+            if (employee.getUsername() != null) {
+                String shopId = employeeDAO.getShopIdByUsername(employee.getUsername());
+                if (shopId != null) {
+                    Shop shop = shopDAO.findById(shopId);
+                    if (shop != null) {
+                        shopName = shop.getShopName();
+                    }
+                }
+            }
+            lblStoreManagement.setText(shopName);
+            
+            // Hiển thị số điện thoại
+            String phone = employee.getPhone();
+            if (phone != null && !phone.trim().isEmpty()) {
+                lblPhone.setText(phone);
+            } else {
+                lblPhone.setText("Chưa có số điện thoại");
+            }
+            
+            // Hiển thị ảnh
+            loadEmployeePhoto(employee.getUsername());
+        }
+    }
+    
+    private void searchEmployees() {
+        String searchText = txtSearch.getText().trim();
+        if (searchText.isEmpty()) {
+            loadEmployeeTable();
+            return;
+        }
+        
+        tblEmployeeModel.setRowCount(0);
+        try {
+            List<Employee> employees = employeeDAO.findAll();
+            String searchLower = searchText.toLowerCase(); // Chuyển về chữ thường một lần
+            
+            for (Employee employee : employees) {
+                String fullname = employee.getFullname();
+                if (fullname != null && fullname.toLowerCase().contains(searchLower)) {
+                    // Lấy thông tin chi nhánh nếu có
+                    String shopName = "Chưa phân công";
+                    String role = "Quản lý chi nhánh"; // Tất cả đều là branch manager
+                    
+                    if (employee.getUsername() != null) {
+                        // Lấy ShopId và ShopName từ database
+                        String shopId = employeeDAO.getShopIdByUsername(employee.getUsername());
+                        if (shopId != null) {
+                            Shop shop = shopDAO.findById(shopId);
+                            if (shop != null) {
+                                shopName = shop.getShopName();
+                            }
+                        }
+                    }
+                    
+                    tblEmployeeModel.addRow(new Object[]{
+                        employee.getFullname(),
+                        role,
+                        shopName
+                    });
+                }
+            }
+            
+            // Hiển thị thông báo nếu không tìm thấy kết quả
+            if (tblEmployeeModel.getRowCount() == 0) {
+                XDialog.alert("Không tìm thấy quản lý chi nhánh nào có tên chứa: '" + searchText + "'");
+            }
+        } catch (Exception e) {
+            XDialog.alert("Lỗi tìm kiếm quản lý chi nhánh!");
+            e.printStackTrace();
+        }
+    }
+    
+    private void loadEmployeePhoto(String username) {
+        try {
+            // Lấy tên file ảnh từ database
+            String photoFileName = getPhotoFileNameByUsername(username);
+            
+            if (photoFileName != null && !photoFileName.trim().isEmpty()) {
+                // Đường dẫn đến thư mục ảnh
+                String imagePath = "src/main/java/poly/cafe/images/avatars/" + photoFileName;
+                File imageFile = new File(imagePath);
+                
+                if (imageFile.exists()) {
+                    // Tải và hiển thị ảnh
+                    ImageIcon originalIcon = new ImageIcon(imagePath);
+                    Image originalImage = originalIcon.getImage();
+                    
+                    // Resize ảnh để vừa với label (129x153 pixels)
+                    Image resizedImage = originalImage.getScaledInstance(129, 153, Image.SCALE_SMOOTH);
+                    ImageIcon resizedIcon = new ImageIcon(resizedImage);
+                    
+                    lblPhoto.setIcon(resizedIcon);
+                    lblPhoto.setText(""); // Xóa text "HÌNH"
+                } else {
+                    // Nếu không tìm thấy ảnh, hiển thị ảnh mặc định
+                    loadDefaultPhoto();
+                }
+            } else {
+                // Nếu không có tên file ảnh, hiển thị ảnh mặc định
+                loadDefaultPhoto();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            loadDefaultPhoto();
+        }
+    }
+    
+    private void loadDefaultPhoto() {
+        try {
+            String defaultImagePath = "src/main/java/poly/cafe/images/avatars/default_avatar.jpg";
+            File defaultImageFile = new File(defaultImagePath);
+            
+            if (defaultImageFile.exists()) {
+                ImageIcon originalIcon = new ImageIcon(defaultImagePath);
+                Image originalImage = originalIcon.getImage();
+                Image resizedImage = originalImage.getScaledInstance(129, 153, Image.SCALE_SMOOTH);
+                ImageIcon resizedIcon = new ImageIcon(resizedImage);
+                
+                lblPhoto.setIcon(resizedIcon);
+                lblPhoto.setText("");
+            } else {
+                lblPhoto.setIcon(null);
+                lblPhoto.setText("HÌNH");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblPhoto.setIcon(null);
+            lblPhoto.setText("HÌNH");
+        }
+    }
+    
+    private String getPhotoFileNameByUsername(String username) {
+        try {
+            String sql = "SELECT Photo FROM Users WHERE Username = ?";
+            return poly.cafe.util.XJdbc.getValue(sql, username);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+        // Đóng dialog hiện tại và mở HomepageBranchManagerJFrame
+        this.dispose();
+        HomepageBranchManagerJFrame homepage = new HomepageBranchManagerJFrame();
+        homepage.setVisible(true);
+    }//GEN-LAST:event_btnExitActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton5ActionPerformed
+    private void lblBranchManagerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblBranchManagerMouseClicked
+        int selectedRow = lblBranchManager.getSelectedRow();
+        if (selectedRow >= 0) {
+            String fullname = (String) lblBranchManager.getValueAt(selectedRow, 0);
+            Employee employee = employeeDAO.findByFullname(fullname);
+            if (employee != null) {
+                displayEmployeeInfo(employee);
+            }
+        }
+    }//GEN-LAST:event_lblBranchManagerMouseClicked
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        searchEmployees();
+    }//GEN-LAST:event_btnSearchActionPerformed
 
     /**
      * @param args the command line arguments
@@ -348,29 +561,27 @@ public class EmployeeBranchManagerJDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
+    private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnSearch;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JLabel lblFullname;
+    private javax.swing.JLabel jlabel1;
+    private javax.swing.JTable lblBranchManager;
+    private javax.swing.JLabel lblFullName;
+    private javax.swing.JLabel lblPhone;
     private javax.swing.JLabel lblPhoto;
+    private javax.swing.JLabel lblStatus;
+    private javax.swing.JLabel lblStoreManagement;
+    private javax.swing.JLabel txtRole;
+    private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 }
