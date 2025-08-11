@@ -36,19 +36,45 @@ public class LoginJDialog extends javax.swing.JDialog implements LoginController
         JFrame parentFrame = (owner instanceof JFrame) ? (JFrame) owner : null;
         this.showWelcomeJDialog(parentFrame);
 
-        // Thêm logo cho jLabel5
-        String urlLogo = "file:/C:/Users/Tan Phat Computer Q8/Fpoly_DA1_Nhom1_PolyCafe/src/main/java/poly/cafe/images/logo/logo.jpg";
-        String fallbackLogo = "/poly/cafe/images/logo/logo.jpg";
-
+        // Thiết lập logo cho lbLogo từ images/logo và scale đúng kích thước label
         try {
-            // Scale logo theo kích thước của jLabel5 (450x480)
-            lbLogo.setIcon(XIcon.getIcon(urlLogo, 450, 480));
-            lbLogo.setText(""); // Xóa text "Logo nhóm"
-        } catch (Exception e) {
-            // Nếu đường dẫn tuyệt đối không hoạt động, sử dụng fallback
-            lbLogo.setIcon(XIcon.getIcon(fallbackLogo, 450, 480));
-            lbLogo.setText(""); // Xóa text "Logo nhóm"
-        }
+            int w = lbLogo.getWidth() > 0 ? lbLogo.getWidth() : 440;
+            int h = lbLogo.getHeight() > 0 ? lbLogo.getHeight() : 480;
+
+            String[] candidates = new String[] {
+                "/poly/cafe/images/logo/logo4.png",
+                "/poly/cafe/images/logo/logo.png",
+                "/poly/cafe/images/logo/logo.jpg"
+            };
+            javax.swing.ImageIcon icon = null;
+            for (String p : candidates) {
+                try {
+                    icon = XIcon.getIcon(p, w, h);
+                    if (icon != null && icon.getImage() != null) {
+                        break;
+                    }
+                } catch (Exception ignore) {}
+            }
+            // Fallback theo đường dẫn file tương đối trong dự án
+            if (icon == null || icon.getImage() == null) {
+                String[] fileCandidates = new String[] {
+                    "src/main/java/poly/cafe/images/logo/logo4.png",
+                    "src/main/java/poly/cafe/images/logo/logo.png",
+                    "src/main/java/poly/cafe/images/logo/logo.jpg"
+                };
+                for (String fp : fileCandidates) {
+                    java.io.File f = new java.io.File(fp);
+                    if (f.exists()) {
+                        icon = XIcon.getIcon(f.getAbsolutePath(), w, h);
+                        break;
+                    }
+                }
+            }
+            if (icon != null && icon.getImage() != null) {
+                lbLogo.setIcon(icon);
+                lbLogo.setText("");
+            }
+        } catch (Exception ignore) {}
     }
 
     @Override

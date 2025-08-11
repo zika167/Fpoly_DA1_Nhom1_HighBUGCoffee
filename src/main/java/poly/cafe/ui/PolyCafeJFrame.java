@@ -49,14 +49,45 @@ public final class PolyCafeJFrame extends javax.swing.JFrame implements PolyCafe
 
         this.setLocationRelativeTo(null);
 
-        // Hiển thị logo coffee trong jLabel1 với fallback và scale đúng kích thước
+        // Hiển thị logo coffee trong lbLogoName với nhiều đường dẫn fallback và scale đúng kích thước
         try {
-            // Scale icon theo kích thước phù hợp với text (khoảng 24x24 pixels)
-            java.net.URL logoUrl = getClass().getResource(fallbackCoffeeLogo);
-            if (logoUrl != null) {
-                javax.swing.ImageIcon logoIcon = new javax.swing.ImageIcon(logoUrl);
+            javax.swing.ImageIcon logoIcon = null;
+            // Thứ tự ưu tiên các path
+            String[] candidatePaths = new String[] {
+                "/poly/cafe/images/icons/coffee.png",         // resource icons (ưu tiên)
+                "/poly/cafe/images/logo/coffee.png",          // resource logo/coffee.png
+                "/poly/cafe/images/logo/logo.png",            // resource logo.png
+                "/poly/cafe/images/logo/logo.jpg"             // resource logo.jpg (hiện có)
+            };
+
+            for (String p : candidatePaths) {
+                java.net.URL url = getClass().getResource(p);
+                if (url != null) {
+                    logoIcon = new javax.swing.ImageIcon(url);
+                    break;
+                }
+            }
+
+            // Fallback cuối: thử theo đường dẫn file tương đối trong project
+            if (logoIcon == null) {
+                java.io.File f1 = new java.io.File("src/main/java/poly/cafe/images/icons/coffee.png");
+                java.io.File f2 = new java.io.File("src/main/java/poly/cafe/images/logo/coffee.png");
+                java.io.File f3 = new java.io.File("src/main/java/poly/cafe/images/logo/logo.png");
+                java.io.File f4 = new java.io.File("src/main/java/poly/cafe/images/logo/logo.jpg");
+                java.io.File[] files = new java.io.File[] { f1, f2, f3, f4 };
+                for (java.io.File f : files) {
+                    if (f.exists()) {
+                        logoIcon = new javax.swing.ImageIcon(f.getAbsolutePath());
+                        break;
+                    }
+                }
+            }
+
+            if (logoIcon != null && logoIcon.getImage() != null) {
                 java.awt.Image scaledLogo = logoIcon.getImage().getScaledInstance(24, 24, java.awt.Image.SCALE_SMOOTH);
                 lbLogoName.setIcon(new javax.swing.ImageIcon(scaledLogo));
+            } else {
+                System.err.println("Không tìm thấy file/logo coffee, hiển thị text mặc định.");
             }
         } catch (Exception e) {
             System.err.println("Không thể load logo: " + e.getMessage());
