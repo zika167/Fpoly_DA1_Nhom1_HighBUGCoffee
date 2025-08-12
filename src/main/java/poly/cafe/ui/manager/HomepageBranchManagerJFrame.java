@@ -4,8 +4,35 @@
  */
 package poly.cafe.ui.manager;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.swing.ImageIcon;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+
+import poly.cafe.dao.RevenueDAO;
+import poly.cafe.dao.TotalRevenueDAO;
+import poly.cafe.dao.impl.RevenueDAOImpl;
+import poly.cafe.dao.impl.TotalRevenueDAOImpl;
+import poly.cafe.entity.Revenue;
+import poly.cafe.entity.RevenueReportItem;
+import poly.cafe.util.XAuth;
+import poly.cafe.util.XJdbc;
+// no direct JDBC here; reuse DAOs only
 
 /**
  *
@@ -13,12 +40,20 @@ import javax.swing.SwingUtilities;
  */
 public class HomepageBranchManagerJFrame extends javax.swing.JFrame {
 
+    private JPanel chartsGridPanel;
+    private JPanel pnlChart1;
+    private JPanel pnlChart2;
+    private final RevenueDAO revenueDAO = new RevenueDAOImpl();
+    private final TotalRevenueDAO totalRevenueDAO = new TotalRevenueDAOImpl();
+    private static final int SIDEBAR_WIDTH = 220;
+
     /**
      * Creates new form HomepageBranchManagerJFrame
      */
     public HomepageBranchManagerJFrame() {
         initComponents();
         initFrame();
+        buildChartsLayout();
         addChartsToPanel();
     }
 
@@ -47,47 +82,184 @@ public class HomepageBranchManagerJFrame extends javax.swing.JFrame {
             }
         } catch (Exception ignore) {
         }
+
+        // Khóa độ rộng sidebar (label + các nút) để không bị kéo giãn
+        lockSidebarWidth();
     }
 
-    // Demo thêm chart (pie + bar) lên jPanel5 sử dụng JFreeChart
+    private void buildChartsLayout() {
+        try {
+            // Sử dụng hai panel có sẵn trong jPanel5 do GUI builder tạo: jPanel3 và jPanel4
+            Color bg = jPanel5.getBackground();
+
+            // Dùng jPanel3 làm vùng chứa biểu đồ 1, jPanel4 cho biểu đồ 2
+            pnlChart1 = jPanel3;
+            pnlChart2 = jPanel4;
+
+            jPanel3.setOpaque(true);
+            jPanel3.setBackground(bg);
+            jPanel3.removeAll();
+            jPanel3.setLayout(new BorderLayout());
+
+            jPanel4.setOpaque(true);
+            jPanel4.setBackground(bg);
+            jPanel4.removeAll();
+            jPanel4.setLayout(new BorderLayout());
+
+            jPanel3.revalidate();
+            jPanel4.revalidate();
+            jPanel3.repaint();
+            jPanel4.repaint();
+        } catch (Throwable t) {
+            System.err.println("Không thể dựng layout biểu đồ: " + t.getMessage());
+        }
+    }
+
+    // Vẽ 2 biểu đồ (cột + đường) vào hai panel con
     private void addChartsToPanel() {
         try {
-            // Pie chart dataset
-            org.jfree.data.general.DefaultPieDataset<String> pieDataset = new org.jfree.data.general.DefaultPieDataset<>();
-            pieDataset.setValue("CN1", 45);
-            pieDataset.setValue("CN2", 25);
-            pieDataset.setValue("CN3", 30);
+            if (chartsGridPanel == null) {
+                buildChartsLayout();
+            }
 
-            org.jfree.chart.JFreeChart pieChart = org.jfree.chart.ChartFactory.createPieChart(
-                    "Tỉ trọng doanh thu", pieDataset, true, true, false);
-            org.jfree.chart.ChartPanel piePanel = new org.jfree.chart.ChartPanel(pieChart);
-            piePanel.setPreferredSize(new java.awt.Dimension(260, 180));
+            // 1) Bar chart: Top đồ uống theo doanh thu (DỮ LIỆU MẪU) -> pnlChart1
+            DefaultCategoryDataset topDrinkDataset = new DefaultCategoryDataset();
+            topDrinkDataset.addValue(200, "Doanh thu", "Cà phê đen");
+            topDrinkDataset.addValue(150, "Doanh thu", "Cà phê sữa");
+            topDrinkDataset.addValue(18, "Doanh thu", "Trà sữa");
+            topDrinkDataset.addValue(100, "Doanh thu", "Nước cam");
+            topDrinkDataset.addValue(80, "Doanh thu", "Soda chanh");
+            JFreeChart topDrinkChart = ChartFactory.createBarChart(
+                    "Top đồ uống theo doanh thu", "Đồ uống", "VNĐ", topDrinkDataset,
+                    PlotOrientation.VERTICAL, false, true, false);
+            setChartInPanel(pnlChart1, topDrinkChart);
 
-            // Bar chart dataset
-            org.jfree.data.category.DefaultCategoryDataset barDataset = new org.jfree.data.category.DefaultCategoryDataset();
-            barDataset.addValue(120, "Doanh thu", "CN1");
-            barDataset.addValue(80, "Doanh thu", "CN2");
-            barDataset.addValue(95, "Doanh thu", "CN3");
+            // 2) Line chart: Doanh thu theo tháng (DỮ LIỆU MẪU) -> pnlChart2
+            DefaultCategoryDataset monthlyDataset = new DefaultCategoryDataset();
+            int[] months = { 1, 2, 3, 4, 5, 6 };
+            double[] vals = { 200, 150, 18, 100, 80, 250 };
+            for (int i = 0; i < months.length; i++) {
+                monthlyDataset.addValue(vals[i], "Doanh thu", "Thg " + months[i]);
+            }
+            for (int m = 7; m <= 12; m++) {
+                monthlyDataset.addValue(0, "Doanh thu", "Thg " + m);
+            }
+            JFreeChart monthlyChart = ChartFactory.createLineChart(
+                    "Doanh thu theo tháng", "Tháng", "VNĐ", monthlyDataset,
+                    PlotOrientation.VERTICAL, false, true, false);
+            setChartInPanel(pnlChart2, monthlyChart);
 
-            org.jfree.chart.JFreeChart barChart = org.jfree.chart.ChartFactory.createBarChart(
-                    "Doanh thu theo chi nhánh", "Chi nhánh", "Triệu VNĐ", barDataset);
-            org.jfree.chart.ChartPanel barPanel = new org.jfree.chart.ChartPanel(barChart);
-            barPanel.setPreferredSize(new java.awt.Dimension(260, 180));
-
-            // Thêm vào jPanel5 (sử dụng GroupLayout hiện có: chèn đơn giản bằng
-            // BorderLayout phụ)
-            java.awt.Panel container = new java.awt.Panel(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 10));
-            container.add(piePanel);
-            container.add(barPanel);
-
-            // Gắn container vào cuối jPanel5
-            jPanel5.add(container, java.awt.BorderLayout.SOUTH);
-            jPanel5.revalidate();
-            jPanel5.repaint();
+            jPanel3.revalidate();
+            jPanel4.revalidate();
+            jPanel3.repaint();
+            jPanel4.repaint();
         } catch (Throwable t) {
-            // Không chặn UI nếu thiếu lib; chỉ log nhẹ
             System.err.println("Không thể tạo chart: " + t.getMessage());
         }
+    }
+
+    private ChartPanel wrapChart(JFreeChart chart) {
+        ChartPanel panel = new ChartPanel(chart);
+        // Thu nhỏ preferred/min size để không đẩy panel còn lại ra khỏi màn hình
+        panel.setPreferredSize(new java.awt.Dimension(100, 100));
+        panel.setMinimumSize(new java.awt.Dimension(0, 0));
+        panel.setMouseWheelEnabled(true);
+        // Cho phép chart vẽ ở kích thước rất lớn/nhỏ để không bị giới hạn
+        panel.setMinimumDrawWidth(0);
+        panel.setMinimumDrawHeight(0);
+        panel.setMaximumDrawWidth(Integer.MAX_VALUE);
+        panel.setMaximumDrawHeight(Integer.MAX_VALUE);
+        return panel;
+    }
+
+    private void setChartInPanel(JPanel host, JFreeChart chart) {
+        if (host == null)
+            return;
+        host.removeAll();
+        host.add(wrapChart(chart), BorderLayout.CENTER);
+        host.revalidate();
+        host.repaint();
+    }
+
+    private void lockSidebarWidth() {
+        java.awt.Dimension fixed = new java.awt.Dimension(SIDEBAR_WIDTH, 40);
+        java.awt.Dimension fixedLabel = new java.awt.Dimension(SIDEBAR_WIDTH, 40);
+
+        lbLogoName.setMinimumSize(fixedLabel);
+        lbLogoName.setPreferredSize(fixedLabel);
+        lbLogoName.setMaximumSize(new java.awt.Dimension(SIDEBAR_WIDTH, Integer.MAX_VALUE));
+
+        javax.swing.AbstractButton[] buttons = new javax.swing.AbstractButton[] {
+                btnBranchManager, btnEmployeeBranchManager, btnCreateNewBranch, btnCreateNewBranchManager, btnExit };
+        for (javax.swing.AbstractButton b : buttons) {
+            b.setMinimumSize(fixed);
+            b.setPreferredSize(fixed);
+            b.setMaximumSize(new java.awt.Dimension(SIDEBAR_WIDTH, Integer.MAX_VALUE));
+        }
+    }
+
+    private String getCurrentShopId() {
+        try {
+            if (XAuth.user != null && XAuth.user.getShopId() != null) {
+                return XAuth.user.getShopId();
+            }
+        } catch (Throwable ignore) {
+        }
+        // Fallback nếu chưa đăng nhập: dùng S01
+        return "S01";
+    }
+
+    private Date[] getDefaultDateRange() {
+        Calendar cal = Calendar.getInstance();
+        Date end = cal.getTime();
+        cal.add(Calendar.DAY_OF_YEAR, -30);
+        Date begin = cal.getTime();
+        return new Date[] { begin, end };
+    }
+
+    private int getCurrentYear() {
+        return Calendar.getInstance().get(Calendar.YEAR);
+    }
+
+    private Map<Integer, Double> fetchMonthlyRevenue(String shopId, int year) {
+        Map<Integer, Double> result = new HashMap<>();
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT MONTH(b.Checkout) AS monthNum, ");
+        sql.append("       SUM(bd.Quantity * d.UnitPrice * (1 - d.Discount/100.0)) AS revenue ");
+        sql.append("FROM BillDetails bd ");
+        sql.append("JOIN Drinks d ON bd.DrinkId = d.Id ");
+        sql.append("JOIN Bills b ON bd.BillId = b.Id ");
+        sql.append("JOIN Users u ON b.Username = u.Username ");
+        sql.append("WHERE b.Status = 1 AND b.Checkout IS NOT NULL AND YEAR(b.Checkout) = ? ");
+        if (shopId != null && !shopId.isBlank()) {
+            sql.append("AND u.ShopId = ? ");
+        }
+        sql.append("GROUP BY MONTH(b.Checkout) ");
+        sql.append("ORDER BY monthNum");
+        java.sql.ResultSet rs = null;
+        try {
+            if (shopId != null && !shopId.isBlank()) {
+                rs = XJdbc.executeQuery(sql.toString(), year, shopId);
+            } else {
+                rs = XJdbc.executeQuery(sql.toString(), year);
+            }
+            while (rs.next()) {
+                int month = rs.getInt("monthNum");
+                double revenue = rs.getDouble("revenue");
+                if (!Double.isFinite(revenue))
+                    revenue = 0.0;
+                result.put(month, revenue);
+            }
+        } catch (Exception ex) {
+            System.err.println("Lỗi truy vấn doanh thu theo tháng: " + ex.getMessage());
+        } finally {
+            try {
+                if (rs != null)
+                    rs.close();
+            } catch (Exception ignore) {
+            }
+        }
+        return result;
     }
 
     /**
@@ -98,19 +270,27 @@ public class HomepageBranchManagerJFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        btnExit = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        lbLogoName = new javax.swing.JLabel();
         btnBranchManager = new javax.swing.JButton();
         btnEmployeeBranchManager = new javax.swing.JButton();
         btnCreateNewBranch = new javax.swing.JButton();
         btnCreateNewBranchManager = new javax.swing.JButton();
-        lbLogoName = new javax.swing.JLabel();
+        btnExit = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -126,34 +306,50 @@ public class HomepageBranchManagerJFrame extends javax.swing.JFrame {
         jSeparator1.setBackground(new java.awt.Color(204, 204, 204));
         jSeparator1.setForeground(new java.awt.Color(204, 204, 204));
 
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jSeparator1)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                                .addContainerGap(184, Short.MAX_VALUE)
-                                .addComponent(jLabel1)
-                                .addGap(209, 209, 209)));
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jSeparator1)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 440, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addContainerGap(410, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(415, 415, 415))
+        );
         jPanel5Layout.setVerticalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGap(20, 20, 20)
-                                .addComponent(jLabel1)
-                                .addGap(20, 20, 20)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(20, Short.MAX_VALUE))
+        );
 
-        btnExit.setBackground(new java.awt.Color(113, 92, 62));
-        btnExit.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
-        btnExit.setForeground(new java.awt.Color(255, 255, 255));
-        btnExit.setText("ĐĂNG XUẤT");
-        btnExit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnExitActionPerformed(evt);
-            }
-        });
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+
+        lbLogoName.setBackground(new java.awt.Color(255, 255, 255));
+        lbLogoName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lbLogoName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbLogoName.setText("HighBUG");
+        lbLogoName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 51, 0)));
+        lbLogoName.setOpaque(true);
 
         btnBranchManager.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnBranchManager.setText("QUẢN LÝ CHI NHÁNH");
@@ -187,73 +383,74 @@ public class HomepageBranchManagerJFrame extends javax.swing.JFrame {
             }
         });
 
-        lbLogoName.setBackground(new java.awt.Color(255, 255, 255));
-        lbLogoName.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        lbLogoName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbLogoName.setText("HighBUG");
-        lbLogoName.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 51, 0)));
-        lbLogoName.setOpaque(true);
+        btnExit.setBackground(new java.awt.Color(113, 92, 62));
+        btnExit.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnExit.setForeground(new java.awt.Color(255, 255, 255));
+        btnExit.setText("ĐĂNG XUẤT");
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExitActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbLogoName, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBranchManager, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEmployeeBranchManager, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCreateNewBranch, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCreateNewBranchManager, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(lbLogoName, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40)
+                .addComponent(btnBranchManager, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(btnEmployeeBranchManager, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(btnCreateNewBranch, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(btnCreateNewBranchManager, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 223, Short.MAX_VALUE)
+                .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20))
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGap(15, 15, 15)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lbLogoName, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnExit, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnCreateNewBranchManager, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnCreateNewBranch, javax.swing.GroupLayout.DEFAULT_SIZE, 183,
-                                                Short.MAX_VALUE)
-                                        .addComponent(btnEmployeeBranchManager, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btnBranchManager, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(15, 15, 15)
-                                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
         jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addGap(20, 20, 20)
-                                .addComponent(lbLogoName, javax.swing.GroupLayout.PREFERRED_SIZE, 40,
-                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(40, 40, 40)
-                                .addComponent(btnBranchManager, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
-                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnEmployeeBranchManager, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
-                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnCreateNewBranch, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
-                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnCreateNewBranchManager, javax.swing.GroupLayout.PREFERRED_SIZE, 35,
-                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 167,
-                                        Short.MAX_VALUE)
-                                .addComponent(btnExit, javax.swing.GroupLayout.PREFERRED_SIZE, 40,
-                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(30, 30, 30)));
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING,
-                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                Short.MAX_VALUE));
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING,
-                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                Short.MAX_VALUE));
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -349,6 +546,9 @@ public class HomepageBranchManagerJFrame extends javax.swing.JFrame {
     private javax.swing.JButton btnExit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lbLogoName;

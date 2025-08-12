@@ -88,7 +88,7 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
                 if (owner instanceof java.awt.Frame) {
                     parentFrame = (java.awt.Frame) owner;
                 }
-                ThankJJDialog thank = new ThankJJDialog(parentFrame, true);
+                ThanksJDialog thank = new ThanksJDialog(parentFrame, true);
                 thank.setLocationRelativeTo(parentFrame);
                 // Hiển thị và chờ đến khi dialog đóng lại (modal)
                 thank.setVisible(true);
