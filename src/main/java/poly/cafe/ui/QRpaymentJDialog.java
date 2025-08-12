@@ -25,6 +25,9 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import java.text.SimpleDateFormat;
+import com.google.zxing.EncodeHintType;
+import java.util.HashMap;
+import java.util.Map;
 /**
  *
  * @author Admin
@@ -85,7 +88,7 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
                 if (owner instanceof java.awt.Frame) {
                     parentFrame = (java.awt.Frame) owner;
                 }
-                ThankJJDialog thank = new ThankJJDialog(parentFrame, true);
+                ThanksJDialog thank = new ThanksJDialog(parentFrame, true);
                 thank.setLocationRelativeTo(parentFrame);
                 // Hiển thị và chờ đến khi dialog đóng lại (modal)
                 thank.setVisible(true);
@@ -171,6 +174,7 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
                      .append(", Giá: ").append(String.format("%,.0f VNĐ", d.getUnitPrice()))
                      .append(", Giảm: ").append(String.format("%.0f%%", d.getDiscount()))
                      .append("\n");
+            System.out.println("QR Content: " + qrContent.toString());
         }
     }
     
@@ -185,12 +189,19 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
     }
     }
 
-    private BufferedImage generateQRCode(String content, int width, int height) throws WriterException {
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
-        return MatrixToImageWriter.toBufferedImage(bitMatrix);
-    }
+   private BufferedImage generateQRCode(String content, int width, int height) throws WriterException {
+    QRCodeWriter qrCodeWriter = new QRCodeWriter();
+    
+    // Thêm hints để chỉ định encoding UTF-8
+    Map<EncodeHintType, Object> hints = new HashMap<>();
+    hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+    hints.put(EncodeHintType.MARGIN, 1); // Optional: Giảm margin để QR rõ hơn nếu cần
+    
+    BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height, hints);
+    return MatrixToImageWriter.toBufferedImage(bitMatrix);
+}
 
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
