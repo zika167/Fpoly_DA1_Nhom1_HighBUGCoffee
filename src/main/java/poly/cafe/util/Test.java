@@ -6,6 +6,19 @@ package poly.cafe.util;
 
 import java.sql.ResultSet;
 import java.util.List;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.statistics.HistogramDataset;
+
 import poly.cafe.entity.Category;
 
 /**
@@ -13,30 +26,129 @@ import poly.cafe.entity.Category;
  * @author wangquockhanh
  */
 public class Test {
+    public void showPieChart() {
+
+        // create dataset
+        DefaultPieDataset barDataset = new DefaultPieDataset();
+        barDataset.setValue("IPhone 5s", new Double(20));
+        barDataset.setValue("SamSung Grand", new Double(20));
+        barDataset.setValue("MotoG", new Double(40));
+        barDataset.setValue("Nokia Lumia", new Double(10));
+
+        // create chart
+        JFreeChart piechart = ChartFactory.createPieChart("mobile sales", barDataset, false, true, false);// explain
+
+        PiePlot piePlot = (PiePlot) piechart.getPlot();
+
+        // changing pie chart blocks colors
+        piePlot.setSectionPaint("IPhone 5s", new Color(255, 255, 102));
+        piePlot.setSectionPaint("SamSung Grand", new Color(102, 255, 102));
+        piePlot.setSectionPaint("MotoG", new Color(255, 102, 153));
+        piePlot.setSectionPaint("Nokia Lumia", new Color(0, 204, 204));
+
+        piePlot.setBackgroundPaint(Color.white);
+
+        // create chartPanel to display chart(graph)
+        ChartPanel barChartPanel = new ChartPanel(piechart);
+        panelBarChart.removeAll();
+        panelBarChart.add(barChartPanel, BorderLayout.CENTER);
+        panelBarChart.validate();
+    }
+
+    /*
+     * =============================================================================
+     */
+
+    public void showLineChart() {
+        // create dataset for the graph
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.setValue(200, "Amount", "january");
+        dataset.setValue(150, "Amount", "february");
+        dataset.setValue(18, "Amount", "march");
+        dataset.setValue(100, "Amount", "april");
+        dataset.setValue(80, "Amount", "may");
+        dataset.setValue(250, "Amount", "june");
+
+        // create chart
+        JFreeChart linechart = ChartFactory.createLineChart("contribution", "monthly", "amount",
+                dataset, PlotOrientation.VERTICAL, false, true, false);
+
+        // create plot object
+        CategoryPlot lineCategoryPlot = linechart.getCategoryPlot();
+        // lineCategoryPlot.setRangeGridlinePaint(Color.BLUE);
+        lineCategoryPlot.setBackgroundPaint(Color.white);
+
+        // create render object to change the moficy the line properties like color
+        LineAndShapeRenderer lineRenderer = (LineAndShapeRenderer) lineCategoryPlot.getRenderer();
+        Color lineChartColor = new Color(204, 0, 51);
+        lineRenderer.setSeriesPaint(0, lineChartColor);
+
+        // create chartPanel to display chart(graph)
+        ChartPanel lineChartPanel = new ChartPanel(linechart);
+        panelLineChart.removeAll();
+        panelLineChart.add(lineChartPanel, BorderLayout.CENTER);
+        panelLineChart.validate();
+    }
+
+    /*
+     * =============================================================================
+     * ===========
+     */
+
+    public void showHistogram() {
+
+        double[] values = { 95, 49, 14, 59, 50, 66, 47, 40, 1, 67,
+                12, 58, 28, 63, 14, 9, 31, 17, 94, 71,
+                49, 64, 73, 97, 15, 63, 10, 12, 31, 62,
+                93, 49, 74, 90, 59, 14, 15, 88, 26, 57,
+                77, 44, 58, 91, 10, 67, 57, 19, 88, 84
+        };
+
+        HistogramDataset dataset = new HistogramDataset();
+        dataset.addSeries("key", values, 20);
+
+        JFreeChart chart = ChartFactory.createHistogram("JFreeChart Histogram", "Data", "Frequency", dataset,
+                PlotOrientation.VERTICAL, false, true, false);
+        XYPlot plot = chart.getXYPlot();
+        plot.setBackgroundPaint(Color.WHITE);
+
+        ChartPanel barpChartPanel2 = new ChartPanel(chart);
+        panelBarChart.removeAll();
+        panelBarChart.add(barpChartPanel2, BorderLayout.CENTER);
+        panelBarChart.validate();
+    }
+
+    /*
+     * =============================================================================
+     * ===========
+     */
+
+    public void showBarChart() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.setValue(200, "Amount", "january");
+        dataset.setValue(150, "Amount", "february");
+        dataset.setValue(18, "Amount", "march");
+        dataset.setValue(100, "Amount", "april");
+        dataset.setValue(80, "Amount", "may");
+        dataset.setValue(250, "Amount", "june");
+
+        JFreeChart chart = ChartFactory.createBarChart("contribution", "monthly", "amount",
+                dataset, PlotOrientation.VERTICAL, false, true, false);
+
+        CategoryPlot categoryPlot = chart.getCategoryPlot();
+        // categoryPlot.setRangeGridlinePaint(Color.BLUE);
+        categoryPlot.setBackgroundPaint(Color.WHITE);
+        BarRenderer renderer = (BarRenderer) categoryPlot.getRenderer();
+        Color clr3 = new Color(204, 0, 51);
+        renderer.setSeriesPaint(0, clr3);
+
+        ChartPanel barpChartPanel = new ChartPanel(chart);
+        panelBarChart.removeAll();
+        panelBarChart.add(barpChartPanel, BorderLayout.CENTER);
+        panelBarChart.validate();
+
+    }
+
     public static void main(String[] args) {
-        // Thêm mới
-        String sqlInsert = "INSERT INTO Categories (Id, Name) VALUES(?, ?)";
-        XJdbc.executeUpdate(sqlInsert, "C01", "Loại 1");
-        XJdbc.executeUpdate(sqlInsert, "C02", "Loại 2");
-
-        // Truy vấn nhiều bản ghi
-        String sqlQuery = "SELECT * FROM Categories WHERE Name LIKE ?";
-        ResultSet rs = XJdbc.executeQuery(sqlQuery, "%Loại%");
-
-        // Truy vấn nhiều bản ghi và chuyển sang List<Category>
-        List<Category> list = XQuery.getBeanList(Category.class, sqlQuery, "%Loại%");
-        for (Category c : list) {
-            System.out.println(c.getId() + " - " + c.getName());
-        }
-
-        // Truy vấn 1 bản ghi
-        String sqlSingle = "SELECT * FROM Categories WHERE Id=?";
-        Category cat = XQuery.getSingleBean(Category.class, sqlSingle, "C02");
-        System.out.println("Single: " + cat.getId() + " - " + cat.getName());
-
-        // Truy vấn 1 giá trị
-        String sqlValue = "SELECT max(Id) FROM Categories WHERE Name LIKE ?";
-        String maxId = String.valueOf(XJdbc.getValue(sqlValue, "%Loại%"));
-        System.out.println("Max ID: " + maxId);
     }
 }

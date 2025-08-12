@@ -155,7 +155,11 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
                 })
                 .collect(Collectors.toList());
 
-        sortedItems.forEach(item -> {
+        // Đồng bộ lại danh sách items với thứ tự đã hiển thị để
+        // các thao tác chọn dòng (edit, điều hướng) lấy đúng phần tử
+        items = sortedItems;
+
+        items.forEach(item -> {
             Object[] rowData = {
                     item.getUsername(),
                     item.getPassword(),
@@ -171,7 +175,11 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
 
     @Override
     public void edit() {
-        User entity = items.get(tblUsers.getSelectedRow());
+        int selectedRow = tblUsers.getSelectedRow();
+        if (selectedRow < 0 || selectedRow >= items.size()) {
+            return;
+        }
+        User entity = items.get(selectedRow);
         this.setForm(entity);
         this.setEditable(true);
         tabs.setSelectedIndex(1);
@@ -323,6 +331,8 @@ public class UserManagerJDialog extends javax.swing.JDialog implements UserContr
         }
 
         // Vai trò: chỉ hiển thị lựa chọn Nhân viên trong view này
+        // Không auto-chọn Staff khi user là quản lý
+        buttonGroup1.clearSelection();
         User.Role role = entity.getRole();
         rdoStaff.setSelected(role == User.Role.staff);
         // Trạng thái

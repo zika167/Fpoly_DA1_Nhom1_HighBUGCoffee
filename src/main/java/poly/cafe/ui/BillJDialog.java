@@ -19,7 +19,7 @@ import poly.cafe.ui.BillController;
 import poly.cafe.ui.DrinkJDialog;
 import poly.cafe.ui.QRpaymentJDialog;
 import poly.cafe.ui.SalesJDialog;
-import poly.cafe.ui.ThankJJDialog;
+import poly.cafe.ui.ThanksJDialog;
 import poly.cafe.util.XDate;
 import poly.cafe.util.XDialog;
 import poly.cafe.util.XQuery;
@@ -173,7 +173,7 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
             this.setVisible(false);
 
             // Mở ThankJJDialog
-            ThankJJDialog thankDialog = new ThankJJDialog((Frame) this.getOwner(), true);
+            ThanksJDialog thankDialog = new ThanksJDialog((Frame) this.getOwner(), true);
             thankDialog.setVisible(true);
 
             // Tự động đóng Thank sau 5 giây
