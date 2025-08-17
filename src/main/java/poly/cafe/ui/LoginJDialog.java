@@ -36,45 +36,20 @@ public class LoginJDialog extends javax.swing.JDialog implements LoginController
         JFrame parentFrame = (owner instanceof JFrame) ? (JFrame) owner : null;
         this.showWelcomeJDialog(parentFrame);
 
-        // Thiết lập logo cho lbLogo từ images/logo và scale đúng kích thước label
+        // Thiết lập logo cho lbLogo sử dụng IconUtils với fallback strategy
         try {
             int w = lbLogo.getWidth() > 0 ? lbLogo.getWidth() : 440;
             int h = lbLogo.getHeight() > 0 ? lbLogo.getHeight() : 480;
 
-            String[] candidates = new String[] {
-                "/poly/cafe/images/logo/logo4.png",
-                "/poly/cafe/images/logo/logo.png",
-                "/poly/cafe/images/logo/logo.jpg"
-            };
-            javax.swing.ImageIcon icon = null;
-            for (String p : candidates) {
-                try {
-                    icon = XIcon.getIcon(p, w, h);
-                    if (icon != null && icon.getImage() != null) {
-                        break;
-                    }
-                } catch (Exception ignore) {}
-            }
-            // Fallback theo đường dẫn file tương đối trong dự án
-            if (icon == null || icon.getImage() == null) {
-                String[] fileCandidates = new String[] {
-                    "src/main/java/poly/cafe/images/logo/logo4.png",
-                    "src/main/java/poly/cafe/images/logo/logo.png",
-                    "src/main/java/poly/cafe/images/logo/logo.jpg"
-                };
-                for (String fp : fileCandidates) {
-                    java.io.File f = new java.io.File(fp);
-                    if (f.exists()) {
-                        icon = XIcon.getIcon(f.getAbsolutePath(), w, h);
-                        break;
-                    }
-                }
-            }
+            // Sử dụng IconUtils để load logo với nhiều fallback options
+            javax.swing.ImageIcon icon = poly.cafe.util.IconUtils.loadLogoIcon(w, h);
+
             if (icon != null && icon.getImage() != null) {
                 lbLogo.setIcon(icon);
                 lbLogo.setText("");
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
     }
 
     @Override

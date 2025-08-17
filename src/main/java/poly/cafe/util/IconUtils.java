@@ -82,9 +82,7 @@ public class IconUtils {
         // Thứ tự ưu tiên các đường dẫn
         String[] resourcePaths = {
                 "/poly/cafe/images/icons/coffee.png",
-                "/poly/cafe/images/logo/coffee.png",
-                "/poly/cafe/images/logo/logo.png",
-                "/poly/cafe/images/logo/logo.jpg"
+                "/poly/cafe/images/logo/coffee.png"
         };
 
         // 1. Thử load từ classpath resources (ưu tiên cao nhất)
@@ -105,9 +103,7 @@ public class IconUtils {
         if (icon == null) {
             String[] filePaths = {
                     "src/main/java/poly/cafe/images/icons/coffee.png",
-                    "src/main/java/poly/cafe/images/logo/coffee.png",
-                    "src/main/java/poly/cafe/images/logo/logo.png",
-                    "src/main/java/poly/cafe/images/logo/logo.jpg"
+                    "src/main/java/poly/cafe/images/logo/coffee.png"
             };
 
             for (String path : filePaths) {
@@ -146,5 +142,80 @@ public class IconUtils {
      */
     public static ImageIcon loadCoffeeIcon() {
         return loadCoffeeIcon(24, 24);
+    }
+
+    /**
+     * Load logo icon với nhiều fallback options
+     * 
+     * @param width  Chiều rộng mong muốn
+     * @param height Chiều cao mong muốn
+     * @return ImageIcon đã được scale, hoặc null nếu không tìm thấy
+     */
+    public static ImageIcon loadLogoIcon(int width, int height) {
+        ImageIcon icon = null;
+
+        // Thứ tự ưu tiên các đường dẫn logo
+        String[] resourcePaths = {
+                "/poly/cafe/images/logo/logo.png",
+                "/poly/cafe/images/logo/logo.jpg"
+        };
+
+        // 1. Thử load từ classpath resources (ưu tiên cao nhất)
+        for (String path : resourcePaths) {
+            try {
+                java.net.URL url = IconUtils.class.getResource(path);
+                if (url != null) {
+                    icon = new ImageIcon(url);
+                    System.out.println("Loaded logo icon from resource: " + path);
+                    break;
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to load logo from resource: " + path + " - " + e.getMessage());
+            }
+        }
+
+        // 2. Fallback: thử load từ file system
+        if (icon == null) {
+            String[] filePaths = {
+                    "src/main/java/poly/cafe/images/logo/logo.png",
+                    "src/main/java/poly/cafe/images/logo/logo.jpg"
+            };
+
+            for (String path : filePaths) {
+                try {
+                    File file = new File(path);
+                    if (file.exists()) {
+                        icon = new ImageIcon(file.getAbsolutePath());
+                        System.out.println("Loaded logo icon from file: " + path);
+                        break;
+                    }
+                } catch (Exception e) {
+                    System.err.println("Failed to load logo from file: " + path + " - " + e.getMessage());
+                }
+            }
+        }
+
+        // 3. Scale icon nếu tìm thấy
+        if (icon != null && icon.getImage() != null) {
+            try {
+                Image scaledImage = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                return new ImageIcon(scaledImage);
+            } catch (Exception e) {
+                System.err.println("Failed to scale logo icon: " + e.getMessage());
+                return icon; // Trả về icon gốc nếu scale thất bại
+            }
+        }
+
+        System.err.println("Could not load logo icon from any source");
+        return null;
+    }
+
+    /**
+     * Load logo icon với kích thước mặc định
+     * 
+     * @return ImageIcon, hoặc null nếu không tìm thấy
+     */
+    public static ImageIcon loadLogoIcon() {
+        return loadLogoIcon(440, 480); // Kích thước mặc định cho logo
     }
 }
