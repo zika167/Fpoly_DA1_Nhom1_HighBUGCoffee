@@ -120,11 +120,11 @@ public class HomepageBranchManagerJFrame extends javax.swing.JFrame {
 
             // 1) Bar chart: Top đồ uống theo doanh thu (DỮ LIỆU MẪU) -> pnlChart1
             DefaultCategoryDataset topDrinkDataset = new DefaultCategoryDataset();
-            topDrinkDataset.addValue(200, "Doanh thu", "Cà phê đen");
-            topDrinkDataset.addValue(150, "Doanh thu", "Cà phê sữa");
-            topDrinkDataset.addValue(18, "Doanh thu", "Trà sữa");
-            topDrinkDataset.addValue(100, "Doanh thu", "Nước cam");
-            topDrinkDataset.addValue(80, "Doanh thu", "Soda chanh");
+            topDrinkDataset.addValue(2, "Doanh thu", "Cà phê đen");
+            topDrinkDataset.addValue(1.5, "Doanh thu", "Cà phê sữa");
+            topDrinkDataset.addValue(1.8, "Doanh thu", "Trà sữa");
+            topDrinkDataset.addValue(1, "Doanh thu", "Nước cam");
+            topDrinkDataset.addValue(0.8, "Doanh thu", "Soda chanh");
             JFreeChart topDrinkChart = ChartFactory.createBarChart(
                     "Top đồ uống theo doanh thu", "Đồ uống", "VNĐ", topDrinkDataset,
                     PlotOrientation.VERTICAL, false, true, false);
@@ -132,13 +132,13 @@ public class HomepageBranchManagerJFrame extends javax.swing.JFrame {
 
             // 2) Line chart: Doanh thu theo tháng (DỮ LIỆU MẪU) -> pnlChart2
             DefaultCategoryDataset monthlyDataset = new DefaultCategoryDataset();
-            int[] months = { 1, 2, 3, 4, 5, 6 };
-            double[] vals = { 200, 150, 18, 100, 80, 250 };
+            int[] months = { 1, 2, 3, 4, 5, 6, 7 };
+            double[] vals = { 2, 1.5, 1.8, 1, 0.8, 2.5, 3 };
             for (int i = 0; i < months.length; i++) {
-                monthlyDataset.addValue(vals[i], "Doanh thu", "Thg " + months[i]);
+                monthlyDataset.addValue(vals[i], "Doanh thu", "" + months[i]);
             }
-            for (int m = 7; m <= 12; m++) {
-                monthlyDataset.addValue(0, "Doanh thu", "Thg " + m);
+            for (int m = 8; m <= 12; m++) {
+                monthlyDataset.addValue(0, "Doanh thu", m + "");
             }
             JFreeChart monthlyChart = ChartFactory.createLineChart(
                     "Doanh thu theo tháng", "Tháng", "VNĐ", monthlyDataset,

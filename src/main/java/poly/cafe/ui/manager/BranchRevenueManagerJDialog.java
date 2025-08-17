@@ -59,6 +59,7 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -140,7 +141,7 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
         });
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel6.setText("Tên chi nhánh:");
+        jLabel6.setText("Chi nhánh:");
 
         tblBranch.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][] {
@@ -209,49 +210,32 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
                                                         javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(18, 18, 18)
                                                 .addGroup(jPanel5Layout
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING,
+                                                                false)
+                                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(jLabel4,
+                                                                javax.swing.GroupLayout.Alignment.TRAILING,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 65,
+                                                                Short.MAX_VALUE))
+                                                .addGap(6, 6, 6)
+                                                .addGroup(jPanel5Layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addGroup(jPanel5Layout.createSequentialGroup()
-                                                                .addGroup(jPanel5Layout.createParallelGroup(
-                                                                        javax.swing.GroupLayout.Alignment.LEADING,
-                                                                        false)
-                                                                        .addComponent(jLabel6,
-                                                                                javax.swing.GroupLayout.Alignment.TRAILING,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                86, Short.MAX_VALUE)
-                                                                        .addComponent(jLabel4,
-                                                                                javax.swing.GroupLayout.Alignment.TRAILING,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                Short.MAX_VALUE)
-                                                                        .addComponent(jLabel7,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                Short.MAX_VALUE))
-                                                                .addGap(6, 6, 6)
-                                                                .addGroup(jPanel5Layout.createParallelGroup(
-                                                                        javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addComponent(lblBranchName,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                Short.MAX_VALUE)
-                                                                        .addComponent(lblManagerName,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                Short.MAX_VALUE)
-                                                                        .addComponent(lblTotalRevenue,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                Short.MAX_VALUE)))
-                                                        .addGroup(jPanel5Layout.createSequentialGroup()
-                                                                .addComponent(jLabel1,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE, 86,
-                                                                        javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                .addPreferredGap(
-                                                                        javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(lblAddress,
-                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                        Short.MAX_VALUE))))
+                                                        .addComponent(lblBranchName,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(lblManagerName,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(lblTotalRevenue,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(lblAddress, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                                         .addComponent(btnExit)
                                         .addGroup(jPanel5Layout
                                                 .createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -347,9 +331,11 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
                                                         .addComponent(lblManagerName))
                                                 .addGap(15, 15, 15)
                                                 .addGroup(jPanel5Layout
-                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(jLabel1)
-                                                        .addComponent(lblAddress))
+                                                        .addComponent(lblAddress,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE, 37,
+                                                                javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addGap(15, 15, 15)
                                                 .addGroup(jPanel5Layout
                                                         .createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -446,7 +432,7 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
 
     private void clearSummaryInfo() {
         lblBranchName.setText("Chưa chọn chi nhánh");
-        lblAddress.setText("...");
+        lblAddress.setText(createWrappedHtmlText("...", 170));
         lblManagerName.setText("...");
         lblTotalRevenue.setText("0 VNĐ");
         tblRevenueModel.setRowCount(0);
@@ -540,7 +526,7 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
         if (shop != null) {
             // Cho phép xuống dòng bằng HTML để auto-wrap
             lblBranchName.setText("<html>" + escapeHtml(shop.getShopName()) + "</html>");
-            lblAddress.setText("<html>" + escapeHtml(shop.getAddress()) + "</html>");
+            lblAddress.setText(createWrappedHtmlText(shop.getAddress(), 170));
 
             // Lấy thông tin người quản lý để hiển thị FullName
             String managerUsername = shop.getManagerUsername();
@@ -615,6 +601,12 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    // Tạo HTML text với line wrap
+    private static String createWrappedHtmlText(String text, int maxWidth) {
+        return "<html><div style='width: " + maxWidth + "px; word-wrap: break-word; white-space: normal;'>"
+                + escapeHtml(text) + "</div></html>";
     }
 
     // Gắn icon coffee cho tiêu đề
