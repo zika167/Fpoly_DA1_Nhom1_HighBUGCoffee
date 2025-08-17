@@ -387,7 +387,7 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
                     java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean[] {
-                    true, true, false
+                    false, false, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -398,9 +398,36 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
                 return canEdit[columnIndex];
             }
         });
+        // Sử dụng TouchpadCompatibility cho table
+        poly.cafe.util.TouchpadCompatibility.addTouchpadCompatibleClickListener(tblCards, () -> {
+            // Xử lý single click cho checkbox
+            java.awt.Point point = tblCards.getMousePosition();
+            if (point != null) {
+                int row = tblCards.rowAtPoint(point);
+                int col = tblCards.columnAtPoint(point);
+
+                // Nếu click vào cột checkbox (cột thứ 3, index = 2)
+                if (col == 2 && row >= 0) {
+                    // Toggle checkbox value
+                    Boolean currentValue = (Boolean) tblCards.getValueAt(row, col);
+                    tblCards.setValueAt(!currentValue, row, col);
+                }
+            }
+        });
+
+        // Thêm double-click listener riêng cho edit
         tblCards.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblCardsMouseClicked(evt);
+                if (evt.getClickCount() == 2) {
+                    // Double click để edit (chỉ khi không click vào checkbox)
+                    java.awt.Point point = evt.getPoint();
+                    int row = tblCards.rowAtPoint(point);
+                    int col = tblCards.columnAtPoint(point);
+
+                    if (col != 2) { // Không phải cột checkbox
+                        edit();
+                    }
+                }
             }
         });
         jScrollPane1.setViewportView(tblCards);
@@ -736,9 +763,8 @@ public class CardManagerJDialog extends javax.swing.JDialog implements CardContr
 
     private void tblCardsMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_tblCardsMouseClicked
         // TODO add your handling code here:
-        if (evt.getClickCount() == 2) {
-            this.edit();
-        }
+        // Method này không còn được sử dụng vì đã thay thế bằng TouchpadCompatibility
+        // Giữ lại để tránh lỗi compile
     }// GEN-LAST:event_tblCardsMouseClicked
 
     /**
