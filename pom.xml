@@ -74,6 +74,31 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            
+            <!-- Plugin để copy resources vào JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-images</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/poly/cafe/images</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/java/poly/cafe/images</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <name>Fpoly_DA1_Nhom1_HighBUGCoffee</name>

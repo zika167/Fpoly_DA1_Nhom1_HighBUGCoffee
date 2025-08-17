@@ -620,12 +620,9 @@ public class BranchRevenueManagerJDialog extends javax.swing.JDialog implements 
     // Gắn icon coffee cho tiêu đề
     private void initHeaderIcon(javax.swing.JLabel label) {
         try {
-            String path = "/poly/cafe/images/icons/coffee.png";
-            java.net.URL url = getClass().getResource(path);
-            if (url != null) {
-                ImageIcon icon = new ImageIcon(url);
-                Image scaled = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
-                label.setIcon(new ImageIcon(scaled));
+            ImageIcon icon = poly.cafe.util.IconUtils.loadCoffeeIcon(24, 24);
+            if (icon != null) {
+                label.setIcon(icon);
                 label.setHorizontalTextPosition(SwingConstants.RIGHT);
                 label.setVerticalTextPosition(SwingConstants.CENTER);
                 label.setIconTextGap(8);
