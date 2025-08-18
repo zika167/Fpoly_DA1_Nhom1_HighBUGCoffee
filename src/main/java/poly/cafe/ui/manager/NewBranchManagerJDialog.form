@@ -3,7 +3,7 @@
 <Form version="1.7" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
-    <Property name="title" type="java.lang.String" value="Th&#xea;m chi nh&#xe1;nh m&#x1edb;i"/>
+    <Property name="title" type="java.lang.String" value="T&#x1ea1;o m&#x1edb;i chi nh&#xe1;nh"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
