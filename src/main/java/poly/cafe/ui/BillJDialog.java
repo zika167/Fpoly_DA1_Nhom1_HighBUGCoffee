@@ -80,6 +80,11 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
             }
         }
         this.fillBillDetails(); // Tải lại dữ liệu
+        
+        // Refresh SalesJDialog để đảm bảo trạng thái được cập nhật (tùy chọn)
+        if (salesJDialog != null) {
+            salesJDialog.loadCards();
+        }
     }
 
     @Override
@@ -198,15 +203,9 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
                     // fillBillDetails();
                     // setForm(bill);
 
-                    // Optional: Refresh SalesJDialog nếu vẫn muốn
-                    if (getOwner() instanceof javax.swing.JFrame) {
-                        java.awt.Window[] windows = getOwner().getOwnedWindows();
-                        for (java.awt.Window window : windows) {
-                            if (window instanceof SalesJDialog) {
-                                ((SalesJDialog) window).loadCards();
-                                break;
-                            }
-                        }
+                    // Refresh SalesJDialog nếu có reference
+                    if (salesJDialog != null) {
+                        salesJDialog.loadCards();
                     }
                 }
             });
@@ -224,12 +223,20 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
             // Nếu phiếu mới tạo và chưa có chi tiết nào, xóa luôn khỏi database
             if (XDialog.confirm("Phiếu bán hàng chưa có đồ uống nào. Bạn có muốn xóa phiếu này?")) {
                 billDao.deleteById(bill.getId());
+                // Refresh SalesJDialog trước khi đóng
+                if (salesJDialog != null) {
+                    salesJDialog.loadCards();
+                }
                 this.dispose();
             }
         } else if (XDialog.confirm("Bạn muốn hủy phiếu bán hàng? (Các đồ uống đã chọn sẽ bị hủy)")) {
             bill.setStatus(Bill.Status.Canceled.ordinal());
             billDao.update(bill);
             this.setForm(bill);
+            // Refresh SalesJDialog sau khi hủy
+            if (salesJDialog != null) {
+                salesJDialog.loadCards();
+            }
         }
     }
 
@@ -277,6 +284,10 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         if (bill != null && bill.getId() != null && billDetails.isEmpty()) {
             // Tự động xóa phiếu mới tạo nếu chưa có chi tiết nào
             billDao.deleteById(bill.getId());
+        }
+        // Refresh SalesJDialog khi đóng dialog để đảm bảo trạng thái được cập nhật
+        if (salesJDialog != null) {
+            salesJDialog.loadCards();
         }
     }
 
@@ -676,11 +687,13 @@ public class BillJDialog extends javax.swing.JDialog implements BillController {
         // Đóng dialog hiện tại
         this.dispose();
 
-        // Mở lại SalesJDialog nếu có reference
+        // Mở lại SalesJDialog nếu có reference và refresh dữ liệu
         if (salesJDialog != null) {
             salesJDialog.setVisible(true);
             salesJDialog.toFront();
             salesJDialog.requestFocus();
+            // Refresh lại trạng thái các bàn để cập nhật ngay lập tức
+            salesJDialog.loadCards();
         }
     }// GEN-LAST:event_btnBackActionPerformed
 

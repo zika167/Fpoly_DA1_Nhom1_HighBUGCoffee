@@ -114,6 +114,10 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
 
     @Override
     public void close() {
+        // Refresh SalesJDialog trước khi đóng để đảm bảo trạng thái được cập nhật
+        if (salesJDialog != null) {
+            salesJDialog.loadCards();
+        }
         this.dispose();
     }
 
@@ -382,8 +386,13 @@ public class QRpaymentJDialog extends javax.swing.JDialog implements QRpaymentCo
     }//GEN-LAST:event_btnConfirmActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        // TODO add your handling code here:
-        this.close();
+        // Đóng QRpaymentJDialog
+        this.dispose();
+        
+        // Refresh SalesJDialog nếu có reference để đảm bảo trạng thái được cập nhật
+        if (salesJDialog != null) {
+            salesJDialog.loadCards();
+        }
     }//GEN-LAST:event_btnBackActionPerformed
 
     /**
